@@ -1,0 +1,157 @@
+// Test suite for raylib constants
+// Run with: hemlock tests/test_constants.hml
+
+let tests_passed = 0;
+let tests_failed = 0;
+
+fn assert_eq(name: string, actual: i32, expected: i32) {
+    if (actual == expected) {
+        print("[PASS] " + name);
+        tests_passed = tests_passed + 1;
+    } else {
+        print("[FAIL] " + name + " - expected " + expected + ", got " + actual);
+        tests_failed = tests_failed + 1;
+    }
+}
+
+// ============================================================================
+// Key Constants (from raylib.h)
+// ============================================================================
+
+print("=== Key Constant Tests ===");
+
+// Alphanumeric keys
+let KEY_A = 65;
+let KEY_Z = 90;
+let KEY_ZERO = 48;
+let KEY_NINE = 57;
+
+assert_eq("KEY_A", KEY_A, 65);
+assert_eq("KEY_Z", KEY_Z, 90);
+assert_eq("KEY_ZERO", KEY_ZERO, 48);
+assert_eq("KEY_NINE", KEY_NINE, 57);
+
+// Special keys
+let KEY_SPACE = 32;
+let KEY_ESCAPE = 256;
+let KEY_ENTER = 257;
+let KEY_TAB = 258;
+let KEY_BACKSPACE = 259;
+
+assert_eq("KEY_SPACE", KEY_SPACE, 32);
+assert_eq("KEY_ESCAPE", KEY_ESCAPE, 256);
+assert_eq("KEY_ENTER", KEY_ENTER, 257);
+assert_eq("KEY_TAB", KEY_TAB, 258);
+assert_eq("KEY_BACKSPACE", KEY_BACKSPACE, 259);
+
+// Arrow keys
+let KEY_RIGHT = 262;
+let KEY_LEFT = 263;
+let KEY_DOWN = 264;
+let KEY_UP = 265;
+
+assert_eq("KEY_RIGHT", KEY_RIGHT, 262);
+assert_eq("KEY_LEFT", KEY_LEFT, 263);
+assert_eq("KEY_DOWN", KEY_DOWN, 264);
+assert_eq("KEY_UP", KEY_UP, 265);
+
+// Function keys
+let KEY_F1 = 290;
+let KEY_F12 = 301;
+
+assert_eq("KEY_F1", KEY_F1, 290);
+assert_eq("KEY_F12", KEY_F12, 301);
+
+// Modifier keys
+let KEY_LEFT_SHIFT = 340;
+let KEY_LEFT_CONTROL = 341;
+let KEY_LEFT_ALT = 342;
+let KEY_RIGHT_SHIFT = 344;
+let KEY_RIGHT_CONTROL = 345;
+let KEY_RIGHT_ALT = 346;
+
+assert_eq("KEY_LEFT_SHIFT", KEY_LEFT_SHIFT, 340);
+assert_eq("KEY_LEFT_CONTROL", KEY_LEFT_CONTROL, 341);
+assert_eq("KEY_LEFT_ALT", KEY_LEFT_ALT, 342);
+assert_eq("KEY_RIGHT_SHIFT", KEY_RIGHT_SHIFT, 344);
+assert_eq("KEY_RIGHT_CONTROL", KEY_RIGHT_CONTROL, 345);
+assert_eq("KEY_RIGHT_ALT", KEY_RIGHT_ALT, 346);
+
+// ============================================================================
+// Mouse Button Constants
+// ============================================================================
+
+print("");
+print("=== Mouse Button Constant Tests ===");
+
+let MOUSE_BUTTON_LEFT = 0;
+let MOUSE_BUTTON_RIGHT = 1;
+let MOUSE_BUTTON_MIDDLE = 2;
+
+assert_eq("MOUSE_BUTTON_LEFT", MOUSE_BUTTON_LEFT, 0);
+assert_eq("MOUSE_BUTTON_RIGHT", MOUSE_BUTTON_RIGHT, 1);
+assert_eq("MOUSE_BUTTON_MIDDLE", MOUSE_BUTTON_MIDDLE, 2);
+
+// ============================================================================
+// Gamepad Button Constants
+// ============================================================================
+
+print("");
+print("=== Gamepad Button Constant Tests ===");
+
+let GAMEPAD_BUTTON_UNKNOWN = 0;
+let GAMEPAD_BUTTON_LEFT_FACE_UP = 1;
+let GAMEPAD_BUTTON_LEFT_FACE_RIGHT = 2;
+let GAMEPAD_BUTTON_LEFT_FACE_DOWN = 3;
+let GAMEPAD_BUTTON_LEFT_FACE_LEFT = 4;
+
+assert_eq("GAMEPAD_BUTTON_UNKNOWN", GAMEPAD_BUTTON_UNKNOWN, 0);
+assert_eq("GAMEPAD_BUTTON_LEFT_FACE_UP", GAMEPAD_BUTTON_LEFT_FACE_UP, 1);
+assert_eq("GAMEPAD_BUTTON_LEFT_FACE_RIGHT", GAMEPAD_BUTTON_LEFT_FACE_RIGHT, 2);
+assert_eq("GAMEPAD_BUTTON_LEFT_FACE_DOWN", GAMEPAD_BUTTON_LEFT_FACE_DOWN, 3);
+assert_eq("GAMEPAD_BUTTON_LEFT_FACE_LEFT", GAMEPAD_BUTTON_LEFT_FACE_LEFT, 4);
+
+// ============================================================================
+// Gamepad Axis Constants
+// ============================================================================
+
+print("");
+print("=== Gamepad Axis Constant Tests ===");
+
+let GAMEPAD_AXIS_LEFT_X = 0;
+let GAMEPAD_AXIS_LEFT_Y = 1;
+let GAMEPAD_AXIS_RIGHT_X = 2;
+let GAMEPAD_AXIS_RIGHT_Y = 3;
+
+assert_eq("GAMEPAD_AXIS_LEFT_X", GAMEPAD_AXIS_LEFT_X, 0);
+assert_eq("GAMEPAD_AXIS_LEFT_Y", GAMEPAD_AXIS_LEFT_Y, 1);
+assert_eq("GAMEPAD_AXIS_RIGHT_X", GAMEPAD_AXIS_RIGHT_X, 2);
+assert_eq("GAMEPAD_AXIS_RIGHT_Y", GAMEPAD_AXIS_RIGHT_Y, 3);
+
+// ============================================================================
+// Blend Mode Constants
+// ============================================================================
+
+print("");
+print("=== Blend Mode Constant Tests ===");
+
+let BLEND_ALPHA = 0;
+let BLEND_ADDITIVE = 1;
+let BLEND_MULTIPLIED = 2;
+
+assert_eq("BLEND_ALPHA", BLEND_ALPHA, 0);
+assert_eq("BLEND_ADDITIVE", BLEND_ADDITIVE, 1);
+assert_eq("BLEND_MULTIPLIED", BLEND_MULTIPLIED, 2);
+
+// ============================================================================
+// Summary
+// ============================================================================
+
+print("");
+print("=== Test Summary ===");
+print("Passed: " + tests_passed);
+print("Failed: " + tests_failed);
+
+if (tests_failed > 0) {
+    exit(1);
+}

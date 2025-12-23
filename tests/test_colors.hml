@@ -1,0 +1,131 @@
+// Test suite for color functions
+// Run with: hemlock tests/test_colors.hml
+
+let tests_passed = 0;
+let tests_failed = 0;
+
+fn assert_eq(name: string, actual: u32, expected: u32) {
+    if (actual == expected) {
+        print("[PASS] " + name);
+        tests_passed = tests_passed + 1;
+    } else {
+        print("[FAIL] " + name + " - expected " + expected + ", got " + actual);
+        tests_failed = tests_failed + 1;
+    }
+}
+
+fn assert_eq_u8(name: string, actual: u8, expected: u8) {
+    if (actual == expected) {
+        print("[PASS] " + name);
+        tests_passed = tests_passed + 1;
+    } else {
+        print("[FAIL] " + name + " - expected " + expected + ", got " + actual);
+        tests_failed = tests_failed + 1;
+    }
+}
+
+// Color helper function (same as in raylib.hml)
+fn Color(r: u8, g: u8, b: u8, a: u8): u32 {
+    let r32: u32 = r;
+    let g32: u32 = g;
+    let b32: u32 = b;
+    let a32: u32 = a;
+    return (a32 << 24) | (b32 << 16) | (g32 << 8) | r32;
+}
+
+fn ColorGetR(color: u32): u8 {
+    return color & 0xFF;
+}
+
+fn ColorGetG(color: u32): u8 {
+    return (color >> 8) & 0xFF;
+}
+
+fn ColorGetB(color: u32): u8 {
+    return (color >> 16) & 0xFF;
+}
+
+fn ColorGetA(color: u32): u8 {
+    return (color >> 24) & 0xFF;
+}
+
+fn ColorAlpha(color: u32, alpha: f32): u32 {
+    let a: u32 = alpha * 255.0;
+    if (a > 255) { a = 255; }
+    return (color & 0x00FFFFFF) | (a << 24);
+}
+
+// ============================================================================
+// Tests
+// ============================================================================
+
+print("=== Color Function Tests ===");
+
+// Test Color creation
+let red = Color(255, 0, 0, 255);
+let green = Color(0, 255, 0, 255);
+let blue = Color(0, 0, 255, 255);
+let white = Color(255, 255, 255, 255);
+let black = Color(0, 0, 0, 255);
+let transparent = Color(0, 0, 0, 0);
+
+// Test component extraction
+assert_eq_u8("ColorGetR(red)", ColorGetR(red), 255);
+assert_eq_u8("ColorGetG(red)", ColorGetG(red), 0);
+assert_eq_u8("ColorGetB(red)", ColorGetB(red), 0);
+assert_eq_u8("ColorGetA(red)", ColorGetA(red), 255);
+
+assert_eq_u8("ColorGetR(green)", ColorGetR(green), 0);
+assert_eq_u8("ColorGetG(green)", ColorGetG(green), 255);
+assert_eq_u8("ColorGetB(green)", ColorGetB(green), 0);
+assert_eq_u8("ColorGetA(green)", ColorGetA(green), 255);
+
+assert_eq_u8("ColorGetR(blue)", ColorGetR(blue), 0);
+assert_eq_u8("ColorGetG(blue)", ColorGetG(blue), 0);
+assert_eq_u8("ColorGetB(blue)", ColorGetB(blue), 255);
+assert_eq_u8("ColorGetA(blue)", ColorGetA(blue), 255);
+
+// Test mixed color
+let purple = Color(128, 0, 128, 200);
+assert_eq_u8("ColorGetR(purple)", ColorGetR(purple), 128);
+assert_eq_u8("ColorGetG(purple)", ColorGetG(purple), 0);
+assert_eq_u8("ColorGetB(purple)", ColorGetB(purple), 128);
+assert_eq_u8("ColorGetA(purple)", ColorGetA(purple), 200);
+
+// Test transparent
+assert_eq_u8("ColorGetA(transparent)", ColorGetA(transparent), 0);
+
+// Test ColorAlpha
+let semi_red = ColorAlpha(red, 0.5);
+assert_eq_u8("ColorAlpha red R", ColorGetR(semi_red), 255);
+assert_eq_u8("ColorAlpha red G", ColorGetG(semi_red), 0);
+assert_eq_u8("ColorAlpha red B", ColorGetB(semi_red), 0);
+// Alpha should be around 127-128
+let alpha = ColorGetA(semi_red);
+if (alpha >= 126 && alpha <= 128) {
+    print("[PASS] ColorAlpha 0.5 produces correct alpha");
+    tests_passed = tests_passed + 1;
+} else {
+    print("[FAIL] ColorAlpha 0.5 - expected ~127, got " + alpha);
+    tests_failed = tests_failed + 1;
+}
+
+// Test predefined colors match expected values
+let RAYWHITE = Color(245, 245, 245, 255);
+assert_eq_u8("RAYWHITE R", ColorGetR(RAYWHITE), 245);
+assert_eq_u8("RAYWHITE G", ColorGetG(RAYWHITE), 245);
+assert_eq_u8("RAYWHITE B", ColorGetB(RAYWHITE), 245);
+assert_eq_u8("RAYWHITE A", ColorGetA(RAYWHITE), 255);
+
+// ============================================================================
+// Summary
+// ============================================================================
+
+print("");
+print("=== Test Summary ===");
+print("Passed: " + tests_passed);
+print("Failed: " + tests_failed);
+
+if (tests_failed > 0) {
+    exit(1);
+}

@@ -1,0 +1,203 @@
+// Test suite for math utility functions
+// Run with: hemlock tests/test_math.hml
+
+let tests_passed = 0;
+let tests_failed = 0;
+
+fn assert_eq_f32(name: string, actual: f32, expected: f32, tolerance: f32) {
+    let diff = actual - expected;
+    if (diff < 0.0) { diff = -diff; }
+
+    if (diff <= tolerance) {
+        print("[PASS] " + name);
+        tests_passed = tests_passed + 1;
+    } else {
+        print("[FAIL] " + name + " - expected " + expected + ", got " + actual);
+        tests_failed = tests_failed + 1;
+    }
+}
+
+fn assert_eq_i32(name: string, actual: i32, expected: i32) {
+    if (actual == expected) {
+        print("[PASS] " + name);
+        tests_passed = tests_passed + 1;
+    } else {
+        print("[FAIL] " + name + " - expected " + expected + ", got " + actual);
+        tests_failed = tests_failed + 1;
+    }
+}
+
+// ============================================================================
+// Math Utility Functions (same as in raylib.hml)
+// ============================================================================
+
+fn Vector2Distance(x1: f32, y1: f32, x2: f32, y2: f32): f32 {
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+    return sqrt(dx * dx + dy * dy);
+}
+
+fn Vector2Length(x: f32, y: f32): f32 {
+    return sqrt(x * x + y * y);
+}
+
+fn Vector2Dot(x1: f32, y1: f32, x2: f32, y2: f32): f32 {
+    return x1 * x2 + y1 * y2;
+}
+
+fn Lerp(start: f32, end: f32, amount: f32): f32 {
+    return start + amount * (end - start);
+}
+
+fn Clamp(value: f32, min: f32, max: f32): f32 {
+    if (value < min) { return min; }
+    if (value > max) { return max; }
+    return value;
+}
+
+fn ClampInt(value: i32, min: i32, max: i32): i32 {
+    if (value < min) { return min; }
+    if (value > max) { return max; }
+    return value;
+}
+
+fn Remap(value: f32, inputStart: f32, inputEnd: f32, outputStart: f32, outputEnd: f32): f32 {
+    return outputStart + (value - inputStart) / (inputEnd - inputStart) * (outputEnd - outputStart);
+}
+
+fn Wrap(value: f32, min: f32, max: f32): f32 {
+    let range = max - min;
+    let result = value - min;
+    while (result < 0.0) { result = result + range; }
+    while (result >= range) { result = result - range; }
+    return result + min;
+}
+
+fn NormalizeAngle(angle: f32): f32 {
+    let result = angle;
+    while (result < 0.0) { result = result + 360.0; }
+    while (result >= 360.0) { result = result - 360.0; }
+    return result;
+}
+
+fn Deg2Rad(degrees: f32): f32 {
+    return degrees * 0.01745329251994329577;
+}
+
+fn Rad2Deg(radians: f32): f32 {
+    return radians * 57.29577951308232087680;
+}
+
+// ============================================================================
+// Vector2 Tests
+// ============================================================================
+
+print("=== Vector2 Tests ===");
+
+// Distance tests
+assert_eq_f32("Distance horizontal", Vector2Distance(0.0, 0.0, 10.0, 0.0), 10.0, 0.001);
+assert_eq_f32("Distance vertical", Vector2Distance(0.0, 0.0, 0.0, 10.0), 10.0, 0.001);
+assert_eq_f32("Distance diagonal 3-4-5", Vector2Distance(0.0, 0.0, 3.0, 4.0), 5.0, 0.001);
+assert_eq_f32("Distance same point", Vector2Distance(5.0, 5.0, 5.0, 5.0), 0.0, 0.001);
+
+// Length tests
+assert_eq_f32("Length (3, 4)", Vector2Length(3.0, 4.0), 5.0, 0.001);
+assert_eq_f32("Length (1, 0)", Vector2Length(1.0, 0.0), 1.0, 0.001);
+assert_eq_f32("Length (0, 1)", Vector2Length(0.0, 1.0), 1.0, 0.001);
+assert_eq_f32("Length (0, 0)", Vector2Length(0.0, 0.0), 0.0, 0.001);
+
+// Dot product tests
+assert_eq_f32("Dot parallel", Vector2Dot(1.0, 0.0, 1.0, 0.0), 1.0, 0.001);
+assert_eq_f32("Dot perpendicular", Vector2Dot(1.0, 0.0, 0.0, 1.0), 0.0, 0.001);
+assert_eq_f32("Dot opposite", Vector2Dot(1.0, 0.0, -1.0, 0.0), -1.0, 0.001);
+assert_eq_f32("Dot general", Vector2Dot(2.0, 3.0, 4.0, 5.0), 23.0, 0.001);
+
+// ============================================================================
+// Lerp Tests
+// ============================================================================
+
+print("");
+print("=== Lerp Tests ===");
+
+assert_eq_f32("Lerp 0%", Lerp(0.0, 100.0, 0.0), 0.0, 0.001);
+assert_eq_f32("Lerp 50%", Lerp(0.0, 100.0, 0.5), 50.0, 0.001);
+assert_eq_f32("Lerp 100%", Lerp(0.0, 100.0, 1.0), 100.0, 0.001);
+assert_eq_f32("Lerp 25%", Lerp(10.0, 20.0, 0.25), 12.5, 0.001);
+assert_eq_f32("Lerp negative range", Lerp(-10.0, 10.0, 0.5), 0.0, 0.001);
+
+// ============================================================================
+// Clamp Tests
+// ============================================================================
+
+print("");
+print("=== Clamp Tests ===");
+
+assert_eq_f32("Clamp within range", Clamp(5.0, 0.0, 10.0), 5.0, 0.001);
+assert_eq_f32("Clamp below min", Clamp(-5.0, 0.0, 10.0), 0.0, 0.001);
+assert_eq_f32("Clamp above max", Clamp(15.0, 0.0, 10.0), 10.0, 0.001);
+assert_eq_f32("Clamp at min", Clamp(0.0, 0.0, 10.0), 0.0, 0.001);
+assert_eq_f32("Clamp at max", Clamp(10.0, 0.0, 10.0), 10.0, 0.001);
+
+assert_eq_i32("ClampInt within range", ClampInt(5, 0, 10), 5);
+assert_eq_i32("ClampInt below min", ClampInt(-5, 0, 10), 0);
+assert_eq_i32("ClampInt above max", ClampInt(15, 0, 10), 10);
+
+// ============================================================================
+// Remap Tests
+// ============================================================================
+
+print("");
+print("=== Remap Tests ===");
+
+assert_eq_f32("Remap 0-10 to 0-100 (5)", Remap(5.0, 0.0, 10.0, 0.0, 100.0), 50.0, 0.001);
+assert_eq_f32("Remap 0-10 to 0-100 (0)", Remap(0.0, 0.0, 10.0, 0.0, 100.0), 0.0, 0.001);
+assert_eq_f32("Remap 0-10 to 0-100 (10)", Remap(10.0, 0.0, 10.0, 0.0, 100.0), 100.0, 0.001);
+assert_eq_f32("Remap inverse", Remap(5.0, 0.0, 10.0, 100.0, 0.0), 50.0, 0.001);
+
+// ============================================================================
+// Wrap Tests
+// ============================================================================
+
+print("");
+print("=== Wrap Tests ===");
+
+assert_eq_f32("Wrap within range", Wrap(5.0, 0.0, 10.0), 5.0, 0.001);
+assert_eq_f32("Wrap above max", Wrap(15.0, 0.0, 10.0), 5.0, 0.001);
+assert_eq_f32("Wrap below min", Wrap(-5.0, 0.0, 10.0), 5.0, 0.001);
+assert_eq_f32("Wrap at min", Wrap(0.0, 0.0, 10.0), 0.0, 0.001);
+
+// ============================================================================
+// Angle Tests
+// ============================================================================
+
+print("");
+print("=== Angle Tests ===");
+
+assert_eq_f32("NormalizeAngle 0", NormalizeAngle(0.0), 0.0, 0.001);
+assert_eq_f32("NormalizeAngle 180", NormalizeAngle(180.0), 180.0, 0.001);
+assert_eq_f32("NormalizeAngle 360", NormalizeAngle(360.0), 0.0, 0.001);
+assert_eq_f32("NormalizeAngle 450", NormalizeAngle(450.0), 90.0, 0.001);
+assert_eq_f32("NormalizeAngle -90", NormalizeAngle(-90.0), 270.0, 0.001);
+
+// Deg/Rad conversion
+let pi = 3.14159265358979323846;
+assert_eq_f32("Deg2Rad 0", Deg2Rad(0.0), 0.0, 0.001);
+assert_eq_f32("Deg2Rad 180", Deg2Rad(180.0), pi, 0.001);
+assert_eq_f32("Deg2Rad 90", Deg2Rad(90.0), pi / 2.0, 0.001);
+
+assert_eq_f32("Rad2Deg 0", Rad2Deg(0.0), 0.0, 0.001);
+assert_eq_f32("Rad2Deg pi", Rad2Deg(pi), 180.0, 0.001);
+assert_eq_f32("Rad2Deg pi/2", Rad2Deg(pi / 2.0), 90.0, 0.001);
+
+// ============================================================================
+// Summary
+// ============================================================================
+
+print("");
+print("=== Test Summary ===");
+print("Passed: " + tests_passed);
+print("Failed: " + tests_failed);
+
+if (tests_failed > 0) {
+    exit(1);
+}

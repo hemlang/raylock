@@ -531,7 +531,7 @@ while (WindowShouldClose() == 0) {
     DrawRectangle(fx + 4, fy + 4, cellSize - 8, cellSize - 8, RED);
     DrawRectangle(fx + 6, fy + 6, 4, 4, ORANGE);
     // Stem
-    DrawRectangle(fx + cellSize / 2 - 1, fy + 2, 2, 4, DARKGREEN);
+    DrawRectangle(fx + divi(cellSize, 2) - 1, fy + 2, 2, 4, DARKGREEN);
 
     // Draw snake
     let si = snakeLen - 1;
@@ -552,7 +552,7 @@ while (WindowShouldClose() == 0) {
     DrawText("FPS: " + GetFPS(), screenWidth - 80, 7, 16, GREEN);
 
     // Draw controls hint
-    DrawText("Arrow Keys/WASD: Move | R: Restart", screenWidth / 2 - 150, screenHeight - 25, 16, DARKGRAY);
+    DrawText("Arrow Keys/WASD: Move | R: Restart", divi(screenWidth, 2) - 150, screenHeight - 25, 16, DARKGRAY);
 
     // Game over overlay
     if (gameOver != 0) {
@@ -560,16 +560,16 @@ while (WindowShouldClose() == 0) {
         DrawRectangle(0, 0, screenWidth, screenHeight, BLACK);
 
         // Draw game over text with shadow
-        DrawText("GAME OVER", screenWidth / 2 - 142, screenHeight / 2 - 52, 48, DARKGRAY);
-        DrawText("GAME OVER", screenWidth / 2 - 140, screenHeight / 2 - 50, 48, RED);
+        DrawText("GAME OVER", divi(screenWidth, 2) - 142, divi(screenHeight, 2) - 52, 48, DARKGRAY);
+        DrawText("GAME OVER", divi(screenWidth, 2) - 140, divi(screenHeight, 2) - 50, 48, RED);
 
-        DrawText("Score: " + score, screenWidth / 2 - 50, screenHeight / 2 + 20, 24, WHITE);
+        DrawText("Score: " + score, divi(screenWidth, 2) - 50, divi(screenHeight, 2) + 20, 24, WHITE);
 
         if (score > highScore) {
-            DrawText("NEW HIGH SCORE!", screenWidth / 2 - 100, screenHeight / 2 + 60, 24, YELLOW);
+            DrawText("NEW HIGH SCORE!", divi(screenWidth, 2) - 100, divi(screenHeight, 2) + 60, 24, YELLOW);
         }
 
-        DrawText("Press R to Restart", screenWidth / 2 - 90, screenHeight / 2 + 110, 20, LIGHTGRAY);
+        DrawText("Press R to Restart", divi(screenWidth, 2) - 90, divi(screenHeight, 2) + 110, 20, LIGHTGRAY);
     }
 
     EndDrawing();

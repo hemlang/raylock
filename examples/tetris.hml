@@ -409,7 +409,7 @@ fn pieceFits(t: i32, rot: i32, px: i32, py: i32): i32 {
     while (i < 4) {
         let block = getPieceBlock(t, rot, i);
         let bx = block % 10;
-        let by = block / 10;
+        let by = divi(block, 10);
         let x = px + bx;
         let y = py + by;
 
@@ -434,7 +434,7 @@ fn placePiece() {
     while (i < 4) {
         let block = getPieceBlock(pieceType, pieceRot, i);
         let bx = block % 10;
-        let by = block / 10;
+        let by = divi(block, 10);
         let x = pieceX + bx;
         let y = pieceY + by;
         if (y >= 0) {
@@ -506,7 +506,7 @@ fn spawnPiece() {
 fn clearBoard() {
     let i = 0;
     while (i < 200) {
-        let row = i / 10;
+        let row = divi(i, 10);
         let col = i % 10;
         setCell(row, col, 0);
         i = i + 1;
@@ -533,21 +533,6 @@ fn drawBlock(x: i32, y: i32, color: u32) {
     // Highlight
     DrawRectangle(px + 2, py + 2, cellSize - 4, 2, WHITE);
     DrawRectangle(px + 2, py + 2, 2, cellSize - 4, WHITE);
-}
-
-// Draw piece preview at absolute screen position (ox, oy)
-fn drawPreview(t: i32, ox: i32, oy: i32) {
-    let previewColor = getPieceColor(t);
-    let previewIdx = 0;
-    while (previewIdx < 4) {
-        let previewBlock = getPieceBlock(t, 0, previewIdx);
-        let previewBx = previewBlock % 10;
-        let previewBy = previewBlock / 10;
-        let previewPx = ox + previewBx * 20;
-        let previewPy = oy + previewBy * 20;
-        DrawRectangle(previewPx, previewPy, 18, 18, previewColor);
-        previewIdx = previewIdx + 1;
-    }
 }
 
 InitWindow(screenWidth, screenHeight, "Tetris - Hemlock + Raylib");
@@ -667,7 +652,7 @@ while (WindowShouldClose() == 0) {
                     if (cleared == 3) { score = score + 500 * level; }
                     if (cleared == 4) { score = score + 800 * level; }
                     // Level up every 10 lines
-                    level = (lines / 10) + 1;
+                    level = divi(lines, 10) + 1;
                     if (level > 15) { level = 15; }
                     fallDelay = 0.5 - (level - 1) * 0.03;
                     if (fallDelay < 0.05) { fallDelay = 0.05; }
@@ -690,7 +675,7 @@ while (WindowShouldClose() == 0) {
                         if (cleared == 2) { score = score + 300 * level; }
                         if (cleared == 3) { score = score + 500 * level; }
                         if (cleared == 4) { score = score + 800 * level; }
-                        level = (lines / 10) + 1;
+                        level = divi(lines, 10) + 1;
                         if (level > 15) { level = 15; }
                         fallDelay = 0.5 - (level - 1) * 0.03;
                         if (fallDelay < 0.05) { fallDelay = 0.05; }
@@ -745,7 +730,7 @@ while (WindowShouldClose() == 0) {
         while (i < 4) {
             let block = getPieceBlock(pieceType, pieceRot, i);
             let bx = block % 10;
-            let by = block / 10;
+            let by = divi(block, 10);
             let x = pieceX + bx;
             let y = ghostY + by;
             if (y >= 0) {
@@ -763,7 +748,7 @@ while (WindowShouldClose() == 0) {
     while (pi < 4) {
         let block = getPieceBlock(pieceType, pieceRot, pi);
         let bx = block % 10;
-        let by = block / 10;
+        let by = divi(block, 10);
         let x = pieceX + bx;
         let y = pieceY + by;
         if (y >= 0) {
@@ -815,15 +800,15 @@ while (WindowShouldClose() == 0) {
 
     // Pause overlay
     if (paused != 0) {
-        DrawRectangle(boardOffsetX, boardOffsetY + boardHeight * cellSize / 2 - 30, boardWidth * cellSize, 60, BLACK);
-        DrawText("PAUSED", boardOffsetX + 70, boardOffsetY + boardHeight * cellSize / 2 - 15, 36, YELLOW);
+        DrawRectangle(boardOffsetX, boardOffsetY + divi(boardHeight * cellSize, 2) - 30, boardWidth * cellSize, 60, BLACK);
+        DrawText("PAUSED", boardOffsetX + 70, boardOffsetY + divi(boardHeight * cellSize, 2) - 15, 36, YELLOW);
     }
 
     // Game over overlay
     if (gameOver != 0) {
-        DrawRectangle(boardOffsetX, boardOffsetY + boardHeight * cellSize / 2 - 50, boardWidth * cellSize, 100, BLACK);
-        DrawText("GAME OVER", boardOffsetX + 40, boardOffsetY + boardHeight * cellSize / 2 - 35, 32, RED);
-        DrawText("Press R to restart", boardOffsetX + 45, boardOffsetY + boardHeight * cellSize / 2 + 10, 18, LIGHTGRAY);
+        DrawRectangle(boardOffsetX, boardOffsetY + divi(boardHeight * cellSize, 2) - 50, boardWidth * cellSize, 100, BLACK);
+        DrawText("GAME OVER", boardOffsetX + 40, boardOffsetY + divi(boardHeight * cellSize, 2) - 35, 32, RED);
+        DrawText("Press R to restart", boardOffsetX + 45, boardOffsetY + divi(boardHeight * cellSize, 2) + 10, 18, LIGHTGRAY);
     }
 
     EndDrawing();

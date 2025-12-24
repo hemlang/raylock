@@ -190,7 +190,7 @@ fn getBrickY(row: i32): i32 {
 
 // Reset ball to paddle
 fn resetBall() {
-    ballX = paddleX + paddleWidth / 2;
+    ballX = paddleX + divi(paddleWidth, 2);
     ballY = paddleY - ballRadius - 2.0;
     ballVX = 250.0;
     ballVY = -350.0;
@@ -283,7 +283,7 @@ while (WindowShouldClose() == 0) {
 
                 // Paddle movement with mouse
                 let mouseX = GetMouseX();
-                let targetX: f32 = mouseX - paddleWidth / 2;
+                let targetX: f32 = mouseX - divi(paddleWidth, 2);
 
                 // Smooth paddle movement towards mouse
                 let diff = targetX - paddleX;
@@ -300,7 +300,7 @@ while (WindowShouldClose() == 0) {
 
                 // Ball follows paddle if not launched
                 if (ballLaunched == 0) {
-                    ballX = paddleX + paddleWidth / 2;
+                    ballX = paddleX + divi(paddleWidth, 2);
                     ballY = paddleY - ballRadius - 2.0;
                 } else {
                     // Update ball position
@@ -377,8 +377,8 @@ while (WindowShouldClose() == 0) {
                                     // Determine bounce direction
                                     let ballCenterX = ballX;
                                     let ballCenterY = ballY;
-                                    let brickCenterX = bx + brickWidth / 2;
-                                    let brickCenterY = by + brickHeight / 2;
+                                    let brickCenterX = bx + divi(brickWidth, 2);
+                                    let brickCenterY = by + divi(brickHeight, 2);
 
                                     let diffX = ballCenterX - brickCenterX;
                                     let diffY = ballCenterY - brickCenterY;
@@ -456,43 +456,43 @@ while (WindowShouldClose() == 0) {
     if (ballLaunched == 0) {
         if (gameOver == 0) {
             if (gameWon == 0) {
-                DrawText("Press SPACE to launch ball", screenWidth / 2 - 130, screenHeight - 40, 20, LIGHTGRAY);
+                DrawText("Press SPACE to launch ball", divi(screenWidth, 2) - 130, screenHeight - 40, 20, LIGHTGRAY);
             }
         }
     }
 
     // Pause overlay
     if (paused != 0) {
-        DrawRectangle(screenWidth / 2 - 100, screenHeight / 2 - 40, 200, 80, BLACK);
-        DrawRectangleLines(screenWidth / 2 - 100, screenHeight / 2 - 40, 200, 80, WHITE);
-        DrawText("PAUSED", screenWidth / 2 - 50, screenHeight / 2 - 15, 30, YELLOW);
-        DrawText("Press P to resume", screenWidth / 2 - 80, screenHeight / 2 + 20, 16, LIGHTGRAY);
+        DrawRectangle(divi(screenWidth, 2) - 100, divi(screenHeight, 2) - 40, 200, 80, BLACK);
+        DrawRectangleLines(divi(screenWidth, 2) - 100, divi(screenHeight, 2) - 40, 200, 80, WHITE);
+        DrawText("PAUSED", divi(screenWidth, 2) - 50, divi(screenHeight, 2) - 15, 30, YELLOW);
+        DrawText("Press P to resume", divi(screenWidth, 2) - 80, divi(screenHeight, 2) + 20, 16, LIGHTGRAY);
     }
 
     // Game over overlay
     if (gameOver != 0) {
-        DrawRectangle(screenWidth / 2 - 150, screenHeight / 2 - 80, 300, 160, BLACK);
-        DrawRectangleLines(screenWidth / 2 - 150, screenHeight / 2 - 80, 300, 160, RED);
+        DrawRectangle(divi(screenWidth, 2) - 150, divi(screenHeight, 2) - 80, 300, 160, BLACK);
+        DrawRectangleLines(divi(screenWidth, 2) - 150, divi(screenHeight, 2) - 80, 300, 160, RED);
 
-        DrawText("GAME OVER", screenWidth / 2 - 95, screenHeight / 2 - 60, 36, RED);
-        DrawText("Final Score: " + score, screenWidth / 2 - 70, screenHeight / 2 - 10, 20, WHITE);
+        DrawText("GAME OVER", divi(screenWidth, 2) - 95, divi(screenHeight, 2) - 60, 36, RED);
+        DrawText("Final Score: " + score, divi(screenWidth, 2) - 70, divi(screenHeight, 2) - 10, 20, WHITE);
 
         if (score > highScore) {
-            DrawText("NEW HIGH SCORE!", screenWidth / 2 - 90, screenHeight / 2 + 20, 20, GOLD);
+            DrawText("NEW HIGH SCORE!", divi(screenWidth, 2) - 90, divi(screenHeight, 2) + 20, 20, GOLD);
         }
 
-        DrawText("Press R to Restart", screenWidth / 2 - 85, screenHeight / 2 + 55, 18, LIGHTGRAY);
+        DrawText("Press R to Restart", divi(screenWidth, 2) - 85, divi(screenHeight, 2) + 55, 18, LIGHTGRAY);
     }
 
     // Win overlay
     if (gameWon != 0) {
-        DrawRectangle(screenWidth / 2 - 150, screenHeight / 2 - 80, 300, 160, BLACK);
-        DrawRectangleLines(screenWidth / 2 - 150, screenHeight / 2 - 80, 300, 160, GOLD);
+        DrawRectangle(divi(screenWidth, 2) - 150, divi(screenHeight, 2) - 80, 300, 160, BLACK);
+        DrawRectangleLines(divi(screenWidth, 2) - 150, divi(screenHeight, 2) - 80, 300, 160, GOLD);
 
-        DrawText("YOU WIN!", screenWidth / 2 - 75, screenHeight / 2 - 60, 36, GOLD);
-        DrawText("Final Score: " + score, screenWidth / 2 - 70, screenHeight / 2 - 10, 20, WHITE);
-        DrawText("Lives Remaining: " + lives, screenWidth / 2 - 85, screenHeight / 2 + 20, 20, GREEN);
-        DrawText("Press R to Play Again", screenWidth / 2 - 95, screenHeight / 2 + 55, 18, LIGHTGRAY);
+        DrawText("YOU WIN!", divi(screenWidth, 2) - 75, divi(screenHeight, 2) - 60, 36, GOLD);
+        DrawText("Final Score: " + score, divi(screenWidth, 2) - 70, divi(screenHeight, 2) - 10, 20, WHITE);
+        DrawText("Lives Remaining: " + lives, divi(screenWidth, 2) - 85, divi(screenHeight, 2) + 20, 20, GREEN);
+        DrawText("Press R to Play Again", divi(screenWidth, 2) - 95, divi(screenHeight, 2) + 55, 18, LIGHTGRAY);
     }
 
     // Controls hint

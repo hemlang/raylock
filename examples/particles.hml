@@ -617,11 +617,11 @@ fn drawParticles() {
 
             // Add glow effect for fire/sparkle
             if (effectType == 2) {
-                let glowColor = Color(r, g, b, alphaInt / 3);
+                let glowColor = Color(r, g, b, divi(alphaInt, 3));
                 DrawCircle(x, y, size * 2.0, glowColor);
             }
             if (effectType == 3) {
-                let glowColor = Color(255, 255, 200, alphaInt / 2);
+                let glowColor = Color(255, 255, 200, divi(alphaInt, 2));
                 DrawCircle(x, y, size * 1.5, glowColor);
             }
         }
@@ -692,7 +692,7 @@ while (WindowShouldClose() == 0) {
     if (effectType == 2) {  // Fire fountain
         if (spawnTimer > 0.02) {
             spawnTimer = 0.0;
-            spawnFire(screenWidth / 2, screenHeight - 50);
+            spawnFire(divi(screenWidth, 2), screenHeight - 50);
         }
     }
     if (effectType == 4) {  // Snow
@@ -720,8 +720,8 @@ while (WindowShouldClose() == 0) {
 
     // Draw fire source indicator
     if (effectType == 2) {
-        DrawRectangle(screenWidth / 2 - 40, screenHeight - 30, 80, 30, MAROON);
-        DrawRectangle(screenWidth / 2 - 35, screenHeight - 25, 70, 20, ORANGE);
+        DrawRectangle(divi(screenWidth, 2) - 40, screenHeight - 30, 80, 30, MAROON);
+        DrawRectangle(divi(screenWidth, 2) - 35, screenHeight - 25, 70, 20, ORANGE);
     }
 
     // UI Panel

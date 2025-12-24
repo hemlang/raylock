@@ -133,6 +133,25 @@ let posY: i32 = myFloatY;
 DrawRectangle(posX - 10, posY - 10, 20, 20, RED);
 ```
 
+### Integer Division - Use `divi` NOT `/`
+The `/` operator in Hemlock always produces a float result. For integer division, use the `divi` function:
+
+```hemlock
+// BAD - / produces float, causes position bugs
+let row = index / 10;        // Returns 1.1 for index=11, not 1
+let centerX = width / 2;     // Returns float, not int
+
+// GOOD - divi performs integer division
+let row = divi(index, 10);   // Returns 1 for index=11
+let centerX = divi(width, 2); // Returns integer result
+```
+
+This is critical for:
+- Grid position calculations (row/column from index)
+- Centering UI elements (screenWidth / 2)
+- Level calculations in games (lines / 10)
+- Any math where you need an integer result
+
 ### Available Colors
 These colors are defined: `LIGHTGRAY`, `GRAY`, `DARKGRAY`, `YELLOW`, `GOLD`, `ORANGE`, `PINK`, `RED`, `MAROON`, `GREEN`, `LIME`, `DARKGREEN`, `SKYBLUE`, `BLUE`, `DARKBLUE`, `PURPLE`, `VIOLET`, `DARKPURPLE`, `BEIGE`, `BROWN`, `DARKBROWN`, `WHITE`, `BLACK`, `BLANK`, `MAGENTA`, `RAYWHITE`
 

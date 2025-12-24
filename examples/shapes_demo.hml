@@ -1,0 +1,116 @@
+// Shapes Demo - Showcase various shape drawing functions
+// Demonstrates: lines, circles, rectangles, polygons, gradients
+
+import {
+    // Window
+    InitWindow, CloseWindow, WindowShouldClose, SetTargetFPS, GetFPS, GetTime,
+    // Drawing
+    BeginDrawing, EndDrawing, ClearBackground,
+    // Shapes
+    DrawLine, DrawCircle, DrawCircleLines, DrawCircleGradient,
+    DrawRectangle, DrawRectangleLines, DrawRectangleGradientV, DrawRectangleGradientH,
+    DrawTriangle, DrawTriangleLines,
+    DrawPoly, DrawPolyLines,
+    DrawRing, DrawRingLines,
+    DrawEllipse, DrawEllipseLines,
+    // Text
+    DrawText, DrawFPS,
+    // Colors
+    RAYWHITE, RED, GREEN, BLUE, YELLOW, ORANGE, PURPLE, PINK,
+    DARKGRAY, BLACK, WHITE, SKYBLUE, LIME, GOLD
+} from "../src/raylib.hml";
+
+let screenWidth = 1000;
+let screenHeight = 700;
+
+InitWindow(screenWidth, screenHeight, "Hemlock + Raylib - Shapes Demo");
+SetTargetFPS(60);
+
+while (WindowShouldClose() == 0) {
+    let time: f32 = GetTime();
+
+    BeginDrawing();
+    ClearBackground(RAYWHITE);
+
+    // Title
+    DrawText("Raylib Shapes Demo", 350, 20, 30, DARKGRAY);
+
+    // Row 1: Basic shapes
+    DrawText("Circles", 80, 80, 16, DARKGRAY);
+    DrawCircle(100, 140, 30.0, RED);
+    DrawCircleLines(180, 140, 30.0, BLUE);
+    DrawCircleGradient(260, 140, 30.0, WHITE, PURPLE);
+
+    DrawText("Rectangles", 380, 80, 16, DARKGRAY);
+    DrawRectangle(380, 110, 60, 50, GREEN);
+    DrawRectangleLines(460, 110, 60, 50, BLUE);
+    DrawRectangleGradientV(540, 110, 60, 50, SKYBLUE, DARKGRAY);
+    DrawRectangleGradientH(620, 110, 60, 50, YELLOW, ORANGE);
+
+    // Row 2: Triangles and polygons
+    DrawText("Triangles", 80, 200, 16, DARKGRAY);
+    DrawTriangle(100, 280, 60, 220, 140, 220, ORANGE);
+    DrawTriangleLines(200, 280, 160, 220, 240, 220, PURPLE);
+
+    DrawText("Polygons", 320, 200, 16, DARKGRAY);
+    // Pentagon
+    let rotation1: f32 = time * 30.0;
+    DrawPoly(370, 250, 5, 35.0, rotation1, GOLD);
+    // Hexagon
+    let rotation2: f32 = time * -20.0;
+    DrawPoly(460, 250, 6, 35.0, rotation2, SKYBLUE);
+    // Octagon
+    DrawPolyLines(550, 250, 8, 35.0, 0.0, RED);
+
+    // Row 3: Ellipses and rings
+    DrawText("Ellipses", 80, 320, 16, DARKGRAY);
+    DrawEllipse(130, 380, 50.0, 25.0, LIME);
+    DrawEllipseLines(250, 380, 50.0, 25.0, PURPLE);
+
+    DrawText("Rings", 380, 320, 16, DARKGRAY);
+    let ringRotation: f32 = time * 50.0;
+    DrawRing(430, 380, 20.0, 40.0, 0.0, 270.0, 36, PINK);
+    DrawRingLines(550, 380, 20.0, 40.0, ringRotation, ringRotation + 270.0, 36, BLUE);
+
+    // Row 4: Lines
+    DrawText("Lines", 80, 440, 16, DARKGRAY);
+    DrawLine(80, 480, 200, 520, RED);
+    DrawLine(80, 520, 200, 480, BLUE);
+    DrawLine(220, 480, 340, 480, GREEN);
+    DrawLine(280, 460, 280, 540, PURPLE);
+
+    // Row 5: Animated shapes
+    DrawText("Animated", 80, 560, 16, DARKGRAY);
+
+    // Pulsing circle
+    let pulse: f32 = sin(time * 3.0) * 10.0 + 25.0;
+    DrawCircle(130, 620, pulse, RED);
+
+    // Rotating polygon
+    let rotAngle: f32 = time * 60.0;
+    DrawPoly(250, 620, 5, 30.0, rotAngle, BLUE);
+
+    // Oscillating rectangle
+    let rectWidth: i32 = sin(time * 2.0) * 20.0 + 50.0;
+    DrawRectangle(320, 595, rectWidth, 50, GREEN);
+
+    // Color cycling ring
+    let hue: f32 = time * 0.5;
+    let colorPhase: i32 = hue * 6.0;
+    let phaseColor = RED;
+    if (colorPhase % 6 == 1) { phaseColor = ORANGE; }
+    if (colorPhase % 6 == 2) { phaseColor = YELLOW; }
+    if (colorPhase % 6 == 3) { phaseColor = GREEN; }
+    if (colorPhase % 6 == 4) { phaseColor = BLUE; }
+    if (colorPhase % 6 == 5) { phaseColor = PURPLE; }
+    DrawRing(480, 620, 15.0, 30.0, 0.0, 360.0, 36, phaseColor);
+
+    // FPS counter
+    DrawFPS(screenWidth - 100, 10);
+    DrawText("Press ESC to exit", screenWidth - 160, screenHeight - 30, 16, DARKGRAY);
+
+    EndDrawing();
+}
+
+CloseWindow();
+print("Shapes demo closed!");

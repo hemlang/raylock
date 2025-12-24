@@ -1,72 +1,56 @@
 // Animation Demo - Bouncing balls with physics
 // Demonstrates: animation, delta time, simple physics, collision
 
-// Load raylib library (cross-platform)
-import { RAYLIB_LOADED } from "../src/raylib_loader.hml";
-
-// Window functions
-extern fn InitWindow(width: i32, height: i32, title: string): void;
-extern fn CloseWindow(): void;
-extern fn WindowShouldClose(): i32;
-extern fn SetTargetFPS(fps: i32): void;
-extern fn GetFPS(): i32;
-extern fn GetFrameTime(): f32;
-
-// Drawing functions
-extern fn BeginDrawing(): void;
-extern fn EndDrawing(): void;
-extern fn ClearBackground(color: u32): void;
-
-// Shape functions
-extern fn DrawCircle(centerX: i32, centerY: i32, radius: f32, color: u32): void;
-extern fn DrawRectangleLines(posX: i32, posY: i32, width: i32, height: i32, color: u32): void;
-
-// Text functions
-extern fn DrawText(text: string, posX: i32, posY: i32, fontSize: i32, color: u32): void;
-
-// Input
-extern fn IsKeyPressed(key: i32): i32;
-
-// Color helper
-fn Color(r: u8, g: u8, b: u8, a: u8): u32 {
-    let r32: u32 = r;
-    let g32: u32 = g;
-    let b32: u32 = b;
-    let a32: u32 = a;
-    return (a32 << 24) | (b32 << 16) | (g32 << 8) | r32;
-}
-
-// Colors
-let RAYWHITE = Color(245, 245, 245, 255);
-let RED = Color(230, 41, 55, 255);
-let GREEN = Color(0, 228, 48, 255);
-let BLUE = Color(0, 121, 241, 255);
-let YELLOW = Color(253, 249, 0, 255);
-let PURPLE = Color(200, 122, 255, 255);
-let DARKGRAY = Color(80, 80, 80, 255);
-let BLACK = Color(0, 0, 0, 255);
-
-// Key constant
-let KEY_SPACE = 32;
+// Import everything we need from raylib
+import {
+    // Functions
+    InitWindow, CloseWindow, WindowShouldClose, SetTargetFPS, GetFPS, GetFrameTime,
+    BeginDrawing, EndDrawing, ClearBackground,
+    DrawCircle, DrawRectangleLines, DrawText,
+    IsKeyPressed,
+    // Colors
+    RAYWHITE, RED, GREEN, BLUE, YELLOW, PURPLE, DARKGRAY, BLACK,
+    // Keys
+    KEY_SPACE
+} from "../src/raylib.hml";
 
 // Screen dimensions
 let screenWidth = 800;
 let screenHeight = 600;
 
-// Ball structure (using parallel arrays since Hemlock doesn't have structs yet)
+// Number of balls
 let MAX_BALLS = 5;
 
-// Ball positions
-let ballX: [f32; 5] = [100.0, 200.0, 300.0, 400.0, 500.0];
-let ballY: [f32; 5] = [100.0, 150.0, 200.0, 250.0, 300.0];
+// Ball positions (individual variables since arrays may have issues)
+let ball0X: f32 = 100.0;
+let ball0Y: f32 = 100.0;
+let ball1X: f32 = 200.0;
+let ball1Y: f32 = 150.0;
+let ball2X: f32 = 300.0;
+let ball2Y: f32 = 200.0;
+let ball3X: f32 = 400.0;
+let ball3Y: f32 = 250.0;
+let ball4X: f32 = 500.0;
+let ball4Y: f32 = 300.0;
 
 // Ball velocities
-let ballVX: [f32; 5] = [200.0, -150.0, 180.0, -220.0, 160.0];
-let ballVY: [f32; 5] = [150.0, 200.0, -180.0, 140.0, -200.0];
+let ball0VX: f32 = 200.0;
+let ball0VY: f32 = 150.0;
+let ball1VX: f32 = -150.0;
+let ball1VY: f32 = 200.0;
+let ball2VX: f32 = 180.0;
+let ball2VY: f32 = -180.0;
+let ball3VX: f32 = -220.0;
+let ball3VY: f32 = 140.0;
+let ball4VX: f32 = 160.0;
+let ball4VY: f32 = -200.0;
 
-// Ball properties
-let ballRadius: [f32; 5] = [20.0, 25.0, 15.0, 30.0, 18.0];
-let ballColors: [u32; 5] = [RED, GREEN, BLUE, YELLOW, PURPLE];
+// Ball radii
+let ball0R: f32 = 20.0;
+let ball1R: f32 = 25.0;
+let ball2R: f32 = 15.0;
+let ball3R: f32 = 30.0;
+let ball4R: f32 = 18.0;
 
 // Physics
 let gravity: f32 = 500.0;
@@ -88,51 +72,50 @@ while (WindowShouldClose() == 0) {
         }
     }
 
-    // Update each ball
-    for (let i = 0; i < MAX_BALLS; i = i + 1) {
-        // Apply gravity if enabled
-        if (gravityEnabled != 0) {
-            ballVY[i] = ballVY[i] + gravity * dt;
-        }
+    // Update ball 0
+    if (gravityEnabled != 0) { ball0VY = ball0VY + gravity * dt; }
+    ball0X = ball0X + ball0VX * dt;
+    ball0Y = ball0Y + ball0VY * dt;
+    if (ball0X - ball0R < 0.0) { ball0X = ball0R; ball0VX = -ball0VX * damping; }
+    if (ball0X + ball0R > screenWidth) { ball0X = screenWidth - ball0R; ball0VX = -ball0VX * damping; }
+    if (ball0Y - ball0R < 0.0) { ball0Y = ball0R; ball0VY = -ball0VY * damping; }
+    if (ball0Y + ball0R > screenHeight) { ball0Y = screenHeight - ball0R; ball0VY = -ball0VY * damping; if (gravityEnabled != 0) { ball0VX = ball0VX * 0.99; } }
 
-        // Update position
-        ballX[i] = ballX[i] + ballVX[i] * dt;
-        ballY[i] = ballY[i] + ballVY[i] * dt;
+    // Update ball 1
+    if (gravityEnabled != 0) { ball1VY = ball1VY + gravity * dt; }
+    ball1X = ball1X + ball1VX * dt;
+    ball1Y = ball1Y + ball1VY * dt;
+    if (ball1X - ball1R < 0.0) { ball1X = ball1R; ball1VX = -ball1VX * damping; }
+    if (ball1X + ball1R > screenWidth) { ball1X = screenWidth - ball1R; ball1VX = -ball1VX * damping; }
+    if (ball1Y - ball1R < 0.0) { ball1Y = ball1R; ball1VY = -ball1VY * damping; }
+    if (ball1Y + ball1R > screenHeight) { ball1Y = screenHeight - ball1R; ball1VY = -ball1VY * damping; if (gravityEnabled != 0) { ball1VX = ball1VX * 0.99; } }
 
-        // Bounce off walls
-        let r = ballRadius[i];
+    // Update ball 2
+    if (gravityEnabled != 0) { ball2VY = ball2VY + gravity * dt; }
+    ball2X = ball2X + ball2VX * dt;
+    ball2Y = ball2Y + ball2VY * dt;
+    if (ball2X - ball2R < 0.0) { ball2X = ball2R; ball2VX = -ball2VX * damping; }
+    if (ball2X + ball2R > screenWidth) { ball2X = screenWidth - ball2R; ball2VX = -ball2VX * damping; }
+    if (ball2Y - ball2R < 0.0) { ball2Y = ball2R; ball2VY = -ball2VY * damping; }
+    if (ball2Y + ball2R > screenHeight) { ball2Y = screenHeight - ball2R; ball2VY = -ball2VY * damping; if (gravityEnabled != 0) { ball2VX = ball2VX * 0.99; } }
 
-        // Left wall
-        if (ballX[i] - r < 0.0) {
-            ballX[i] = r;
-            ballVX[i] = -ballVX[i] * damping;
-        }
+    // Update ball 3
+    if (gravityEnabled != 0) { ball3VY = ball3VY + gravity * dt; }
+    ball3X = ball3X + ball3VX * dt;
+    ball3Y = ball3Y + ball3VY * dt;
+    if (ball3X - ball3R < 0.0) { ball3X = ball3R; ball3VX = -ball3VX * damping; }
+    if (ball3X + ball3R > screenWidth) { ball3X = screenWidth - ball3R; ball3VX = -ball3VX * damping; }
+    if (ball3Y - ball3R < 0.0) { ball3Y = ball3R; ball3VY = -ball3VY * damping; }
+    if (ball3Y + ball3R > screenHeight) { ball3Y = screenHeight - ball3R; ball3VY = -ball3VY * damping; if (gravityEnabled != 0) { ball3VX = ball3VX * 0.99; } }
 
-        // Right wall
-        let maxX: f32 = screenWidth;
-        if (ballX[i] + r > maxX) {
-            ballX[i] = maxX - r;
-            ballVX[i] = -ballVX[i] * damping;
-        }
-
-        // Top wall
-        if (ballY[i] - r < 0.0) {
-            ballY[i] = r;
-            ballVY[i] = -ballVY[i] * damping;
-        }
-
-        // Bottom wall
-        let maxY: f32 = screenHeight;
-        if (ballY[i] + r > maxY) {
-            ballY[i] = maxY - r;
-            ballVY[i] = -ballVY[i] * damping;
-
-            // Extra friction on ground when gravity is on
-            if (gravityEnabled != 0) {
-                ballVX[i] = ballVX[i] * 0.99;
-            }
-        }
-    }
+    // Update ball 4
+    if (gravityEnabled != 0) { ball4VY = ball4VY + gravity * dt; }
+    ball4X = ball4X + ball4VX * dt;
+    ball4Y = ball4Y + ball4VY * dt;
+    if (ball4X - ball4R < 0.0) { ball4X = ball4R; ball4VX = -ball4VX * damping; }
+    if (ball4X + ball4R > screenWidth) { ball4X = screenWidth - ball4R; ball4VX = -ball4VX * damping; }
+    if (ball4Y - ball4R < 0.0) { ball4Y = ball4R; ball4VY = -ball4VY * damping; }
+    if (ball4Y + ball4R > screenHeight) { ball4Y = screenHeight - ball4R; ball4VY = -ball4VY * damping; if (gravityEnabled != 0) { ball4VX = ball4VX * 0.99; } }
 
     // Draw
     BeginDrawing();
@@ -142,11 +125,11 @@ while (WindowShouldClose() == 0) {
     DrawRectangleLines(0, 0, screenWidth, screenHeight, DARKGRAY);
 
     // Draw balls
-    for (let i = 0; i < MAX_BALLS; i = i + 1) {
-        let bx: i32 = ballX[i];
-        let by: i32 = ballY[i];
-        DrawCircle(bx, by, ballRadius[i], ballColors[i]);
-    }
+    DrawCircle(ball0X, ball0Y, ball0R, RED);
+    DrawCircle(ball1X, ball1Y, ball1R, GREEN);
+    DrawCircle(ball2X, ball2Y, ball2R, BLUE);
+    DrawCircle(ball3X, ball3Y, ball3R, YELLOW);
+    DrawCircle(ball4X, ball4Y, ball4R, PURPLE);
 
     // UI
     DrawText("Bouncing Balls Demo", 10, 10, 24, BLACK);

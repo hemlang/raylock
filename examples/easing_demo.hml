@@ -1,0 +1,179 @@
+// Easing Demo - Showcase various easing functions
+// Demonstrates: animation with different easing curves
+
+import {
+    // Window
+    InitWindow, CloseWindow, WindowShouldClose, SetTargetFPS, GetFPS, GetTime,
+    // Drawing
+    BeginDrawing, EndDrawing, ClearBackground,
+    // Shapes
+    DrawCircle, DrawRectangle, DrawLine,
+    // Text
+    DrawText, DrawFPS,
+    // Input
+    IsKeyPressed,
+    // Colors
+    RAYWHITE, RED, GREEN, BLUE, YELLOW, ORANGE, PURPLE, PINK,
+    DARKGRAY, BLACK, LIGHTGRAY, SKYBLUE, LIME, GOLD, MAROON, DARKBLUE,
+    // Keys
+    KEY_SPACE, KEY_R,
+    // Easing functions
+    EaseLinear, EaseInQuad, EaseOutQuad, EaseInOutQuad,
+    EaseInCubic, EaseOutCubic, EaseInOutCubic,
+    EaseInElastic, EaseOutElastic, EaseOutBounce, EaseInOutBack,
+    // Utilities
+    Lerp
+} from "../src/raylib.hml";
+
+let screenWidth = 900;
+let screenHeight = 700;
+
+InitWindow(screenWidth, screenHeight, "Hemlock + Raylib - Easing Demo");
+SetTargetFPS(60);
+
+// Animation state
+let animTime: f32 = 0.0;
+let animDuration: f32 = 2.0;
+let playing = 1;
+
+// Positions
+let startX: f32 = 100.0;
+let endX: f32 = 750.0;
+
+while (WindowShouldClose() == 0) {
+    let dt: f32 = 1.0 / 60.0;
+
+    // Toggle play/pause
+    if (IsKeyPressed(KEY_SPACE) != 0) {
+        if (playing == 0) {
+            playing = 1;
+        } else {
+            playing = 0;
+        }
+    }
+
+    // Reset animation
+    if (IsKeyPressed(KEY_R) != 0) {
+        animTime = 0.0;
+        playing = 1;
+    }
+
+    // Update animation time
+    if (playing != 0) {
+        animTime = animTime + dt;
+        if (animTime > animDuration) {
+            animTime = 0.0;
+        }
+    }
+
+    // Normalized time (0 to 1)
+    let t: f32 = animTime / animDuration;
+
+    BeginDrawing();
+    ClearBackground(RAYWHITE);
+
+    // Title
+    DrawText("Easing Functions Demo", 300, 20, 30, DARKGRAY);
+    DrawText("SPACE: Play/Pause | R: Reset", 300, 55, 16, DARKGRAY);
+
+    // Draw timeline
+    DrawRectangle(100, 85, 650, 4, LIGHTGRAY);
+    let timelinePos: i32 = 100 + t * 650.0;
+    DrawCircle(timelinePos, 87, 8.0, DARKGRAY);
+
+    // Row spacing
+    let rowHeight = 50;
+    let baseY = 120;
+    let ballRadius: f32 = 12.0;
+
+    // Linear
+    let y0 = baseY;
+    let x0: i32 = Lerp(startX, endX, EaseLinear(t));
+    DrawText("Linear", 10, y0 - 5, 14, DARKGRAY);
+    DrawLine(100, y0, 750, y0, LIGHTGRAY);
+    DrawCircle(x0, y0, ballRadius, RED);
+
+    // Quad In
+    let y1 = baseY + rowHeight;
+    let x1: i32 = Lerp(startX, endX, EaseInQuad(t));
+    DrawText("InQuad", 10, y1 - 5, 14, DARKGRAY);
+    DrawLine(100, y1, 750, y1, LIGHTGRAY);
+    DrawCircle(x1, y1, ballRadius, ORANGE);
+
+    // Quad Out
+    let y2 = baseY + rowHeight * 2;
+    let x2: i32 = Lerp(startX, endX, EaseOutQuad(t));
+    DrawText("OutQuad", 10, y2 - 5, 14, DARKGRAY);
+    DrawLine(100, y2, 750, y2, LIGHTGRAY);
+    DrawCircle(x2, y2, ballRadius, YELLOW);
+
+    // Quad InOut
+    let y3 = baseY + rowHeight * 3;
+    let x3: i32 = Lerp(startX, endX, EaseInOutQuad(t));
+    DrawText("InOutQuad", 10, y3 - 5, 14, DARKGRAY);
+    DrawLine(100, y3, 750, y3, LIGHTGRAY);
+    DrawCircle(x3, y3, ballRadius, LIME);
+
+    // Cubic In
+    let y4 = baseY + rowHeight * 4;
+    let x4: i32 = Lerp(startX, endX, EaseInCubic(t));
+    DrawText("InCubic", 10, y4 - 5, 14, DARKGRAY);
+    DrawLine(100, y4, 750, y4, LIGHTGRAY);
+    DrawCircle(x4, y4, ballRadius, GREEN);
+
+    // Cubic Out
+    let y5 = baseY + rowHeight * 5;
+    let x5: i32 = Lerp(startX, endX, EaseOutCubic(t));
+    DrawText("OutCubic", 10, y5 - 5, 14, DARKGRAY);
+    DrawLine(100, y5, 750, y5, LIGHTGRAY);
+    DrawCircle(x5, y5, ballRadius, SKYBLUE);
+
+    // Cubic InOut
+    let y6 = baseY + rowHeight * 6;
+    let x6: i32 = Lerp(startX, endX, EaseInOutCubic(t));
+    DrawText("InOutCubic", 10, y6 - 5, 14, DARKGRAY);
+    DrawLine(100, y6, 750, y6, LIGHTGRAY);
+    DrawCircle(x6, y6, ballRadius, BLUE);
+
+    // Elastic In
+    let y7 = baseY + rowHeight * 7;
+    let x7: i32 = Lerp(startX, endX, EaseInElastic(t));
+    DrawText("InElastic", 10, y7 - 5, 14, DARKGRAY);
+    DrawLine(100, y7, 750, y7, LIGHTGRAY);
+    DrawCircle(x7, y7, ballRadius, PURPLE);
+
+    // Elastic Out
+    let y8 = baseY + rowHeight * 8;
+    let x8: i32 = Lerp(startX, endX, EaseOutElastic(t));
+    DrawText("OutElastic", 10, y8 - 5, 14, DARKGRAY);
+    DrawLine(100, y8, 750, y8, LIGHTGRAY);
+    DrawCircle(x8, y8, ballRadius, PINK);
+
+    // Bounce Out
+    let y9 = baseY + rowHeight * 9;
+    let x9: i32 = Lerp(startX, endX, EaseOutBounce(t));
+    DrawText("OutBounce", 10, y9 - 5, 14, DARKGRAY);
+    DrawLine(100, y9, 750, y9, LIGHTGRAY);
+    DrawCircle(x9, y9, ballRadius, MAROON);
+
+    // Back InOut
+    let y10 = baseY + rowHeight * 10;
+    let x10: i32 = Lerp(startX, endX, EaseInOutBack(t));
+    DrawText("InOutBack", 10, y10 - 5, 14, DARKGRAY);
+    DrawLine(100, y10, 750, y10, LIGHTGRAY);
+    DrawCircle(x10, y10, ballRadius, DARKBLUE);
+
+    // Status
+    if (playing != 0) {
+        DrawText("Playing", 800, 100, 16, GREEN);
+    } else {
+        DrawText("Paused", 800, 100, 16, RED);
+    }
+
+    DrawFPS(screenWidth - 100, 10);
+
+    EndDrawing();
+}
+
+CloseWindow();
+print("Easing demo closed!");

@@ -1,0 +1,134 @@
+// raylib-hemlock: Core raylib bindings for Hemlock
+// This is a minimal version with essential functions and constants
+
+// Load raylib library (cross-platform)
+import { RAYLIB_LOADED } from "./raylib_loader.hml";
+
+// ============================================================================
+// Core FFI Functions
+// ============================================================================
+
+export extern fn InitWindow(width: i32, height: i32, title: string): void;
+export extern fn CloseWindow(): void;
+export extern fn WindowShouldClose(): i32;
+export extern fn SetTargetFPS(fps: i32): void;
+export extern fn GetFPS(): i32;
+export extern fn GetFrameTime(): f32;
+export extern fn GetTime(): f64;
+export extern fn BeginDrawing(): void;
+export extern fn EndDrawing(): void;
+export extern fn ClearBackground(color: u32): void;
+
+// Shapes
+export extern fn DrawRectangle(posX: i32, posY: i32, width: i32, height: i32, color: u32): void;
+export extern fn DrawRectangleLines(posX: i32, posY: i32, width: i32, height: i32, color: u32): void;
+export extern fn DrawCircle(centerX: i32, centerY: i32, radius: f32, color: u32): void;
+export extern fn DrawCircleLines(centerX: i32, centerY: i32, radius: f32, color: u32): void;
+export extern fn DrawLine(startX: i32, startY: i32, endX: i32, endY: i32, color: u32): void;
+
+// Text
+export extern fn DrawText(text: string, posX: i32, posY: i32, fontSize: i32, color: u32): void;
+export extern fn DrawFPS(posX: i32, posY: i32): void;
+
+// Input - Keyboard
+export extern fn IsKeyPressed(key: i32): i32;
+export extern fn IsKeyDown(key: i32): i32;
+export extern fn IsKeyReleased(key: i32): i32;
+export extern fn IsKeyUp(key: i32): i32;
+
+// Input - Mouse
+export extern fn IsMouseButtonPressed(button: i32): i32;
+export extern fn IsMouseButtonDown(button: i32): i32;
+export extern fn GetMouseX(): i32;
+export extern fn GetMouseY(): i32;
+
+// ============================================================================
+// Color Helper
+// ============================================================================
+
+export fn Color(r: u8, g: u8, b: u8, a: u8): u32 {
+    let r32: u32 = r;
+    let g32: u32 = g;
+    let b32: u32 = b;
+    let a32: u32 = a;
+    return (a32 << 24) | (b32 << 16) | (g32 << 8) | r32;
+}
+
+// ============================================================================
+// Standard Colors
+// ============================================================================
+
+export let LIGHTGRAY: u32  = Color(200, 200, 200, 255);
+export let GRAY: u32       = Color(130, 130, 130, 255);
+export let DARKGRAY: u32   = Color(80, 80, 80, 255);
+export let YELLOW: u32     = Color(253, 249, 0, 255);
+export let GOLD: u32       = Color(255, 203, 0, 255);
+export let ORANGE: u32     = Color(255, 161, 0, 255);
+export let PINK: u32       = Color(255, 109, 194, 255);
+export let RED: u32        = Color(230, 41, 55, 255);
+export let MAROON: u32     = Color(190, 33, 55, 255);
+export let GREEN: u32      = Color(0, 228, 48, 255);
+export let LIME: u32       = Color(0, 158, 47, 255);
+export let DARKGREEN: u32  = Color(0, 117, 44, 255);
+export let SKYBLUE: u32    = Color(102, 191, 255, 255);
+export let BLUE: u32       = Color(0, 121, 241, 255);
+export let DARKBLUE: u32   = Color(0, 82, 172, 255);
+export let PURPLE: u32     = Color(200, 122, 255, 255);
+export let VIOLET: u32     = Color(135, 60, 190, 255);
+export let DARKPURPLE: u32 = Color(112, 31, 126, 255);
+export let BEIGE: u32      = Color(211, 176, 131, 255);
+export let BROWN: u32      = Color(127, 106, 79, 255);
+export let DARKBROWN: u32  = Color(76, 63, 47, 255);
+export let WHITE: u32      = Color(255, 255, 255, 255);
+export let BLACK: u32      = Color(0, 0, 0, 255);
+export let BLANK: u32      = Color(0, 0, 0, 0);
+export let MAGENTA: u32    = Color(255, 0, 255, 255);
+export let RAYWHITE: u32   = Color(245, 245, 245, 255);
+
+// ============================================================================
+// Key Constants
+// ============================================================================
+
+export let KEY_SPACE: i32          = 32;
+export let KEY_ESCAPE: i32         = 256;
+export let KEY_ENTER: i32          = 257;
+export let KEY_TAB: i32            = 258;
+export let KEY_BACKSPACE: i32      = 259;
+export let KEY_RIGHT: i32          = 262;
+export let KEY_LEFT: i32           = 263;
+export let KEY_DOWN: i32           = 264;
+export let KEY_UP: i32             = 265;
+export let KEY_A: i32              = 65;
+export let KEY_B: i32              = 66;
+export let KEY_C: i32              = 67;
+export let KEY_D: i32              = 68;
+export let KEY_E: i32              = 69;
+export let KEY_F: i32              = 70;
+export let KEY_G: i32              = 71;
+export let KEY_H: i32              = 72;
+export let KEY_I: i32              = 73;
+export let KEY_J: i32              = 74;
+export let KEY_K: i32              = 75;
+export let KEY_L: i32              = 76;
+export let KEY_M: i32              = 77;
+export let KEY_N: i32              = 78;
+export let KEY_O: i32              = 79;
+export let KEY_P: i32              = 80;
+export let KEY_Q: i32              = 81;
+export let KEY_R: i32              = 82;
+export let KEY_S: i32              = 83;
+export let KEY_T: i32              = 84;
+export let KEY_U: i32              = 85;
+export let KEY_V: i32              = 86;
+export let KEY_W: i32              = 87;
+export let KEY_X: i32              = 88;
+export let KEY_Y: i32              = 89;
+export let KEY_Z: i32              = 90;
+
+// ============================================================================
+// Mouse Button Constants
+// ============================================================================
+
+export let MOUSE_BUTTON_LEFT: i32   = 0;
+export let MOUSE_BUTTON_RIGHT: i32  = 1;
+export let MOUSE_BUTTON_MIDDLE: i32 = 2;

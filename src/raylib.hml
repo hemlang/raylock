@@ -2,19 +2,15 @@
 // Uses Hemlock's FFI to call raylib C functions
 //
 // Usage:
-//   1. First import the loader to load raylib for your platform:
-//      import { RAYLIB_LOADED } from "./raylib_loader.hml";
+//   import { InitWindow, CloseWindow, DrawText, RED, KEY_ESCAPE } from "./raylib.hml";
 //
-//   2. Then define the extern functions you need in your file.
-//      See examples/ for usage patterns.
-//
-// This file contains:
-//   - extern fn declarations for raylib functions
-//   - Utility functions (Color, collision detection, math helpers, etc.)
+// This file exports:
+//   - All raylib FFI functions (export extern fn)
+//   - Utility functions (Color, collision detection, math helpers, easing, etc.)
 //   - Constants (colors, keys, config flags, etc.)
 //
-// Note: The raylib_loader.hml module handles cross-platform library loading.
-// Import it before defining extern functions.
+// The raylib library is automatically loaded when you import this module.
+// FFI symbols are resolved lazily - only when you actually call the function.
 
 // Load raylib library (cross-platform)
 import { RAYLIB_LOADED } from "./raylib_loader.hml";
@@ -23,217 +19,217 @@ import { RAYLIB_LOADED } from "./raylib_loader.hml";
 // Core - Window/Context
 // ============================================================================
 
-extern fn InitWindow(width: i32, height: i32, title: string): void;
-extern fn CloseWindow(): void;
-extern fn WindowShouldClose(): i32;
-extern fn IsWindowReady(): i32;
-extern fn IsWindowFullscreen(): i32;
-extern fn IsWindowHidden(): i32;
-extern fn IsWindowMinimized(): i32;
-extern fn IsWindowMaximized(): i32;
-extern fn IsWindowFocused(): i32;
-extern fn IsWindowResized(): i32;
-extern fn SetWindowTitle(title: string): void;
-extern fn SetWindowPosition(x: i32, y: i32): void;
-extern fn SetWindowSize(width: i32, height: i32): void;
-extern fn SetWindowMinSize(width: i32, height: i32): void;
-extern fn SetWindowMaxSize(width: i32, height: i32): void;
-extern fn GetScreenWidth(): i32;
-extern fn GetScreenHeight(): i32;
-extern fn GetRenderWidth(): i32;
-extern fn GetRenderHeight(): i32;
-extern fn GetMonitorCount(): i32;
-extern fn GetCurrentMonitor(): i32;
-extern fn GetMonitorWidth(monitor: i32): i32;
-extern fn GetMonitorHeight(monitor: i32): i32;
-extern fn GetMonitorRefreshRate(monitor: i32): i32;
-extern fn ToggleFullscreen(): void;
-extern fn ToggleBorderlessWindowed(): void;
-extern fn MaximizeWindow(): void;
-extern fn MinimizeWindow(): void;
-extern fn RestoreWindow(): void;
-extern fn SetWindowOpacity(opacity: f32): void;
-extern fn SetTargetFPS(fps: i32): void;
-extern fn GetFPS(): i32;
-extern fn GetFrameTime(): f32;
-extern fn GetTime(): f64;
+export extern fn InitWindow(width: i32, height: i32, title: string): void;
+export extern fn CloseWindow(): void;
+export extern fn WindowShouldClose(): i32;
+export extern fn IsWindowReady(): i32;
+export extern fn IsWindowFullscreen(): i32;
+export extern fn IsWindowHidden(): i32;
+export extern fn IsWindowMinimized(): i32;
+export extern fn IsWindowMaximized(): i32;
+export extern fn IsWindowFocused(): i32;
+export extern fn IsWindowResized(): i32;
+export extern fn SetWindowTitle(title: string): void;
+export extern fn SetWindowPosition(x: i32, y: i32): void;
+export extern fn SetWindowSize(width: i32, height: i32): void;
+export extern fn SetWindowMinSize(width: i32, height: i32): void;
+export extern fn SetWindowMaxSize(width: i32, height: i32): void;
+export extern fn GetScreenWidth(): i32;
+export extern fn GetScreenHeight(): i32;
+export extern fn GetRenderWidth(): i32;
+export extern fn GetRenderHeight(): i32;
+export extern fn GetMonitorCount(): i32;
+export extern fn GetCurrentMonitor(): i32;
+export extern fn GetMonitorWidth(monitor: i32): i32;
+export extern fn GetMonitorHeight(monitor: i32): i32;
+export extern fn GetMonitorRefreshRate(monitor: i32): i32;
+export extern fn ToggleFullscreen(): void;
+export extern fn ToggleBorderlessWindowed(): void;
+export extern fn MaximizeWindow(): void;
+export extern fn MinimizeWindow(): void;
+export extern fn RestoreWindow(): void;
+export extern fn SetWindowOpacity(opacity: f32): void;
+export extern fn SetTargetFPS(fps: i32): void;
+export extern fn GetFPS(): i32;
+export extern fn GetFrameTime(): f32;
+export extern fn GetTime(): f64;
 
 // ============================================================================
 // Core - Drawing
 // ============================================================================
 
 // Note: ClearBackground takes Color struct (4 bytes RGBA) passed as u32
-extern fn ClearBackground(color: u32): void;
-extern fn BeginDrawing(): void;
-extern fn EndDrawing(): void;
+export extern fn ClearBackground(color: u32): void;
+export extern fn BeginDrawing(): void;
+export extern fn EndDrawing(): void;
 
 // Blend modes
-extern fn BeginBlendMode(mode: i32): void;
-extern fn EndBlendMode(): void;
+export extern fn BeginBlendMode(mode: i32): void;
+export extern fn EndBlendMode(): void;
 
 // Scissor mode (clipping)
-extern fn BeginScissorMode(x: i32, y: i32, width: i32, height: i32): void;
-extern fn EndScissorMode(): void;
+export extern fn BeginScissorMode(x: i32, y: i32, width: i32, height: i32): void;
+export extern fn EndScissorMode(): void;
 
 // ============================================================================
 // Core - Input: Keyboard
 // ============================================================================
 
-extern fn IsKeyPressed(key: i32): i32;
-extern fn IsKeyPressedRepeat(key: i32): i32;
-extern fn IsKeyDown(key: i32): i32;
-extern fn IsKeyReleased(key: i32): i32;
-extern fn IsKeyUp(key: i32): i32;
-extern fn GetKeyPressed(): i32;
-extern fn GetCharPressed(): i32;
-extern fn SetExitKey(key: i32): void;
+export extern fn IsKeyPressed(key: i32): i32;
+export extern fn IsKeyPressedRepeat(key: i32): i32;
+export extern fn IsKeyDown(key: i32): i32;
+export extern fn IsKeyReleased(key: i32): i32;
+export extern fn IsKeyUp(key: i32): i32;
+export extern fn GetKeyPressed(): i32;
+export extern fn GetCharPressed(): i32;
+export extern fn SetExitKey(key: i32): void;
 
 // ============================================================================
 // Core - Input: Mouse
 // ============================================================================
 
-extern fn IsMouseButtonPressed(button: i32): i32;
-extern fn IsMouseButtonDown(button: i32): i32;
-extern fn IsMouseButtonReleased(button: i32): i32;
-extern fn IsMouseButtonUp(button: i32): i32;
-extern fn GetMouseX(): i32;
-extern fn GetMouseY(): i32;
-extern fn GetMouseWheelMove(): f32;
-extern fn SetMousePosition(x: i32, y: i32): void;
-extern fn SetMouseOffset(offsetX: i32, offsetY: i32): void;
-extern fn SetMouseScale(scaleX: f32, scaleY: f32): void;
-extern fn ShowCursor(): void;
-extern fn HideCursor(): void;
-extern fn IsCursorHidden(): i32;
-extern fn EnableCursor(): void;
-extern fn DisableCursor(): void;
-extern fn IsCursorOnScreen(): i32;
+export extern fn IsMouseButtonPressed(button: i32): i32;
+export extern fn IsMouseButtonDown(button: i32): i32;
+export extern fn IsMouseButtonReleased(button: i32): i32;
+export extern fn IsMouseButtonUp(button: i32): i32;
+export extern fn GetMouseX(): i32;
+export extern fn GetMouseY(): i32;
+export extern fn GetMouseWheelMove(): f32;
+export extern fn SetMousePosition(x: i32, y: i32): void;
+export extern fn SetMouseOffset(offsetX: i32, offsetY: i32): void;
+export extern fn SetMouseScale(scaleX: f32, scaleY: f32): void;
+export extern fn ShowCursor(): void;
+export extern fn HideCursor(): void;
+export extern fn IsCursorHidden(): i32;
+export extern fn EnableCursor(): void;
+export extern fn DisableCursor(): void;
+export extern fn IsCursorOnScreen(): i32;
 
 // ============================================================================
 // Core - Input: Gamepad
 // ============================================================================
 
-extern fn IsGamepadAvailable(gamepad: i32): i32;
-extern fn GetGamepadName(gamepad: i32): string;
-extern fn IsGamepadButtonPressed(gamepad: i32, button: i32): i32;
-extern fn IsGamepadButtonDown(gamepad: i32, button: i32): i32;
-extern fn IsGamepadButtonReleased(gamepad: i32, button: i32): i32;
-extern fn IsGamepadButtonUp(gamepad: i32, button: i32): i32;
-extern fn GetGamepadButtonPressed(): i32;
-extern fn GetGamepadAxisCount(gamepad: i32): i32;
-extern fn GetGamepadAxisMovement(gamepad: i32, axis: i32): f32;
-extern fn SetGamepadMappings(mappings: string): i32;
+export extern fn IsGamepadAvailable(gamepad: i32): i32;
+export extern fn GetGamepadName(gamepad: i32): string;
+export extern fn IsGamepadButtonPressed(gamepad: i32, button: i32): i32;
+export extern fn IsGamepadButtonDown(gamepad: i32, button: i32): i32;
+export extern fn IsGamepadButtonReleased(gamepad: i32, button: i32): i32;
+export extern fn IsGamepadButtonUp(gamepad: i32, button: i32): i32;
+export extern fn GetGamepadButtonPressed(): i32;
+export extern fn GetGamepadAxisCount(gamepad: i32): i32;
+export extern fn GetGamepadAxisMovement(gamepad: i32, axis: i32): f32;
+export extern fn SetGamepadMappings(mappings: string): i32;
 
 // ============================================================================
 // Core - Input: Touch
 // ============================================================================
 
-extern fn GetTouchX(): i32;
-extern fn GetTouchY(): i32;
-extern fn GetTouchPointId(index: i32): i32;
-extern fn GetTouchPointCount(): i32;
+export extern fn GetTouchX(): i32;
+export extern fn GetTouchY(): i32;
+export extern fn GetTouchPointId(index: i32): i32;
+export extern fn GetTouchPointCount(): i32;
 
 // ============================================================================
 // Core - Gestures
 // ============================================================================
 
-extern fn SetGesturesEnabled(flags: u32): void;
-extern fn IsGestureDetected(gesture: u32): i32;
-extern fn GetGestureDetected(): i32;
-extern fn GetGestureHoldDuration(): f32;
-extern fn GetGestureDragAngle(): f32;
-extern fn GetGesturePinchAngle(): f32;
+export extern fn SetGesturesEnabled(flags: u32): void;
+export extern fn IsGestureDetected(gesture: u32): i32;
+export extern fn GetGestureDetected(): i32;
+export extern fn GetGestureHoldDuration(): f32;
+export extern fn GetGestureDragAngle(): f32;
+export extern fn GetGesturePinchAngle(): f32;
 
 // ============================================================================
 // Shapes - Basic Drawing
 // ============================================================================
 
-extern fn DrawPixel(posX: i32, posY: i32, color: u32): void;
-extern fn DrawLine(startPosX: i32, startPosY: i32, endPosX: i32, endPosY: i32, color: u32): void;
-extern fn DrawLineEx(startPosX: i32, startPosY: i32, endPosX: i32, endPosY: i32, thick: f32, color: u32): void;
-extern fn DrawCircle(centerX: i32, centerY: i32, radius: f32, color: u32): void;
-extern fn DrawCircleGradient(centerX: i32, centerY: i32, radius: f32, color1: u32, color2: u32): void;
-extern fn DrawCircleLines(centerX: i32, centerY: i32, radius: f32, color: u32): void;
-extern fn DrawEllipse(centerX: i32, centerY: i32, radiusH: f32, radiusV: f32, color: u32): void;
-extern fn DrawEllipseLines(centerX: i32, centerY: i32, radiusH: f32, radiusV: f32, color: u32): void;
-extern fn DrawRectangle(posX: i32, posY: i32, width: i32, height: i32, color: u32): void;
-extern fn DrawRectangleGradientV(posX: i32, posY: i32, width: i32, height: i32, color1: u32, color2: u32): void;
-extern fn DrawRectangleGradientH(posX: i32, posY: i32, width: i32, height: i32, color1: u32, color2: u32): void;
-extern fn DrawRectangleLines(posX: i32, posY: i32, width: i32, height: i32, color: u32): void;
-extern fn DrawTriangle(v1x: i32, v1y: i32, v2x: i32, v2y: i32, v3x: i32, v3y: i32, color: u32): void;
-extern fn DrawTriangleLines(v1x: i32, v1y: i32, v2x: i32, v2y: i32, v3x: i32, v3y: i32, color: u32): void;
+export extern fn DrawPixel(posX: i32, posY: i32, color: u32): void;
+export extern fn DrawLine(startPosX: i32, startPosY: i32, endPosX: i32, endPosY: i32, color: u32): void;
+export extern fn DrawLineEx(startPosX: i32, startPosY: i32, endPosX: i32, endPosY: i32, thick: f32, color: u32): void;
+export extern fn DrawCircle(centerX: i32, centerY: i32, radius: f32, color: u32): void;
+export extern fn DrawCircleGradient(centerX: i32, centerY: i32, radius: f32, color1: u32, color2: u32): void;
+export extern fn DrawCircleLines(centerX: i32, centerY: i32, radius: f32, color: u32): void;
+export extern fn DrawEllipse(centerX: i32, centerY: i32, radiusH: f32, radiusV: f32, color: u32): void;
+export extern fn DrawEllipseLines(centerX: i32, centerY: i32, radiusH: f32, radiusV: f32, color: u32): void;
+export extern fn DrawRectangle(posX: i32, posY: i32, width: i32, height: i32, color: u32): void;
+export extern fn DrawRectangleGradientV(posX: i32, posY: i32, width: i32, height: i32, color1: u32, color2: u32): void;
+export extern fn DrawRectangleGradientH(posX: i32, posY: i32, width: i32, height: i32, color1: u32, color2: u32): void;
+export extern fn DrawRectangleLines(posX: i32, posY: i32, width: i32, height: i32, color: u32): void;
+export extern fn DrawTriangle(v1x: i32, v1y: i32, v2x: i32, v2y: i32, v3x: i32, v3y: i32, color: u32): void;
+export extern fn DrawTriangleLines(v1x: i32, v1y: i32, v2x: i32, v2y: i32, v3x: i32, v3y: i32, color: u32): void;
 
 // ============================================================================
 // Text - Drawing
 // ============================================================================
 
-extern fn DrawText(text: string, posX: i32, posY: i32, fontSize: i32, color: u32): void;
-extern fn MeasureText(text: string, fontSize: i32): i32;
+export extern fn DrawText(text: string, posX: i32, posY: i32, fontSize: i32, color: u32): void;
+export extern fn MeasureText(text: string, fontSize: i32): i32;
 
 // ============================================================================
 // Core - Timing
 // ============================================================================
 
-extern fn WaitTime(seconds: f64): void;
+export extern fn WaitTime(seconds: f64): void;
 
 // ============================================================================
 // Core - Random
 // ============================================================================
 
-extern fn GetRandomValue(min: i32, max: i32): i32;
-extern fn SetRandomSeed(seed: u32): void;
+export extern fn GetRandomValue(min: i32, max: i32): i32;
+export extern fn SetRandomSeed(seed: u32): void;
 
 // ============================================================================
 // Core - Misc
 // ============================================================================
 
-extern fn TakeScreenshot(fileName: string): void;
-extern fn SetConfigFlags(flags: u32): void;
-extern fn OpenURL(url: string): void;
+export extern fn TakeScreenshot(fileName: string): void;
+export extern fn SetConfigFlags(flags: u32): void;
+export extern fn OpenURL(url: string): void;
 
 // ============================================================================
 // Core - Clipboard
 // ============================================================================
 
-extern fn SetClipboardText(text: string): void;
-extern fn GetClipboardText(): string;
+export extern fn SetClipboardText(text: string): void;
+export extern fn GetClipboardText(): string;
 
 // ============================================================================
 // Shapes - Advanced Drawing
 // ============================================================================
 
-extern fn DrawCircleSector(centerX: i32, centerY: i32, radius: f32, startAngle: f32, endAngle: f32, segments: i32, color: u32): void;
-extern fn DrawCircleSectorLines(centerX: i32, centerY: i32, radius: f32, startAngle: f32, endAngle: f32, segments: i32, color: u32): void;
-extern fn DrawRing(centerX: i32, centerY: i32, innerRadius: f32, outerRadius: f32, startAngle: f32, endAngle: f32, segments: i32, color: u32): void;
-extern fn DrawRingLines(centerX: i32, centerY: i32, innerRadius: f32, outerRadius: f32, startAngle: f32, endAngle: f32, segments: i32, color: u32): void;
-extern fn DrawRectangleRounded(posX: i32, posY: i32, width: i32, height: i32, roundness: f32, segments: i32, color: u32): void;
-extern fn DrawRectangleRoundedLines(posX: i32, posY: i32, width: i32, height: i32, roundness: f32, segments: i32, color: u32): void;
-extern fn DrawRectangleLinesEx(posX: i32, posY: i32, width: i32, height: i32, lineThick: f32, color: u32): void;
-extern fn DrawPoly(centerX: i32, centerY: i32, sides: i32, radius: f32, rotation: f32, color: u32): void;
-extern fn DrawPolyLines(centerX: i32, centerY: i32, sides: i32, radius: f32, rotation: f32, color: u32): void;
-extern fn DrawPolyLinesEx(centerX: i32, centerY: i32, sides: i32, radius: f32, rotation: f32, lineThick: f32, color: u32): void;
+export extern fn DrawCircleSector(centerX: i32, centerY: i32, radius: f32, startAngle: f32, endAngle: f32, segments: i32, color: u32): void;
+export extern fn DrawCircleSectorLines(centerX: i32, centerY: i32, radius: f32, startAngle: f32, endAngle: f32, segments: i32, color: u32): void;
+export extern fn DrawRing(centerX: i32, centerY: i32, innerRadius: f32, outerRadius: f32, startAngle: f32, endAngle: f32, segments: i32, color: u32): void;
+export extern fn DrawRingLines(centerX: i32, centerY: i32, innerRadius: f32, outerRadius: f32, startAngle: f32, endAngle: f32, segments: i32, color: u32): void;
+export extern fn DrawRectangleRounded(posX: i32, posY: i32, width: i32, height: i32, roundness: f32, segments: i32, color: u32): void;
+export extern fn DrawRectangleRoundedLines(posX: i32, posY: i32, width: i32, height: i32, roundness: f32, segments: i32, color: u32): void;
+export extern fn DrawRectangleLinesEx(posX: i32, posY: i32, width: i32, height: i32, lineThick: f32, color: u32): void;
+export extern fn DrawPoly(centerX: i32, centerY: i32, sides: i32, radius: f32, rotation: f32, color: u32): void;
+export extern fn DrawPolyLines(centerX: i32, centerY: i32, sides: i32, radius: f32, rotation: f32, color: u32): void;
+export extern fn DrawPolyLinesEx(centerX: i32, centerY: i32, sides: i32, radius: f32, rotation: f32, lineThick: f32, color: u32): void;
 
 // ============================================================================
 // Shapes - Splines
 // ============================================================================
 
-extern fn DrawLineBezier(startPosX: i32, startPosY: i32, endPosX: i32, endPosY: i32, thick: f32, color: u32): void;
+export extern fn DrawLineBezier(startPosX: i32, startPosY: i32, endPosX: i32, endPosY: i32, thick: f32, color: u32): void;
 
 // ============================================================================
 // Text - Extended
 // ============================================================================
 
-extern fn DrawFPS(posX: i32, posY: i32): void;
+export extern fn DrawFPS(posX: i32, posY: i32): void;
 
 // ============================================================================
 // Audio - Device Management
 // ============================================================================
 
-extern fn InitAudioDevice(): void;
-extern fn CloseAudioDevice(): void;
-extern fn IsAudioDeviceReady(): i32;
-extern fn SetMasterVolume(volume: f32): void;
-extern fn GetMasterVolume(): f32;
+export extern fn InitAudioDevice(): void;
+export extern fn CloseAudioDevice(): void;
+export extern fn IsAudioDeviceReady(): i32;
+export extern fn SetMasterVolume(volume: f32): void;
+export extern fn GetMasterVolume(): f32;
 
 // ============================================================================
 // Textures - Loading and Drawing
@@ -241,151 +237,151 @@ extern fn GetMasterVolume(): f32;
 // Note: Texture2D is passed as an opaque handle (pointer)
 // These functions assume the FFI can handle struct-by-value or pointer semantics
 
-extern fn LoadTexture(fileName: string): ptr;
-extern fn UnloadTexture(texture: ptr): void;
-extern fn DrawTexture(texture: ptr, posX: i32, posY: i32, tint: u32): void;
-extern fn DrawTextureV(texture: ptr, posX: f32, posY: f32, tint: u32): void;
-extern fn DrawTextureEx(texture: ptr, posX: f32, posY: f32, rotation: f32, scale: f32, tint: u32): void;
-extern fn DrawTextureRec(texture: ptr, srcX: f32, srcY: f32, srcW: f32, srcH: f32, posX: f32, posY: f32, tint: u32): void;
-extern fn DrawTexturePro(texture: ptr, srcX: f32, srcY: f32, srcW: f32, srcH: f32, destX: f32, destY: f32, destW: f32, destH: f32, originX: f32, originY: f32, rotation: f32, tint: u32): void;
+export extern fn LoadTexture(fileName: string): ptr;
+export extern fn UnloadTexture(texture: ptr): void;
+export extern fn DrawTexture(texture: ptr, posX: i32, posY: i32, tint: u32): void;
+export extern fn DrawTextureV(texture: ptr, posX: f32, posY: f32, tint: u32): void;
+export extern fn DrawTextureEx(texture: ptr, posX: f32, posY: f32, rotation: f32, scale: f32, tint: u32): void;
+export extern fn DrawTextureRec(texture: ptr, srcX: f32, srcY: f32, srcW: f32, srcH: f32, posX: f32, posY: f32, tint: u32): void;
+export extern fn DrawTexturePro(texture: ptr, srcX: f32, srcY: f32, srcW: f32, srcH: f32, destX: f32, destY: f32, destW: f32, destH: f32, originX: f32, originY: f32, rotation: f32, tint: u32): void;
 
 // Texture properties (get dimensions from loaded texture)
-extern fn GetTextureWidth(texture: ptr): i32;
-extern fn GetTextureHeight(texture: ptr): i32;
+export extern fn GetTextureWidth(texture: ptr): i32;
+export extern fn GetTextureHeight(texture: ptr): i32;
 
 // Texture configuration
-extern fn SetTextureFilter(texture: ptr, filter: i32): void;
-extern fn SetTextureWrap(texture: ptr, wrap: i32): void;
-extern fn GenTextureMipmaps(texture: ptr): void;
+export extern fn SetTextureFilter(texture: ptr, filter: i32): void;
+export extern fn SetTextureWrap(texture: ptr, wrap: i32): void;
+export extern fn GenTextureMipmaps(texture: ptr): void;
 
 // Render texture (for off-screen rendering)
-extern fn LoadRenderTexture(width: i32, height: i32): ptr;
-extern fn UnloadRenderTexture(target: ptr): void;
-extern fn BeginTextureMode(target: ptr): void;
-extern fn EndTextureMode(): void;
+export extern fn LoadRenderTexture(width: i32, height: i32): ptr;
+export extern fn UnloadRenderTexture(target: ptr): void;
+export extern fn BeginTextureMode(target: ptr): void;
+export extern fn EndTextureMode(): void;
 
 // ============================================================================
 // Audio - Sound Loading and Playing
 // ============================================================================
 
-extern fn LoadSound(fileName: string): ptr;
-extern fn UnloadSound(sound: ptr): void;
-extern fn PlaySound(sound: ptr): void;
-extern fn StopSound(sound: ptr): void;
-extern fn PauseSound(sound: ptr): void;
-extern fn ResumeSound(sound: ptr): void;
-extern fn IsSoundPlaying(sound: ptr): i32;
-extern fn SetSoundVolume(sound: ptr, volume: f32): void;
-extern fn SetSoundPitch(sound: ptr, pitch: f32): void;
-extern fn SetSoundPan(sound: ptr, pan: f32): void;
+export extern fn LoadSound(fileName: string): ptr;
+export extern fn UnloadSound(sound: ptr): void;
+export extern fn PlaySound(sound: ptr): void;
+export extern fn StopSound(sound: ptr): void;
+export extern fn PauseSound(sound: ptr): void;
+export extern fn ResumeSound(sound: ptr): void;
+export extern fn IsSoundPlaying(sound: ptr): i32;
+export extern fn SetSoundVolume(sound: ptr, volume: f32): void;
+export extern fn SetSoundPitch(sound: ptr, pitch: f32): void;
+export extern fn SetSoundPan(sound: ptr, pan: f32): void;
 
 // ============================================================================
 // Audio - Music Streaming
 // ============================================================================
 
-extern fn LoadMusicStream(fileName: string): ptr;
-extern fn UnloadMusicStream(music: ptr): void;
-extern fn PlayMusicStream(music: ptr): void;
-extern fn StopMusicStream(music: ptr): void;
-extern fn PauseMusicStream(music: ptr): void;
-extern fn ResumeMusicStream(music: ptr): void;
-extern fn UpdateMusicStream(music: ptr): void;
-extern fn IsMusicStreamPlaying(music: ptr): i32;
-extern fn SetMusicVolume(music: ptr, volume: f32): void;
-extern fn SetMusicPitch(music: ptr, pitch: f32): void;
-extern fn SetMusicPan(music: ptr, pan: f32): void;
-extern fn GetMusicTimeLength(music: ptr): f32;
-extern fn GetMusicTimePlayed(music: ptr): f32;
-extern fn SeekMusicStream(music: ptr, position: f32): void;
-extern fn SetMusicLooping(music: ptr, looping: i32): void;
+export extern fn LoadMusicStream(fileName: string): ptr;
+export extern fn UnloadMusicStream(music: ptr): void;
+export extern fn PlayMusicStream(music: ptr): void;
+export extern fn StopMusicStream(music: ptr): void;
+export extern fn PauseMusicStream(music: ptr): void;
+export extern fn ResumeMusicStream(music: ptr): void;
+export extern fn UpdateMusicStream(music: ptr): void;
+export extern fn IsMusicStreamPlaying(music: ptr): i32;
+export extern fn SetMusicVolume(music: ptr, volume: f32): void;
+export extern fn SetMusicPitch(music: ptr, pitch: f32): void;
+export extern fn SetMusicPan(music: ptr, pan: f32): void;
+export extern fn GetMusicTimeLength(music: ptr): f32;
+export extern fn GetMusicTimePlayed(music: ptr): f32;
+export extern fn SeekMusicStream(music: ptr, position: f32): void;
+export extern fn SetMusicLooping(music: ptr, looping: i32): void;
 
 // ============================================================================
 // Text - Font Loading and Drawing
 // ============================================================================
 // Note: Font is passed as an opaque handle (pointer)
 
-extern fn LoadFont(fileName: string): ptr;
-extern fn LoadFontEx(fileName: string, fontSize: i32, codepoints: ptr, codepointCount: i32): ptr;
-extern fn UnloadFont(font: ptr): void;
-extern fn DrawTextEx(font: ptr, text: string, posX: f32, posY: f32, fontSize: f32, spacing: f32, tint: u32): void;
-extern fn DrawTextPro(font: ptr, text: string, posX: f32, posY: f32, originX: f32, originY: f32, rotation: f32, fontSize: f32, spacing: f32, tint: u32): void;
-extern fn MeasureTextEx(font: ptr, text: string, fontSize: f32, spacing: f32): f32;
-extern fn GetFontDefault(): ptr;
-extern fn IsFontValid(font: ptr): i32;
+export extern fn LoadFont(fileName: string): ptr;
+export extern fn LoadFontEx(fileName: string, fontSize: i32, codepoints: ptr, codepointCount: i32): ptr;
+export extern fn UnloadFont(font: ptr): void;
+export extern fn DrawTextEx(font: ptr, text: string, posX: f32, posY: f32, fontSize: f32, spacing: f32, tint: u32): void;
+export extern fn DrawTextPro(font: ptr, text: string, posX: f32, posY: f32, originX: f32, originY: f32, rotation: f32, fontSize: f32, spacing: f32, tint: u32): void;
+export extern fn MeasureTextEx(font: ptr, text: string, fontSize: f32, spacing: f32): f32;
+export extern fn GetFontDefault(): ptr;
+export extern fn IsFontValid(font: ptr): i32;
 
 // ============================================================================
 // Images - Loading and Manipulation
 // ============================================================================
 // Note: Image is passed as an opaque handle (pointer)
 
-extern fn LoadImage(fileName: string): ptr;
-extern fn LoadImageRaw(fileName: string, width: i32, height: i32, format: i32, headerSize: i32): ptr;
-extern fn LoadImageFromMemory(fileType: string, fileData: ptr, dataSize: i32): ptr;
-extern fn UnloadImage(image: ptr): void;
-extern fn ExportImage(image: ptr, fileName: string): i32;
+export extern fn LoadImage(fileName: string): ptr;
+export extern fn LoadImageRaw(fileName: string, width: i32, height: i32, format: i32, headerSize: i32): ptr;
+export extern fn LoadImageFromMemory(fileType: string, fileData: ptr, dataSize: i32): ptr;
+export extern fn UnloadImage(image: ptr): void;
+export extern fn ExportImage(image: ptr, fileName: string): i32;
 
 // Image generation
-extern fn GenImageColor(width: i32, height: i32, color: u32): ptr;
-extern fn GenImageGradientLinear(width: i32, height: i32, direction: i32, start: u32, end: u32): ptr;
-extern fn GenImageGradientRadial(width: i32, height: i32, density: f32, inner: u32, outer: u32): ptr;
-extern fn GenImageChecked(width: i32, height: i32, checksX: i32, checksY: i32, col1: u32, col2: u32): ptr;
-extern fn GenImageWhiteNoise(width: i32, height: i32, factor: f32): ptr;
-extern fn GenImagePerlinNoise(width: i32, height: i32, offsetX: i32, offsetY: i32, scale: f32): ptr;
+export extern fn GenImageColor(width: i32, height: i32, color: u32): ptr;
+export extern fn GenImageGradientLinear(width: i32, height: i32, direction: i32, start: u32, end: u32): ptr;
+export extern fn GenImageGradientRadial(width: i32, height: i32, density: f32, inner: u32, outer: u32): ptr;
+export extern fn GenImageChecked(width: i32, height: i32, checksX: i32, checksY: i32, col1: u32, col2: u32): ptr;
+export extern fn GenImageWhiteNoise(width: i32, height: i32, factor: f32): ptr;
+export extern fn GenImagePerlinNoise(width: i32, height: i32, offsetX: i32, offsetY: i32, scale: f32): ptr;
 
 // Image manipulation
-extern fn ImageCopy(image: ptr): ptr;
-extern fn ImageFromImage(image: ptr, x: i32, y: i32, width: i32, height: i32): ptr;
-extern fn ImageResize(image: ptr, newWidth: i32, newHeight: i32): void;
-extern fn ImageResizeNN(image: ptr, newWidth: i32, newHeight: i32): void;
-extern fn ImageCrop(image: ptr, x: i32, y: i32, width: i32, height: i32): void;
-extern fn ImageFlipVertical(image: ptr): void;
-extern fn ImageFlipHorizontal(image: ptr): void;
-extern fn ImageRotate(image: ptr, degrees: i32): void;
-extern fn ImageRotateCW(image: ptr): void;
-extern fn ImageRotateCCW(image: ptr): void;
-extern fn ImageColorTint(image: ptr, color: u32): void;
-extern fn ImageColorInvert(image: ptr): void;
-extern fn ImageColorGrayscale(image: ptr): void;
-extern fn ImageColorContrast(image: ptr, contrast: f32): void;
-extern fn ImageColorBrightness(image: ptr, brightness: i32): void;
+export extern fn ImageCopy(image: ptr): ptr;
+export extern fn ImageFromImage(image: ptr, x: i32, y: i32, width: i32, height: i32): ptr;
+export extern fn ImageResize(image: ptr, newWidth: i32, newHeight: i32): void;
+export extern fn ImageResizeNN(image: ptr, newWidth: i32, newHeight: i32): void;
+export extern fn ImageCrop(image: ptr, x: i32, y: i32, width: i32, height: i32): void;
+export extern fn ImageFlipVertical(image: ptr): void;
+export extern fn ImageFlipHorizontal(image: ptr): void;
+export extern fn ImageRotate(image: ptr, degrees: i32): void;
+export extern fn ImageRotateCW(image: ptr): void;
+export extern fn ImageRotateCCW(image: ptr): void;
+export extern fn ImageColorTint(image: ptr, color: u32): void;
+export extern fn ImageColorInvert(image: ptr): void;
+export extern fn ImageColorGrayscale(image: ptr): void;
+export extern fn ImageColorContrast(image: ptr, contrast: f32): void;
+export extern fn ImageColorBrightness(image: ptr, brightness: i32): void;
 
 // Image drawing
-extern fn ImageClearBackground(image: ptr, color: u32): void;
-extern fn ImageDrawPixel(image: ptr, posX: i32, posY: i32, color: u32): void;
-extern fn ImageDrawLine(image: ptr, startX: i32, startY: i32, endX: i32, endY: i32, color: u32): void;
-extern fn ImageDrawCircle(image: ptr, centerX: i32, centerY: i32, radius: i32, color: u32): void;
-extern fn ImageDrawRectangle(image: ptr, posX: i32, posY: i32, width: i32, height: i32, color: u32): void;
-extern fn ImageDrawText(image: ptr, text: string, posX: i32, posY: i32, fontSize: i32, color: u32): void;
+export extern fn ImageClearBackground(image: ptr, color: u32): void;
+export extern fn ImageDrawPixel(image: ptr, posX: i32, posY: i32, color: u32): void;
+export extern fn ImageDrawLine(image: ptr, startX: i32, startY: i32, endX: i32, endY: i32, color: u32): void;
+export extern fn ImageDrawCircle(image: ptr, centerX: i32, centerY: i32, radius: i32, color: u32): void;
+export extern fn ImageDrawRectangle(image: ptr, posX: i32, posY: i32, width: i32, height: i32, color: u32): void;
+export extern fn ImageDrawText(image: ptr, text: string, posX: i32, posY: i32, fontSize: i32, color: u32): void;
 
 // Image to texture
-extern fn LoadTextureFromImage(image: ptr): ptr;
+export extern fn LoadTextureFromImage(image: ptr): ptr;
 
 // Image properties
-extern fn GetImageWidth(image: ptr): i32;
-extern fn GetImageHeight(image: ptr): i32;
+export extern fn GetImageWidth(image: ptr): i32;
+export extern fn GetImageHeight(image: ptr): i32;
 
 // ============================================================================
 // File I/O Utilities
 // ============================================================================
 
-extern fn FileExists(fileName: string): i32;
-extern fn DirectoryExists(dirPath: string): i32;
-extern fn IsFileExtension(fileName: string, ext: string): i32;
-extern fn GetFileExtension(fileName: string): string;
-extern fn GetFileName(filePath: string): string;
-extern fn GetFileNameWithoutExt(filePath: string): string;
-extern fn GetDirectoryPath(filePath: string): string;
-extern fn GetPrevDirectoryPath(dirPath: string): string;
-extern fn GetWorkingDirectory(): string;
-extern fn ChangeDirectory(dir: string): i32;
-extern fn GetFileLength(fileName: string): i32;
-extern fn GetFileModTime(fileName: string): i64;
-extern fn IsPathFile(path: string): i32;
+export extern fn FileExists(fileName: string): i32;
+export extern fn DirectoryExists(dirPath: string): i32;
+export extern fn IsFileExtension(fileName: string, ext: string): i32;
+export extern fn GetFileExtension(fileName: string): string;
+export extern fn GetFileName(filePath: string): string;
+export extern fn GetFileNameWithoutExt(filePath: string): string;
+export extern fn GetDirectoryPath(filePath: string): string;
+export extern fn GetPrevDirectoryPath(dirPath: string): string;
+export extern fn GetWorkingDirectory(): string;
+export extern fn ChangeDirectory(dir: string): i32;
+export extern fn GetFileLength(fileName: string): i32;
+export extern fn GetFileModTime(fileName: string): i64;
+export extern fn IsPathFile(path: string): i32;
 
 // Text file I/O
-extern fn LoadFileText(fileName: string): string;
-extern fn UnloadFileText(text: string): void;
-extern fn SaveFileText(fileName: string, text: string): i32;
+export extern fn LoadFileText(fileName: string): string;
+export extern fn UnloadFileText(text: string): void;
+export extern fn SaveFileText(fileName: string, text: string): i32;
 
 // ============================================================================
 // Texture Filter/Wrap Constants

@@ -1,0 +1,202 @@
+// Collision Demo - Interactive collision detection
+// Demonstrates: collision detection helpers, mouse interaction
+
+import {
+    // Window
+    InitWindow, CloseWindow, WindowShouldClose, SetTargetFPS, GetFPS,
+    // Drawing
+    BeginDrawing, EndDrawing, ClearBackground,
+    // Shapes
+    DrawCircle, DrawCircleLines, DrawRectangle, DrawRectangleLines,
+    DrawTriangle, DrawTriangleLines, DrawLine,
+    // Text
+    DrawText, DrawFPS,
+    // Input
+    GetMouseX, GetMouseY, IsMouseButtonDown,
+    // Colors
+    RAYWHITE, RED, GREEN, BLUE, YELLOW, ORANGE, PURPLE,
+    DARKGRAY, BLACK, LIGHTGRAY, LIME,
+    // Mouse
+    MOUSE_BUTTON_LEFT,
+    // Collision detection
+    CheckCollisionPointCircleXY, CheckCollisionPointRectXY,
+    CheckCollisionCirclesXY, CheckCollisionRectsXY,
+    CheckCollisionCircleRecXY, CheckCollisionPointTriangleXY,
+    // Utility
+    Color, ColorAlpha
+} from "../src/raylib.hml";
+
+let screenWidth = 900;
+let screenHeight = 700;
+
+InitWindow(screenWidth, screenHeight, "Hemlock + Raylib - Collision Demo");
+SetTargetFPS(60);
+
+// Static shapes for collision testing
+// Circle 1
+let circle1X: f32 = 200.0;
+let circle1Y: f32 = 200.0;
+let circle1R: f32 = 50.0;
+
+// Circle 2
+let circle2X: f32 = 400.0;
+let circle2Y: f32 = 200.0;
+let circle2R: f32 = 40.0;
+
+// Rectangle 1
+let rect1X: f32 = 600.0;
+let rect1Y: f32 = 150.0;
+let rect1W: f32 = 120.0;
+let rect1H: f32 = 80.0;
+
+// Rectangle 2
+let rect2X: f32 = 150.0;
+let rect2Y: f32 = 400.0;
+let rect2W: f32 = 100.0;
+let rect2H: f32 = 100.0;
+
+// Triangle vertices
+let triAX: f32 = 450.0;
+let triAY: f32 = 500.0;
+let triBX: f32 = 350.0;
+let triBY: f32 = 380.0;
+let triCX: f32 = 550.0;
+let triCY: f32 = 380.0;
+
+// Draggable circle (controlled by mouse)
+let dragRadius: f32 = 30.0;
+
+while (WindowShouldClose() == 0) {
+    // Get mouse position as floats
+    let mouseX: f32 = GetMouseX();
+    let mouseY: f32 = GetMouseY();
+
+    // Check all collisions with draggable circle
+    let hitCircle1 = CheckCollisionCirclesXY(mouseX, mouseY, dragRadius, circle1X, circle1Y, circle1R);
+    let hitCircle2 = CheckCollisionCirclesXY(mouseX, mouseY, dragRadius, circle2X, circle2Y, circle2R);
+    let hitRect1 = CheckCollisionCircleRecXY(mouseX, mouseY, dragRadius, rect1X, rect1Y, rect1W, rect1H);
+    let hitRect2 = CheckCollisionCircleRecXY(mouseX, mouseY, dragRadius, rect2X, rect2Y, rect2W, rect2H);
+    let hitTriangle = CheckCollisionPointTriangleXY(mouseX, mouseY, triAX, triAY, triBX, triBY, triCX, triCY);
+
+    // Check point collisions (mouse cursor only)
+    let pointInCircle1 = CheckCollisionPointCircleXY(mouseX, mouseY, circle1X, circle1Y, circle1R);
+    let pointInRect1 = CheckCollisionPointRectXY(mouseX, mouseY, rect1X, rect1Y, rect1W, rect1H);
+
+    BeginDrawing();
+    ClearBackground(RAYWHITE);
+
+    // Title
+    DrawText("Collision Detection Demo", 280, 20, 30, DARKGRAY);
+    DrawText("Move mouse to test collisions", 310, 55, 16, DARKGRAY);
+
+    // Draw Circle 1
+    let c1Color = BLUE;
+    if (hitCircle1 != 0) { c1Color = RED; }
+    let c1x: i32 = circle1X;
+    let c1y: i32 = circle1Y;
+    DrawCircle(c1x, c1y, circle1R, c1Color);
+    if (pointInCircle1 != 0) {
+        DrawCircleLines(c1x, c1y, circle1R + 5.0, YELLOW);
+    }
+    DrawText("Circle 1", c1x - 30, c1y + 60, 14, DARKGRAY);
+
+    // Draw Circle 2
+    let c2Color = GREEN;
+    if (hitCircle2 != 0) { c2Color = RED; }
+    let c2x: i32 = circle2X;
+    let c2y: i32 = circle2Y;
+    DrawCircle(c2x, c2y, circle2R, c2Color);
+    DrawText("Circle 2", c2x - 30, c2y + 50, 14, DARKGRAY);
+
+    // Draw Rectangle 1
+    let r1Color = PURPLE;
+    if (hitRect1 != 0) { r1Color = RED; }
+    let r1x: i32 = rect1X;
+    let r1y: i32 = rect1Y;
+    let r1w: i32 = rect1W;
+    let r1h: i32 = rect1H;
+    DrawRectangle(r1x, r1y, r1w, r1h, r1Color);
+    if (pointInRect1 != 0) {
+        DrawRectangleLines(r1x - 3, r1y - 3, r1w + 6, r1h + 6, YELLOW);
+    }
+    DrawText("Rect 1", r1x + 30, r1y + r1h + 10, 14, DARKGRAY);
+
+    // Draw Rectangle 2
+    let r2Color = ORANGE;
+    if (hitRect2 != 0) { r2Color = RED; }
+    let r2x: i32 = rect2X;
+    let r2y: i32 = rect2Y;
+    let r2w: i32 = rect2W;
+    let r2h: i32 = rect2H;
+    DrawRectangle(r2x, r2y, r2w, r2h, r2Color);
+    DrawText("Rect 2", r2x + 20, r2y + r2h + 10, 14, DARKGRAY);
+
+    // Draw Triangle
+    let triColor = LIME;
+    if (hitTriangle != 0) { triColor = RED; }
+    let tax: i32 = triAX;
+    let tay: i32 = triAY;
+    let tbx: i32 = triBX;
+    let tby: i32 = triBY;
+    let tcx: i32 = triCX;
+    let tcy: i32 = triCY;
+    DrawTriangle(tax, tay, tbx, tby, tcx, tcy, triColor);
+    DrawText("Triangle", 420, 510, 14, DARKGRAY);
+
+    // Draw draggable circle at mouse position
+    let mx: i32 = mouseX;
+    let my: i32 = mouseY;
+    let anyHit = hitCircle1 + hitCircle2 + hitRect1 + hitRect2 + hitTriangle;
+    if (anyHit > 0) {
+        DrawCircle(mx, my, dragRadius, ColorAlpha(RED, 0.5));
+        DrawCircleLines(mx, my, dragRadius, RED);
+    } else {
+        DrawCircle(mx, my, dragRadius, ColorAlpha(BLUE, 0.3));
+        DrawCircleLines(mx, my, dragRadius, BLUE);
+    }
+
+    // Collision status panel
+    DrawRectangle(650, 350, 230, 200, LIGHTGRAY);
+    DrawText("Collision Status:", 660, 360, 18, BLACK);
+
+    let statusY = 390;
+    if (hitCircle1 != 0) {
+        DrawText("Circle 1: HIT", 670, statusY, 14, RED);
+    } else {
+        DrawText("Circle 1: -", 670, statusY, 14, DARKGRAY);
+    }
+
+    if (hitCircle2 != 0) {
+        DrawText("Circle 2: HIT", 670, statusY + 25, 14, RED);
+    } else {
+        DrawText("Circle 2: -", 670, statusY + 25, 14, DARKGRAY);
+    }
+
+    if (hitRect1 != 0) {
+        DrawText("Rect 1: HIT", 670, statusY + 50, 14, RED);
+    } else {
+        DrawText("Rect 1: -", 670, statusY + 50, 14, DARKGRAY);
+    }
+
+    if (hitRect2 != 0) {
+        DrawText("Rect 2: HIT", 670, statusY + 75, 14, RED);
+    } else {
+        DrawText("Rect 2: -", 670, statusY + 75, 14, DARKGRAY);
+    }
+
+    if (hitTriangle != 0) {
+        DrawText("Triangle: HIT", 670, statusY + 100, 14, RED);
+    } else {
+        DrawText("Triangle: -", 670, statusY + 100, 14, DARKGRAY);
+    }
+
+    // Mouse position
+    DrawText(`Mouse: (${mx}, ${my})`, 660, statusY + 130, 12, DARKGRAY);
+
+    DrawFPS(screenWidth - 100, 10);
+
+    EndDrawing();
+}
+
+CloseWindow();
+print("Collision demo closed!");

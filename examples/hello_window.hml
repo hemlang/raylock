@@ -1,49 +1,18 @@
 // Hello Window - Basic raylib example in Hemlock
 // Demonstrates: window creation, game loop, drawing shapes and text
 
-// Load raylib library (cross-platform)
-import { RAYLIB_LOADED } from "../src/raylib_loader.hml";
-
-// Window functions
-extern fn InitWindow(width: i32, height: i32, title: string): void;
-extern fn CloseWindow(): void;
-extern fn WindowShouldClose(): i32;
-extern fn SetTargetFPS(fps: i32): void;
-extern fn GetFPS(): i32;
-
-// Drawing functions
-extern fn BeginDrawing(): void;
-extern fn EndDrawing(): void;
-extern fn ClearBackground(color: u32): void;
-
-// Shape functions
-extern fn DrawRectangle(posX: i32, posY: i32, width: i32, height: i32, color: u32): void;
-extern fn DrawCircle(centerX: i32, centerY: i32, radius: f32, color: u32): void;
-
-// Text functions
-extern fn DrawText(text: string, posX: i32, posY: i32, fontSize: i32, color: u32): void;
-
-// Input functions
-extern fn IsKeyPressed(key: i32): i32;
-
-// Color helper - raylib uses RGBA struct, on little-endian stored as ABGR
-fn Color(r: u8, g: u8, b: u8, a: u8): u32 {
-    let r32: u32 = r;
-    let g32: u32 = g;
-    let b32: u32 = b;
-    let a32: u32 = a;
-    return (a32 << 24) | (b32 << 16) | (g32 << 8) | r32;
-}
-
-// Colors
-let RAYWHITE = Color(245, 245, 245, 255);
-let RED = Color(230, 41, 55, 255);
-let GREEN = Color(0, 228, 48, 255);
-let BLUE = Color(0, 121, 241, 255);
-let BLACK = Color(0, 0, 0, 255);
-
-// Key constants
-let KEY_ESCAPE = 256;
+// Import everything we need from raylib
+import {
+    // Functions
+    InitWindow, CloseWindow, WindowShouldClose, SetTargetFPS, GetFPS,
+    BeginDrawing, EndDrawing, ClearBackground,
+    DrawRectangle, DrawCircle, DrawText,
+    IsKeyPressed,
+    // Colors
+    RAYWHITE, RED, GREEN, BLUE, BLACK,
+    // Keys
+    KEY_ESCAPE
+} from "../src/raylib.hml";
 
 // Initialize window
 let screenWidth = 800;
@@ -71,7 +40,7 @@ while (WindowShouldClose() == 0) {
 
     // Draw text
     DrawText("Hello from Hemlock + Raylib!", 240, 20, 20, BLACK);
-    DrawText(`FPS: ${GetFPS()}`, 10, 10, 20, BLACK);
+    DrawText("FPS: " + GetFPS(), 10, 10, 20, BLACK);
     DrawText("Press ESC to exit", 10, 420, 16, BLACK);
 
     EndDrawing();

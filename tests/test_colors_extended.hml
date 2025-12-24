@@ -1,0 +1,272 @@
+// Test suite for extended color utility functions
+// Run with: hemlock tests/test_colors_extended.hml
+
+let tests_passed = 0;
+let tests_failed = 0;
+
+fn assert_eq_u32(name: string, actual: u32, expected: u32) {
+    if (actual == expected) {
+        print("[PASS] " + name);
+        tests_passed = tests_passed + 1;
+    } else {
+        print("[FAIL] " + name + " - expected " + expected + ", got " + actual);
+        tests_failed = tests_failed + 1;
+    }
+}
+
+fn assert_eq_u8(name: string, actual: u8, expected: u8) {
+    if (actual == expected) {
+        print("[PASS] " + name);
+        tests_passed = tests_passed + 1;
+    } else {
+        let a: i32 = actual;
+        let e: i32 = expected;
+        print("[FAIL] " + name + " - expected " + e + ", got " + a);
+        tests_failed = tests_failed + 1;
+    }
+}
+
+// ============================================================================
+// Color Functions (same as in raylib.hml)
+// ============================================================================
+
+fn Color(r: u8, g: u8, b: u8, a: u8): u32 {
+    let r32: u32 = r;
+    let g32: u32 = g;
+    let b32: u32 = b;
+    let a32: u32 = a;
+    return (a32 << 24) | (b32 << 16) | (g32 << 8) | r32;
+}
+
+fn ColorGetR(color: u32): u8 {
+    return color & 0xFF;
+}
+
+fn ColorGetG(color: u32): u8 {
+    return (color >> 8) & 0xFF;
+}
+
+fn ColorGetB(color: u32): u8 {
+    return (color >> 16) & 0xFF;
+}
+
+fn ColorGetA(color: u32): u8 {
+    return (color >> 24) & 0xFF;
+}
+
+fn Lerp(start: f32, end: f32, amount: f32): f32 {
+    return start + amount * (end - start);
+}
+
+fn Clamp(value: f32, min: f32, max: f32): f32 {
+    if (value < min) { return min; }
+    if (value > max) { return max; }
+    return value;
+}
+
+fn ColorBlend(color1: u32, color2: u32, factor: f32): u32 {
+    let r1: i32 = color1 & 0xFF;
+    let g1: i32 = (color1 >> 8) & 0xFF;
+    let b1: i32 = (color1 >> 16) & 0xFF;
+    let a1: i32 = (color1 >> 24) & 0xFF;
+
+    let r2: i32 = color2 & 0xFF;
+    let g2: i32 = (color2 >> 8) & 0xFF;
+    let b2: i32 = (color2 >> 16) & 0xFF;
+    let a2: i32 = (color2 >> 24) & 0xFF;
+
+    let r: i32 = Lerp(r1, r2, factor);
+    let g: i32 = Lerp(g1, g2, factor);
+    let b: i32 = Lerp(b1, b2, factor);
+    let a: i32 = Lerp(a1, a2, factor);
+
+    return Color(r, g, b, a);
+}
+
+fn ColorInvert(color: u32): u32 {
+    let r: u8 = 255 - ColorGetR(color);
+    let g: u8 = 255 - ColorGetG(color);
+    let b: u8 = 255 - ColorGetB(color);
+    let a: u8 = ColorGetA(color);
+    return Color(r, g, b, a);
+}
+
+fn ColorToGrayscale(color: u32): u32 {
+    let r: i32 = ColorGetR(color);
+    let g: i32 = ColorGetG(color);
+    let b: i32 = ColorGetB(color);
+    let a: u8 = ColorGetA(color);
+    let gray: i32 = (r * 299 + g * 587 + b * 114) / 1000;
+    return Color(gray, gray, gray, a);
+}
+
+fn ColorTint(color: u32, tint: u32): u32 {
+    let r1: i32 = ColorGetR(color);
+    let g1: i32 = ColorGetG(color);
+    let b1: i32 = ColorGetB(color);
+    let a1: u8 = ColorGetA(color);
+
+    let r2: i32 = ColorGetR(tint);
+    let g2: i32 = ColorGetG(tint);
+    let b2: i32 = ColorGetB(tint);
+
+    let r: i32 = (r1 * r2) / 255;
+    let g: i32 = (g1 * g2) / 255;
+    let b: i32 = (b1 * b2) / 255;
+
+    return Color(r, g, b, a1);
+}
+
+// ============================================================================
+// ColorBlend Tests
+// ============================================================================
+
+print("=== ColorBlend Tests ===");
+
+let red: u32 = Color(255, 0, 0, 255);
+let blue: u32 = Color(0, 0, 255, 255);
+let white: u32 = Color(255, 255, 255, 255);
+let black: u32 = Color(0, 0, 0, 255);
+
+// Blend at 0% should return first color
+let blend0 = ColorBlend(red, blue, 0.0);
+assert_eq_u8("Blend 0% R", ColorGetR(blend0), 255);
+assert_eq_u8("Blend 0% G", ColorGetG(blend0), 0);
+assert_eq_u8("Blend 0% B", ColorGetB(blend0), 0);
+
+// Blend at 100% should return second color
+let blend100 = ColorBlend(red, blue, 1.0);
+assert_eq_u8("Blend 100% R", ColorGetR(blend100), 0);
+assert_eq_u8("Blend 100% G", ColorGetG(blend100), 0);
+assert_eq_u8("Blend 100% B", ColorGetB(blend100), 255);
+
+// Blend at 50% should mix
+let blend50 = ColorBlend(red, blue, 0.5);
+assert_eq_u8("Blend 50% R", ColorGetR(blend50), 127);
+assert_eq_u8("Blend 50% G", ColorGetG(blend50), 0);
+assert_eq_u8("Blend 50% B", ColorGetB(blend50), 127);
+
+// Blend black and white
+let gray = ColorBlend(black, white, 0.5);
+assert_eq_u8("Blend gray R", ColorGetR(gray), 127);
+assert_eq_u8("Blend gray G", ColorGetG(gray), 127);
+assert_eq_u8("Blend gray B", ColorGetB(gray), 127);
+
+// ============================================================================
+// ColorInvert Tests
+// ============================================================================
+
+print("");
+print("=== ColorInvert Tests ===");
+
+// Invert white should give black
+let invertedWhite = ColorInvert(white);
+assert_eq_u8("Invert white R", ColorGetR(invertedWhite), 0);
+assert_eq_u8("Invert white G", ColorGetG(invertedWhite), 0);
+assert_eq_u8("Invert white B", ColorGetB(invertedWhite), 0);
+assert_eq_u8("Invert white A", ColorGetA(invertedWhite), 255);
+
+// Invert black should give white
+let invertedBlack = ColorInvert(black);
+assert_eq_u8("Invert black R", ColorGetR(invertedBlack), 255);
+assert_eq_u8("Invert black G", ColorGetG(invertedBlack), 255);
+assert_eq_u8("Invert black B", ColorGetB(invertedBlack), 255);
+
+// Invert red should give cyan
+let invertedRed = ColorInvert(red);
+assert_eq_u8("Invert red R", ColorGetR(invertedRed), 0);
+assert_eq_u8("Invert red G", ColorGetG(invertedRed), 255);
+assert_eq_u8("Invert red B", ColorGetB(invertedRed), 255);
+
+// Alpha should be preserved
+let semiTransparent = Color(100, 150, 200, 128);
+let invertedSemi = ColorInvert(semiTransparent);
+assert_eq_u8("Invert preserves alpha", ColorGetA(invertedSemi), 128);
+
+// ============================================================================
+// ColorToGrayscale Tests
+// ============================================================================
+
+print("");
+print("=== ColorToGrayscale Tests ===");
+
+// Red to grayscale (luminance formula weights red at 29.9%)
+let grayRed = ColorToGrayscale(red);
+assert_eq_u8("Grayscale red R=G=B", ColorGetR(grayRed), ColorGetG(grayRed));
+assert_eq_u8("Grayscale red G=B", ColorGetG(grayRed), ColorGetB(grayRed));
+
+// White should stay white
+let grayWhite = ColorToGrayscale(white);
+assert_eq_u8("Grayscale white R", ColorGetR(grayWhite), 255);
+assert_eq_u8("Grayscale white G", ColorGetG(grayWhite), 255);
+assert_eq_u8("Grayscale white B", ColorGetB(grayWhite), 255);
+
+// Black should stay black
+let grayBlack = ColorToGrayscale(black);
+assert_eq_u8("Grayscale black R", ColorGetR(grayBlack), 0);
+
+// Alpha should be preserved
+let grayTransparent = ColorToGrayscale(Color(100, 100, 100, 50));
+assert_eq_u8("Grayscale preserves alpha", ColorGetA(grayTransparent), 50);
+
+// Green dominates luminance (58.7%)
+let green = Color(0, 255, 0, 255);
+let grayGreen = ColorToGrayscale(green);
+let grayBlue = ColorToGrayscale(blue);
+// Green should produce brighter gray than blue
+if (ColorGetR(grayGreen) > ColorGetR(grayBlue)) {
+    print("[PASS] Green is brighter than blue in grayscale");
+    tests_passed = tests_passed + 1;
+} else {
+    print("[FAIL] Green should be brighter than blue in grayscale");
+    tests_failed = tests_failed + 1;
+}
+
+// ============================================================================
+// ColorTint Tests
+// ============================================================================
+
+print("");
+print("=== ColorTint Tests ===");
+
+// Tint with white should not change color
+let tintWhite = ColorTint(red, white);
+assert_eq_u8("Tint with white R", ColorGetR(tintWhite), 255);
+assert_eq_u8("Tint with white G", ColorGetG(tintWhite), 0);
+assert_eq_u8("Tint with white B", ColorGetB(tintWhite), 0);
+
+// Tint with black should give black
+let tintBlack = ColorTint(white, black);
+assert_eq_u8("Tint with black R", ColorGetR(tintBlack), 0);
+assert_eq_u8("Tint with black G", ColorGetG(tintBlack), 0);
+assert_eq_u8("Tint with black B", ColorGetB(tintBlack), 0);
+
+// Tint with same color should reduce (multiply)
+let halfRed = Color(128, 0, 0, 255);
+let tintHalf = ColorTint(white, halfRed);
+assert_eq_u8("Tint multiply R", ColorGetR(tintHalf), 128);
+
+// Tint white with (128,128,128) should give (128,128,128)
+let gray128 = Color(128, 128, 128, 255);
+let tintGray = ColorTint(white, gray128);
+assert_eq_u8("Tint gray R", ColorGetR(tintGray), 128);
+assert_eq_u8("Tint gray G", ColorGetG(tintGray), 128);
+assert_eq_u8("Tint gray B", ColorGetB(tintGray), 128);
+
+// Alpha should be preserved from source color
+let semiRed = Color(255, 0, 0, 100);
+let tintSemi = ColorTint(semiRed, gray128);
+assert_eq_u8("Tint preserves alpha", ColorGetA(tintSemi), 100);
+
+// ============================================================================
+// Summary
+// ============================================================================
+
+print("");
+print("=== Test Summary ===");
+print("Passed: " + tests_passed);
+print("Failed: " + tests_failed);
+
+if (tests_failed > 0) {
+    exit(1);
+}

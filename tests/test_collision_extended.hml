@@ -1,0 +1,240 @@
+// Test suite for extended collision detection functions
+// Run with: hemlock tests/test_collision_extended.hml
+
+let tests_passed = 0;
+let tests_failed = 0;
+
+fn assert_true(name: string, condition: i32) {
+    if (condition != 0) {
+        print("[PASS] " + name);
+        tests_passed = tests_passed + 1;
+    } else {
+        print("[FAIL] " + name + " - expected true");
+        tests_failed = tests_failed + 1;
+    }
+}
+
+fn assert_false(name: string, condition: i32) {
+    if (condition == 0) {
+        print("[PASS] " + name);
+        tests_passed = tests_passed + 1;
+    } else {
+        print("[FAIL] " + name + " - expected false");
+        tests_failed = tests_failed + 1;
+    }
+}
+
+// ============================================================================
+// Extended Collision Functions (same as in raylib.hml)
+// ============================================================================
+
+fn Vector2Distance(x1: f32, y1: f32, x2: f32, y2: f32): f32 {
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+    return sqrt(dx * dx + dy * dy);
+}
+
+fn CheckCollisionLinesXY(p1x: f32, p1y: f32, p2x: f32, p2y: f32, p3x: f32, p3y: f32, p4x: f32, p4y: f32): i32 {
+    let d1x = p2x - p1x;
+    let d1y = p2y - p1y;
+    let d2x = p4x - p3x;
+    let d2y = p4y - p3y;
+
+    let cross = d1x * d2y - d1y * d2x;
+    if (cross == 0.0) { return 0; }
+
+    let dx = p3x - p1x;
+    let dy = p3y - p1y;
+
+    let t = (dx * d2y - dy * d2x) / cross;
+    let u = (dx * d1y - dy * d1x) / cross;
+
+    if (t >= 0.0 && t <= 1.0 && u >= 0.0 && u <= 1.0) {
+        return 1;
+    }
+    return 0;
+}
+
+fn CheckCollisionPointTriangleXY(px: f32, py: f32, ax: f32, ay: f32, bx: f32, by: f32, cx: f32, cy: f32): i32 {
+    let v0x = cx - ax;
+    let v0y = cy - ay;
+    let v1x = bx - ax;
+    let v1y = by - ay;
+    let v2x = px - ax;
+    let v2y = py - ay;
+
+    let dot00 = v0x * v0x + v0y * v0y;
+    let dot01 = v0x * v1x + v0y * v1y;
+    let dot02 = v0x * v2x + v0y * v2y;
+    let dot11 = v1x * v1x + v1y * v1y;
+    let dot12 = v1x * v2x + v1y * v2y;
+
+    let invDenom = 1.0 / (dot00 * dot11 - dot01 * dot01);
+    let u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+    let v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+
+    if (u >= 0.0 && v >= 0.0 && u + v <= 1.0) {
+        return 1;
+    }
+    return 0;
+}
+
+fn CheckCollisionPointLineXY(px: f32, py: f32, p1x: f32, p1y: f32, p2x: f32, p2y: f32, threshold: f32): i32 {
+    let d1 = Vector2Distance(px, py, p1x, p1y);
+    let d2 = Vector2Distance(px, py, p2x, p2y);
+    let lineLen = Vector2Distance(p1x, p1y, p2x, p2y);
+
+    if (d1 + d2 >= lineLen - threshold && d1 + d2 <= lineLen + threshold) {
+        return 1;
+    }
+    return 0;
+}
+
+// ============================================================================
+// Line vs Line Collision Tests
+// ============================================================================
+
+print("=== Line vs Line Collision Tests ===");
+
+// Two crossing lines
+assert_true("Lines crossing X", CheckCollisionLinesXY(0.0, 0.0, 10.0, 10.0, 0.0, 10.0, 10.0, 0.0));
+
+// Two parallel lines (horizontal)
+assert_false("Lines parallel horizontal", CheckCollisionLinesXY(0.0, 0.0, 10.0, 0.0, 0.0, 5.0, 10.0, 5.0));
+
+// Two parallel lines (vertical)
+assert_false("Lines parallel vertical", CheckCollisionLinesXY(0.0, 0.0, 0.0, 10.0, 5.0, 0.0, 5.0, 10.0));
+
+// Lines that would intersect if extended, but segments don't touch
+assert_false("Lines non-intersecting segments", CheckCollisionLinesXY(0.0, 0.0, 5.0, 5.0, 10.0, 0.0, 15.0, 5.0));
+
+// T-intersection
+assert_true("Lines T-intersection", CheckCollisionLinesXY(0.0, 5.0, 10.0, 5.0, 5.0, 0.0, 5.0, 10.0));
+
+// Lines touching at endpoint
+assert_true("Lines touching at endpoint", CheckCollisionLinesXY(0.0, 0.0, 5.0, 5.0, 5.0, 5.0, 10.0, 0.0));
+
+// Lines with same start point
+assert_true("Lines same start", CheckCollisionLinesXY(0.0, 0.0, 5.0, 5.0, 0.0, 0.0, 5.0, -5.0));
+
+// Perpendicular lines crossing
+assert_true("Lines perpendicular crossing", CheckCollisionLinesXY(-5.0, 0.0, 5.0, 0.0, 0.0, -5.0, 0.0, 5.0));
+
+// Lines that almost touch but don't
+assert_false("Lines close but no touch", CheckCollisionLinesXY(0.0, 0.0, 4.0, 4.0, 6.0, 6.0, 10.0, 10.0));
+
+// ============================================================================
+// Point vs Triangle Collision Tests
+// ============================================================================
+
+print("");
+print("=== Point vs Triangle Collision Tests ===");
+
+// Triangle with vertices at (0,0), (10,0), (5,10)
+let ax: f32 = 0.0;
+let ay: f32 = 0.0;
+let bx: f32 = 10.0;
+let by: f32 = 0.0;
+let cx: f32 = 5.0;
+let cy: f32 = 10.0;
+
+// Point inside triangle (center)
+assert_true("Point in triangle center", CheckCollisionPointTriangleXY(5.0, 3.0, ax, ay, bx, by, cx, cy));
+
+// Point at vertex A
+assert_true("Point at vertex A", CheckCollisionPointTriangleXY(0.0, 0.0, ax, ay, bx, by, cx, cy));
+
+// Point at vertex B
+assert_true("Point at vertex B", CheckCollisionPointTriangleXY(10.0, 0.0, ax, ay, bx, by, cx, cy));
+
+// Point at vertex C
+assert_true("Point at vertex C", CheckCollisionPointTriangleXY(5.0, 10.0, ax, ay, bx, by, cx, cy));
+
+// Point on edge AB
+assert_true("Point on edge AB", CheckCollisionPointTriangleXY(5.0, 0.0, ax, ay, bx, by, cx, cy));
+
+// Point clearly outside (far right)
+assert_false("Point outside right", CheckCollisionPointTriangleXY(20.0, 5.0, ax, ay, bx, by, cx, cy));
+
+// Point clearly outside (far left)
+assert_false("Point outside left", CheckCollisionPointTriangleXY(-10.0, 5.0, ax, ay, bx, by, cx, cy));
+
+// Point clearly outside (above)
+assert_false("Point outside above", CheckCollisionPointTriangleXY(5.0, 15.0, ax, ay, bx, by, cx, cy));
+
+// Point clearly outside (below)
+assert_false("Point outside below", CheckCollisionPointTriangleXY(5.0, -5.0, ax, ay, bx, by, cx, cy));
+
+// Point just outside the edge
+assert_false("Point just outside edge", CheckCollisionPointTriangleXY(-0.1, 5.0, ax, ay, bx, by, cx, cy));
+
+// Right-angled triangle (0,0), (10,0), (0,10)
+assert_true("Point in right triangle", CheckCollisionPointTriangleXY(2.0, 2.0, 0.0, 0.0, 10.0, 0.0, 0.0, 10.0));
+assert_false("Point outside right triangle", CheckCollisionPointTriangleXY(8.0, 8.0, 0.0, 0.0, 10.0, 0.0, 0.0, 10.0));
+
+// ============================================================================
+// Point vs Line Collision Tests
+// ============================================================================
+
+print("");
+print("=== Point vs Line Collision Tests ===");
+
+// Point on horizontal line segment
+assert_true("Point on horizontal line", CheckCollisionPointLineXY(5.0, 0.0, 0.0, 0.0, 10.0, 0.0, 0.01));
+
+// Point at start of line
+assert_true("Point at line start", CheckCollisionPointLineXY(0.0, 0.0, 0.0, 0.0, 10.0, 0.0, 0.01));
+
+// Point at end of line
+assert_true("Point at line end", CheckCollisionPointLineXY(10.0, 0.0, 0.0, 0.0, 10.0, 0.0, 0.01));
+
+// Point on diagonal line
+assert_true("Point on diagonal line", CheckCollisionPointLineXY(5.0, 5.0, 0.0, 0.0, 10.0, 10.0, 0.01));
+
+// Point off line (perpendicular)
+assert_false("Point off line perp", CheckCollisionPointLineXY(5.0, 1.0, 0.0, 0.0, 10.0, 0.0, 0.01));
+
+// Point beyond line segment end
+assert_false("Point beyond line end", CheckCollisionPointLineXY(15.0, 0.0, 0.0, 0.0, 10.0, 0.0, 0.01));
+
+// Point before line segment start
+assert_false("Point before line start", CheckCollisionPointLineXY(-5.0, 0.0, 0.0, 0.0, 10.0, 0.0, 0.01));
+
+// Point close but not on (with larger threshold)
+assert_true("Point close with threshold", CheckCollisionPointLineXY(5.0, 0.5, 0.0, 0.0, 10.0, 0.0, 1.0));
+
+// Point on vertical line
+assert_true("Point on vertical line", CheckCollisionPointLineXY(0.0, 5.0, 0.0, 0.0, 0.0, 10.0, 0.01));
+
+// ============================================================================
+// Edge Cases
+// ============================================================================
+
+print("");
+print("=== Edge Cases ===");
+
+// Line with zero length (point)
+assert_false("Zero length line", CheckCollisionLinesXY(5.0, 5.0, 5.0, 5.0, 0.0, 0.0, 10.0, 10.0));
+
+// Collinear overlapping lines - depends on implementation
+// This case should return true if they overlap
+assert_true("Collinear overlapping", CheckCollisionLinesXY(0.0, 0.0, 10.0, 0.0, 5.0, 0.0, 15.0, 0.0));
+
+// Degenerate triangle (all points same) - point should be inside
+assert_true("Degenerate triangle same point", CheckCollisionPointTriangleXY(5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0));
+
+// Very small triangle
+assert_true("Very small triangle inside", CheckCollisionPointTriangleXY(0.5, 0.3, 0.0, 0.0, 1.0, 0.0, 0.5, 1.0));
+
+// ============================================================================
+// Summary
+// ============================================================================
+
+print("");
+print("=== Test Summary ===");
+print("Passed: " + tests_passed);
+print("Failed: " + tests_failed);
+
+if (tests_failed > 0) {
+    exit(1);
+}

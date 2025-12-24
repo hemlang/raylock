@@ -1,0 +1,343 @@
+// Test suite for extended math utility functions
+// Run with: hemlock tests/test_math_extended.hml
+
+let tests_passed = 0;
+let tests_failed = 0;
+
+fn assert_eq_f32(name: string, actual: f32, expected: f32, tolerance: f32) {
+    let diff = actual - expected;
+    if (diff < 0.0) { diff = -diff; }
+
+    if (diff <= tolerance) {
+        print("[PASS] " + name);
+        tests_passed = tests_passed + 1;
+    } else {
+        print("[FAIL] " + name + " - expected " + expected + ", got " + actual);
+        tests_failed = tests_failed + 1;
+    }
+}
+
+fn assert_eq_i32(name: string, actual: i32, expected: i32) {
+    if (actual == expected) {
+        print("[PASS] " + name);
+        tests_passed = tests_passed + 1;
+    } else {
+        print("[FAIL] " + name + " - expected " + expected + ", got " + actual);
+        tests_failed = tests_failed + 1;
+    }
+}
+
+fn assert_true(name: string, condition: i32) {
+    if (condition != 0) {
+        print("[PASS] " + name);
+        tests_passed = tests_passed + 1;
+    } else {
+        print("[FAIL] " + name + " - expected true");
+        tests_failed = tests_failed + 1;
+    }
+}
+
+fn assert_false(name: string, condition: i32) {
+    if (condition == 0) {
+        print("[PASS] " + name);
+        tests_passed = tests_passed + 1;
+    } else {
+        print("[FAIL] " + name + " - expected false");
+        tests_failed = tests_failed + 1;
+    }
+}
+
+// ============================================================================
+// Extended Math Functions (same as in raylib.hml)
+// ============================================================================
+
+fn Sign(value: f32): f32 {
+    if (value > 0.0) { return 1.0; }
+    if (value < 0.0) { return -1.0; }
+    return 0.0;
+}
+
+fn SignInt(value: i32): i32 {
+    if (value > 0) { return 1; }
+    if (value < 0) { return -1; }
+    return 0;
+}
+
+fn Abs(value: f32): f32 {
+    if (value < 0.0) { return -value; }
+    return value;
+}
+
+fn AbsInt(value: i32): i32 {
+    if (value < 0) { return -value; }
+    return value;
+}
+
+fn Min(a: f32, b: f32): f32 {
+    if (a < b) { return a; }
+    return b;
+}
+
+fn Max(a: f32, b: f32): f32 {
+    if (a > b) { return a; }
+    return b;
+}
+
+fn MinInt(a: i32, b: i32): i32 {
+    if (a < b) { return a; }
+    return b;
+}
+
+fn MaxInt(a: i32, b: i32): i32 {
+    if (a > b) { return a; }
+    return b;
+}
+
+fn FloorInt(value: f32): i32 {
+    let i: i32 = value;
+    if (value < 0.0 && value != i) { return i - 1; }
+    return i;
+}
+
+fn CeilInt(value: f32): i32 {
+    let i: i32 = value;
+    if (value > 0.0 && value != i) { return i + 1; }
+    return i;
+}
+
+fn RoundInt(value: f32): i32 {
+    if (value >= 0.0) { return FloorInt(value + 0.5); }
+    return CeilInt(value - 0.5);
+}
+
+fn Clamp(value: f32, min: f32, max: f32): f32 {
+    if (value < min) { return min; }
+    if (value > max) { return max; }
+    return value;
+}
+
+fn SmoothStep(edge0: f32, edge1: f32, x: f32): f32 {
+    let t = Clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+    return t * t * (3.0 - 2.0 * t);
+}
+
+fn InverseLerp(start: f32, end: f32, value: f32): f32 {
+    if (start == end) { return 0.0; }
+    return (value - start) / (end - start);
+}
+
+fn MoveTowards(current: f32, target: f32, maxDelta: f32): f32 {
+    let diff = target - current;
+    if (Abs(diff) <= maxDelta) { return target; }
+    return current + Sign(diff) * maxDelta;
+}
+
+fn MoveTowardsInt(current: i32, target: i32, maxDelta: i32): i32 {
+    let diff = target - current;
+    if (AbsInt(diff) <= maxDelta) { return target; }
+    return current + SignInt(diff) * maxDelta;
+}
+
+fn Approximately(a: f32, b: f32, epsilon: f32): i32 {
+    let diff = a - b;
+    if (diff < 0.0) { diff = -diff; }
+    if (diff <= epsilon) { return 1; }
+    return 0;
+}
+
+fn InRange(value: f32, min: f32, max: f32): i32 {
+    if (value >= min && value <= max) { return 1; }
+    return 0;
+}
+
+fn InRangeInt(value: i32, min: i32, max: i32): i32 {
+    if (value >= min && value <= max) { return 1; }
+    return 0;
+}
+
+fn WrapInt(value: i32, min: i32, max: i32): i32 {
+    let range = max - min;
+    let result = value - min;
+    while (result < 0) { result = result + range; }
+    while (result >= range) { result = result - range; }
+    return result + min;
+}
+
+// ============================================================================
+// Sign Tests
+// ============================================================================
+
+print("=== Sign Tests ===");
+
+assert_eq_f32("Sign positive", Sign(5.0), 1.0, 0.001);
+assert_eq_f32("Sign negative", Sign(-5.0), -1.0, 0.001);
+assert_eq_f32("Sign zero", Sign(0.0), 0.0, 0.001);
+assert_eq_f32("Sign small positive", Sign(0.001), 1.0, 0.001);
+assert_eq_f32("Sign small negative", Sign(-0.001), -1.0, 0.001);
+
+assert_eq_i32("SignInt positive", SignInt(10), 1);
+assert_eq_i32("SignInt negative", SignInt(-10), -1);
+assert_eq_i32("SignInt zero", SignInt(0), 0);
+
+// ============================================================================
+// Abs Tests
+// ============================================================================
+
+print("");
+print("=== Abs Tests ===");
+
+assert_eq_f32("Abs positive", Abs(5.0), 5.0, 0.001);
+assert_eq_f32("Abs negative", Abs(-5.0), 5.0, 0.001);
+assert_eq_f32("Abs zero", Abs(0.0), 0.0, 0.001);
+assert_eq_f32("Abs large negative", Abs(-1000.5), 1000.5, 0.001);
+
+assert_eq_i32("AbsInt positive", AbsInt(10), 10);
+assert_eq_i32("AbsInt negative", AbsInt(-10), 10);
+assert_eq_i32("AbsInt zero", AbsInt(0), 0);
+
+// ============================================================================
+// Min/Max Tests
+// ============================================================================
+
+print("");
+print("=== Min/Max Tests ===");
+
+assert_eq_f32("Min first smaller", Min(3.0, 7.0), 3.0, 0.001);
+assert_eq_f32("Min second smaller", Min(7.0, 3.0), 3.0, 0.001);
+assert_eq_f32("Min equal", Min(5.0, 5.0), 5.0, 0.001);
+assert_eq_f32("Min negative", Min(-3.0, -7.0), -7.0, 0.001);
+
+assert_eq_f32("Max first larger", Max(7.0, 3.0), 7.0, 0.001);
+assert_eq_f32("Max second larger", Max(3.0, 7.0), 7.0, 0.001);
+assert_eq_f32("Max equal", Max(5.0, 5.0), 5.0, 0.001);
+assert_eq_f32("Max negative", Max(-3.0, -7.0), -3.0, 0.001);
+
+assert_eq_i32("MinInt first smaller", MinInt(3, 7), 3);
+assert_eq_i32("MinInt second smaller", MinInt(7, 3), 3);
+assert_eq_i32("MaxInt first larger", MaxInt(7, 3), 7);
+assert_eq_i32("MaxInt second larger", MaxInt(3, 7), 7);
+
+// ============================================================================
+// Floor/Ceil/Round Tests
+// ============================================================================
+
+print("");
+print("=== Floor/Ceil/Round Tests ===");
+
+assert_eq_i32("FloorInt positive", FloorInt(3.7), 3);
+assert_eq_i32("FloorInt positive exact", FloorInt(3.0), 3);
+assert_eq_i32("FloorInt negative", FloorInt(-3.7), -4);
+assert_eq_i32("FloorInt negative exact", FloorInt(-3.0), -3);
+
+assert_eq_i32("CeilInt positive", CeilInt(3.3), 4);
+assert_eq_i32("CeilInt positive exact", CeilInt(3.0), 3);
+assert_eq_i32("CeilInt negative", CeilInt(-3.3), -3);
+assert_eq_i32("CeilInt negative exact", CeilInt(-3.0), -3);
+
+assert_eq_i32("RoundInt up", RoundInt(3.6), 4);
+assert_eq_i32("RoundInt down", RoundInt(3.4), 3);
+assert_eq_i32("RoundInt half", RoundInt(3.5), 4);
+assert_eq_i32("RoundInt negative up", RoundInt(-3.4), -3);
+assert_eq_i32("RoundInt negative down", RoundInt(-3.6), -4);
+
+// ============================================================================
+// SmoothStep Tests
+// ============================================================================
+
+print("");
+print("=== SmoothStep Tests ===");
+
+assert_eq_f32("SmoothStep at edge0", SmoothStep(0.0, 1.0, 0.0), 0.0, 0.001);
+assert_eq_f32("SmoothStep at edge1", SmoothStep(0.0, 1.0, 1.0), 1.0, 0.001);
+assert_eq_f32("SmoothStep at midpoint", SmoothStep(0.0, 1.0, 0.5), 0.5, 0.001);
+assert_eq_f32("SmoothStep below edge0", SmoothStep(0.0, 1.0, -0.5), 0.0, 0.001);
+assert_eq_f32("SmoothStep above edge1", SmoothStep(0.0, 1.0, 1.5), 1.0, 0.001);
+// SmoothStep is slower at edges and faster in middle
+assert_eq_f32("SmoothStep at 0.25", SmoothStep(0.0, 1.0, 0.25), 0.15625, 0.001);
+
+// ============================================================================
+// InverseLerp Tests
+// ============================================================================
+
+print("");
+print("=== InverseLerp Tests ===");
+
+assert_eq_f32("InverseLerp at start", InverseLerp(0.0, 100.0, 0.0), 0.0, 0.001);
+assert_eq_f32("InverseLerp at end", InverseLerp(0.0, 100.0, 100.0), 1.0, 0.001);
+assert_eq_f32("InverseLerp at middle", InverseLerp(0.0, 100.0, 50.0), 0.5, 0.001);
+assert_eq_f32("InverseLerp at quarter", InverseLerp(0.0, 100.0, 25.0), 0.25, 0.001);
+assert_eq_f32("InverseLerp same start/end", InverseLerp(50.0, 50.0, 50.0), 0.0, 0.001);
+
+// ============================================================================
+// MoveTowards Tests
+// ============================================================================
+
+print("");
+print("=== MoveTowards Tests ===");
+
+assert_eq_f32("MoveTowards reach target", MoveTowards(0.0, 5.0, 10.0), 5.0, 0.001);
+assert_eq_f32("MoveTowards partial move", MoveTowards(0.0, 10.0, 3.0), 3.0, 0.001);
+assert_eq_f32("MoveTowards at target", MoveTowards(5.0, 5.0, 1.0), 5.0, 0.001);
+assert_eq_f32("MoveTowards backwards", MoveTowards(10.0, 0.0, 3.0), 7.0, 0.001);
+
+assert_eq_i32("MoveTowardsInt reach target", MoveTowardsInt(0, 5, 10), 5);
+assert_eq_i32("MoveTowardsInt partial move", MoveTowardsInt(0, 10, 3), 3);
+assert_eq_i32("MoveTowardsInt backwards", MoveTowardsInt(10, 0, 3), 7);
+
+// ============================================================================
+// Approximately Tests
+// ============================================================================
+
+print("");
+print("=== Approximately Tests ===");
+
+assert_true("Approximately equal", Approximately(1.0, 1.0001, 0.001));
+assert_false("Approximately not equal", Approximately(1.0, 2.0, 0.001));
+assert_true("Approximately exact", Approximately(5.0, 5.0, 0.001));
+assert_true("Approximately negative", Approximately(-1.0, -1.0001, 0.001));
+
+// ============================================================================
+// InRange Tests
+// ============================================================================
+
+print("");
+print("=== InRange Tests ===");
+
+assert_true("InRange inside", InRange(5.0, 0.0, 10.0));
+assert_true("InRange at min", InRange(0.0, 0.0, 10.0));
+assert_true("InRange at max", InRange(10.0, 0.0, 10.0));
+assert_false("InRange below", InRange(-1.0, 0.0, 10.0));
+assert_false("InRange above", InRange(11.0, 0.0, 10.0));
+
+assert_true("InRangeInt inside", InRangeInt(5, 0, 10));
+assert_true("InRangeInt at min", InRangeInt(0, 0, 10));
+assert_true("InRangeInt at max", InRangeInt(10, 0, 10));
+assert_false("InRangeInt below", InRangeInt(-1, 0, 10));
+assert_false("InRangeInt above", InRangeInt(11, 0, 10));
+
+// ============================================================================
+// WrapInt Tests
+// ============================================================================
+
+print("");
+print("=== WrapInt Tests ===");
+
+assert_eq_i32("WrapInt within range", WrapInt(5, 0, 10), 5);
+assert_eq_i32("WrapInt above max", WrapInt(15, 0, 10), 5);
+assert_eq_i32("WrapInt below min", WrapInt(-5, 0, 10), 5);
+assert_eq_i32("WrapInt at min", WrapInt(0, 0, 10), 0);
+assert_eq_i32("WrapInt at max", WrapInt(10, 0, 10), 0);
+assert_eq_i32("WrapInt double wrap", WrapInt(25, 0, 10), 5);
+
+// ============================================================================
+// Summary
+// ============================================================================
+
+print("");
+print("=== Test Summary ===");
+print("Passed: " + tests_passed);
+print("Failed: " + tests_failed);
+
+if (tests_failed > 0) {
+    exit(1);
+}

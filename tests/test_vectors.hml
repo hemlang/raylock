@@ -1,0 +1,324 @@
+// Test suite for extended vector utility functions
+// Run with: hemlock tests/test_vectors.hml
+
+let tests_passed = 0;
+let tests_failed = 0;
+
+fn assert_eq_f32(name: string, actual: f32, expected: f32, tolerance: f32) {
+    let diff = actual - expected;
+    if (diff < 0.0) { diff = -diff; }
+
+    if (diff <= tolerance) {
+        print("[PASS] " + name);
+        tests_passed = tests_passed + 1;
+    } else {
+        print("[FAIL] " + name + " - expected " + expected + ", got " + actual);
+        tests_failed = tests_failed + 1;
+    }
+}
+
+// ============================================================================
+// Vector2 Functions (same as in raylib.hml)
+// ============================================================================
+
+fn Vector2Length(x: f32, y: f32): f32 {
+    return sqrt(x * x + y * y);
+}
+
+fn Vector2LengthSq(x: f32, y: f32): f32 {
+    return x * x + y * y;
+}
+
+fn Vector2Distance(x1: f32, y1: f32, x2: f32, y2: f32): f32 {
+    let dx = x2 - x1;
+    let dy = y2 - y1;
+    return sqrt(dx * dx + dy * dy);
+}
+
+fn Vector2Dot(x1: f32, y1: f32, x2: f32, y2: f32): f32 {
+    return x1 * x2 + y1 * y2;
+}
+
+fn Lerp(start: f32, end: f32, amount: f32): f32 {
+    return start + amount * (end - start);
+}
+
+fn Deg2Rad(degrees: f32): f32 {
+    return degrees * 0.01745329251994329577;
+}
+
+fn Rad2Deg(radians: f32): f32 {
+    return radians * 57.29577951308232087680;
+}
+
+fn Clamp(value: f32, min: f32, max: f32): f32 {
+    if (value < min) { return min; }
+    if (value > max) { return max; }
+    return value;
+}
+
+fn Vector2NormalizeGetLength(x: f32, y: f32): f32 {
+    let length = Vector2Length(x, y);
+    if (length == 0.0) { return 0.0; }
+    return length;
+}
+
+fn Vector2ScaleX(x: f32, scale: f32): f32 {
+    return x * scale;
+}
+
+fn Vector2ScaleY(y: f32, scale: f32): f32 {
+    return y * scale;
+}
+
+fn Vector2AddX(x1: f32, x2: f32): f32 {
+    return x1 + x2;
+}
+
+fn Vector2AddY(y1: f32, y2: f32): f32 {
+    return y1 + y2;
+}
+
+fn Vector2SubtractX(x1: f32, x2: f32): f32 {
+    return x1 - x2;
+}
+
+fn Vector2SubtractY(y1: f32, y2: f32): f32 {
+    return y1 - y2;
+}
+
+fn Vector2NegateX(x: f32): f32 {
+    return -x;
+}
+
+fn Vector2NegateY(y: f32): f32 {
+    return -y;
+}
+
+fn Vector2RotateX(x: f32, y: f32, angle: f32): f32 {
+    let rad = Deg2Rad(angle);
+    let cosA = cos(rad);
+    let sinA = sin(rad);
+    return x * cosA - y * sinA;
+}
+
+fn Vector2RotateY(x: f32, y: f32, angle: f32): f32 {
+    let rad = Deg2Rad(angle);
+    let cosA = cos(rad);
+    let sinA = sin(rad);
+    return x * sinA + y * cosA;
+}
+
+fn Vector2LerpX(x1: f32, x2: f32, amount: f32): f32 {
+    return Lerp(x1, x2, amount);
+}
+
+fn Vector2LerpY(y1: f32, y2: f32, amount: f32): f32 {
+    return Lerp(y1, y2, amount);
+}
+
+fn Vector2ReflectX(vx: f32, vy: f32, nx: f32, ny: f32): f32 {
+    let dot = Vector2Dot(vx, vy, nx, ny);
+    return vx - 2.0 * dot * nx;
+}
+
+fn Vector2ReflectY(vx: f32, vy: f32, nx: f32, ny: f32): f32 {
+    let dot = Vector2Dot(vx, vy, nx, ny);
+    return vy - 2.0 * dot * ny;
+}
+
+fn Vector2Angle(x1: f32, y1: f32, x2: f32, y2: f32): f32 {
+    let dot = Vector2Dot(x1, y1, x2, y2);
+    let len1 = Vector2Length(x1, y1);
+    let len2 = Vector2Length(x2, y2);
+    if (len1 == 0.0 || len2 == 0.0) { return 0.0; }
+    let cosAngle = dot / (len1 * len2);
+    if (cosAngle > 1.0) { cosAngle = 1.0; }
+    if (cosAngle < -1.0) { cosAngle = -1.0; }
+    return Rad2Deg(acos(cosAngle));
+}
+
+fn Vector2AngleFromX(x: f32, y: f32): f32 {
+    return Rad2Deg(atan2(y, x));
+}
+
+fn Vector2MoveTowardsX(currentX: f32, currentY: f32, targetX: f32, targetY: f32, maxDistance: f32): f32 {
+    let dx = targetX - currentX;
+    let dy = targetY - currentY;
+    let dist = Vector2Length(dx, dy);
+    if (dist <= maxDistance || dist == 0.0) { return targetX; }
+    return currentX + dx / dist * maxDistance;
+}
+
+fn Vector2MoveTowardsY(currentX: f32, currentY: f32, targetX: f32, targetY: f32, maxDistance: f32): f32 {
+    let dx = targetX - currentX;
+    let dy = targetY - currentY;
+    let dist = Vector2Length(dx, dy);
+    if (dist <= maxDistance || dist == 0.0) { return targetY; }
+    return currentY + dy / dist * maxDistance;
+}
+
+// ============================================================================
+// Vector2LengthSq Tests
+// ============================================================================
+
+print("=== Vector2LengthSq Tests ===");
+
+assert_eq_f32("LengthSq (3, 4)", Vector2LengthSq(3.0, 4.0), 25.0, 0.001);
+assert_eq_f32("LengthSq (1, 0)", Vector2LengthSq(1.0, 0.0), 1.0, 0.001);
+assert_eq_f32("LengthSq (0, 0)", Vector2LengthSq(0.0, 0.0), 0.0, 0.001);
+assert_eq_f32("LengthSq (5, 5)", Vector2LengthSq(5.0, 5.0), 50.0, 0.001);
+
+// ============================================================================
+// Vector2 Scale Tests
+// ============================================================================
+
+print("");
+print("=== Vector2 Scale Tests ===");
+
+assert_eq_f32("ScaleX by 2", Vector2ScaleX(5.0, 2.0), 10.0, 0.001);
+assert_eq_f32("ScaleY by 2", Vector2ScaleY(5.0, 2.0), 10.0, 0.001);
+assert_eq_f32("ScaleX by 0.5", Vector2ScaleX(10.0, 0.5), 5.0, 0.001);
+assert_eq_f32("ScaleX by 0", Vector2ScaleX(5.0, 0.0), 0.0, 0.001);
+assert_eq_f32("ScaleX negative", Vector2ScaleX(5.0, -1.0), -5.0, 0.001);
+
+// ============================================================================
+// Vector2 Add/Subtract Tests
+// ============================================================================
+
+print("");
+print("=== Vector2 Add/Subtract Tests ===");
+
+assert_eq_f32("AddX", Vector2AddX(3.0, 5.0), 8.0, 0.001);
+assert_eq_f32("AddY", Vector2AddY(3.0, 5.0), 8.0, 0.001);
+assert_eq_f32("SubtractX", Vector2SubtractX(10.0, 3.0), 7.0, 0.001);
+assert_eq_f32("SubtractY", Vector2SubtractY(10.0, 3.0), 7.0, 0.001);
+assert_eq_f32("AddX negative", Vector2AddX(-3.0, 5.0), 2.0, 0.001);
+
+// ============================================================================
+// Vector2 Negate Tests
+// ============================================================================
+
+print("");
+print("=== Vector2 Negate Tests ===");
+
+assert_eq_f32("NegateX positive", Vector2NegateX(5.0), -5.0, 0.001);
+assert_eq_f32("NegateY positive", Vector2NegateY(5.0), -5.0, 0.001);
+assert_eq_f32("NegateX negative", Vector2NegateX(-5.0), 5.0, 0.001);
+assert_eq_f32("NegateX zero", Vector2NegateX(0.0), 0.0, 0.001);
+
+// ============================================================================
+// Vector2 Rotate Tests
+// ============================================================================
+
+print("");
+print("=== Vector2 Rotate Tests ===");
+
+// Rotate (1, 0) by 90 degrees should give (0, 1)
+assert_eq_f32("Rotate 90 X", Vector2RotateX(1.0, 0.0, 90.0), 0.0, 0.001);
+assert_eq_f32("Rotate 90 Y", Vector2RotateY(1.0, 0.0, 90.0), 1.0, 0.001);
+
+// Rotate (1, 0) by 180 degrees should give (-1, 0)
+assert_eq_f32("Rotate 180 X", Vector2RotateX(1.0, 0.0, 180.0), -1.0, 0.001);
+assert_eq_f32("Rotate 180 Y", Vector2RotateY(1.0, 0.0, 180.0), 0.0, 0.001);
+
+// Rotate (1, 0) by 0 degrees should stay (1, 0)
+assert_eq_f32("Rotate 0 X", Vector2RotateX(1.0, 0.0, 0.0), 1.0, 0.001);
+assert_eq_f32("Rotate 0 Y", Vector2RotateY(1.0, 0.0, 0.0), 0.0, 0.001);
+
+// Rotate (0, 1) by 90 degrees should give (-1, 0)
+assert_eq_f32("Rotate (0,1) 90 X", Vector2RotateX(0.0, 1.0, 90.0), -1.0, 0.001);
+assert_eq_f32("Rotate (0,1) 90 Y", Vector2RotateY(0.0, 1.0, 90.0), 0.0, 0.001);
+
+// ============================================================================
+// Vector2 Lerp Tests
+// ============================================================================
+
+print("");
+print("=== Vector2 Lerp Tests ===");
+
+assert_eq_f32("LerpX 0%", Vector2LerpX(0.0, 10.0, 0.0), 0.0, 0.001);
+assert_eq_f32("LerpY 0%", Vector2LerpY(0.0, 10.0, 0.0), 0.0, 0.001);
+assert_eq_f32("LerpX 50%", Vector2LerpX(0.0, 10.0, 0.5), 5.0, 0.001);
+assert_eq_f32("LerpY 50%", Vector2LerpY(0.0, 10.0, 0.5), 5.0, 0.001);
+assert_eq_f32("LerpX 100%", Vector2LerpX(0.0, 10.0, 1.0), 10.0, 0.001);
+assert_eq_f32("LerpY 100%", Vector2LerpY(0.0, 10.0, 1.0), 10.0, 0.001);
+
+// ============================================================================
+// Vector2 Reflect Tests
+// ============================================================================
+
+print("");
+print("=== Vector2 Reflect Tests ===");
+
+// Reflect (1, -1) off horizontal surface (normal 0, 1) should give (1, 1)
+assert_eq_f32("Reflect horizontal X", Vector2ReflectX(1.0, -1.0, 0.0, 1.0), 1.0, 0.001);
+assert_eq_f32("Reflect horizontal Y", Vector2ReflectY(1.0, -1.0, 0.0, 1.0), 1.0, 0.001);
+
+// Reflect (-1, 0) off vertical surface (normal 1, 0) should give (1, 0)
+assert_eq_f32("Reflect vertical X", Vector2ReflectX(-1.0, 0.0, 1.0, 0.0), 1.0, 0.001);
+assert_eq_f32("Reflect vertical Y", Vector2ReflectY(-1.0, 0.0, 1.0, 0.0), 0.0, 0.001);
+
+// ============================================================================
+// Vector2 Angle Tests
+// ============================================================================
+
+print("");
+print("=== Vector2 Angle Tests ===");
+
+// Angle between same direction is 0
+assert_eq_f32("Angle same direction", Vector2Angle(1.0, 0.0, 1.0, 0.0), 0.0, 0.001);
+
+// Angle between perpendicular is 90
+assert_eq_f32("Angle perpendicular", Vector2Angle(1.0, 0.0, 0.0, 1.0), 90.0, 0.001);
+
+// Angle between opposite is 180
+assert_eq_f32("Angle opposite", Vector2Angle(1.0, 0.0, -1.0, 0.0), 180.0, 0.001);
+
+// Angle with zero vector is 0
+assert_eq_f32("Angle zero vector", Vector2Angle(1.0, 0.0, 0.0, 0.0), 0.0, 0.001);
+
+// ============================================================================
+// Vector2 AngleFromX Tests
+// ============================================================================
+
+print("");
+print("=== Vector2 AngleFromX Tests ===");
+
+assert_eq_f32("AngleFromX (1,0)", Vector2AngleFromX(1.0, 0.0), 0.0, 0.001);
+assert_eq_f32("AngleFromX (0,1)", Vector2AngleFromX(0.0, 1.0), 90.0, 0.001);
+assert_eq_f32("AngleFromX (-1,0)", Vector2AngleFromX(-1.0, 0.0), 180.0, 0.001);
+assert_eq_f32("AngleFromX (0,-1)", Vector2AngleFromX(0.0, -1.0), -90.0, 0.001);
+assert_eq_f32("AngleFromX (1,1)", Vector2AngleFromX(1.0, 1.0), 45.0, 0.001);
+
+// ============================================================================
+// Vector2 MoveTowards Tests
+// ============================================================================
+
+print("");
+print("=== Vector2 MoveTowards Tests ===");
+
+// Move from (0,0) towards (10,0) by 5 units
+assert_eq_f32("MoveTowards X partial", Vector2MoveTowardsX(0.0, 0.0, 10.0, 0.0, 5.0), 5.0, 0.001);
+assert_eq_f32("MoveTowards Y partial", Vector2MoveTowardsY(0.0, 0.0, 10.0, 0.0, 5.0), 0.0, 0.001);
+
+// Move from (0,0) towards (10,0) by 15 units (overshoots, clamps to target)
+assert_eq_f32("MoveTowards X overshoot", Vector2MoveTowardsX(0.0, 0.0, 10.0, 0.0, 15.0), 10.0, 0.001);
+assert_eq_f32("MoveTowards Y overshoot", Vector2MoveTowardsY(0.0, 0.0, 10.0, 0.0, 15.0), 0.0, 0.001);
+
+// Move from (0,0) towards (3,4) by 2.5 units (should be halfway)
+assert_eq_f32("MoveTowards diagonal X", Vector2MoveTowardsX(0.0, 0.0, 3.0, 4.0, 2.5), 1.5, 0.001);
+assert_eq_f32("MoveTowards diagonal Y", Vector2MoveTowardsY(0.0, 0.0, 3.0, 4.0, 2.5), 2.0, 0.001);
+
+// ============================================================================
+// Summary
+// ============================================================================
+
+print("");
+print("=== Test Summary ===");
+print("Passed: " + tests_passed);
+print("Failed: " + tests_failed);
+
+if (tests_failed > 0) {
+    exit(1);
+}

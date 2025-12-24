@@ -1,0 +1,373 @@
+// Test suite for easing functions
+// Run with: hemlock tests/test_easing.hml
+
+let tests_passed = 0;
+let tests_failed = 0;
+
+fn assert_eq_f32(name: string, actual: f32, expected: f32, tolerance: f32) {
+    let diff = actual - expected;
+    if (diff < 0.0) { diff = -diff; }
+
+    if (diff <= tolerance) {
+        print("[PASS] " + name);
+        tests_passed = tests_passed + 1;
+    } else {
+        print("[FAIL] " + name + " - expected " + expected + ", got " + actual);
+        tests_failed = tests_failed + 1;
+    }
+}
+
+fn assert_in_range(name: string, actual: f32, min: f32, max: f32) {
+    if (actual >= min && actual <= max) {
+        print("[PASS] " + name);
+        tests_passed = tests_passed + 1;
+    } else {
+        print("[FAIL] " + name + " - expected in [" + min + ", " + max + "], got " + actual);
+        tests_failed = tests_failed + 1;
+    }
+}
+
+// ============================================================================
+// Easing Functions (same as in raylib.hml)
+// ============================================================================
+
+fn EaseLinear(t: f32): f32 {
+    return t;
+}
+
+fn EaseInQuad(t: f32): f32 {
+    return t * t;
+}
+
+fn EaseOutQuad(t: f32): f32 {
+    return t * (2.0 - t);
+}
+
+fn EaseInOutQuad(t: f32): f32 {
+    if (t < 0.5) {
+        return 2.0 * t * t;
+    }
+    return -1.0 + (4.0 - 2.0 * t) * t;
+}
+
+fn EaseInCubic(t: f32): f32 {
+    return t * t * t;
+}
+
+fn EaseOutCubic(t: f32): f32 {
+    let t1 = t - 1.0;
+    return t1 * t1 * t1 + 1.0;
+}
+
+fn EaseInOutCubic(t: f32): f32 {
+    if (t < 0.5) {
+        return 4.0 * t * t * t;
+    }
+    let t1 = 2.0 * t - 2.0;
+    return 0.5 * t1 * t1 * t1 + 1.0;
+}
+
+fn EaseInQuart(t: f32): f32 {
+    return t * t * t * t;
+}
+
+fn EaseOutQuart(t: f32): f32 {
+    let t1 = t - 1.0;
+    return 1.0 - t1 * t1 * t1 * t1;
+}
+
+fn EaseInOutQuart(t: f32): f32 {
+    if (t < 0.5) {
+        return 8.0 * t * t * t * t;
+    }
+    let t1 = t - 1.0;
+    return 1.0 - 8.0 * t1 * t1 * t1 * t1;
+}
+
+fn EaseInQuint(t: f32): f32 {
+    return t * t * t * t * t;
+}
+
+fn EaseOutQuint(t: f32): f32 {
+    let t1 = t - 1.0;
+    return 1.0 + t1 * t1 * t1 * t1 * t1;
+}
+
+fn EaseInOutQuint(t: f32): f32 {
+    if (t < 0.5) {
+        return 16.0 * t * t * t * t * t;
+    }
+    let t1 = 2.0 * t - 2.0;
+    return 0.5 * t1 * t1 * t1 * t1 * t1 + 1.0;
+}
+
+fn EaseInSine(t: f32): f32 {
+    return 1.0 - cos(t * 1.5707963267948966);
+}
+
+fn EaseOutSine(t: f32): f32 {
+    return sin(t * 1.5707963267948966);
+}
+
+fn EaseInOutSine(t: f32): f32 {
+    return 0.5 * (1.0 - cos(3.141592653589793 * t));
+}
+
+fn EaseInCirc(t: f32): f32 {
+    return 1.0 - sqrt(1.0 - t * t);
+}
+
+fn EaseOutCirc(t: f32): f32 {
+    let t1 = t - 1.0;
+    return sqrt(1.0 - t1 * t1);
+}
+
+fn EaseInOutCirc(t: f32): f32 {
+    if (t < 0.5) {
+        return 0.5 * (1.0 - sqrt(1.0 - 4.0 * t * t));
+    }
+    let t1 = 2.0 * t - 2.0;
+    return 0.5 * (sqrt(1.0 - t1 * t1) + 1.0);
+}
+
+fn EaseInBack(t: f32): f32 {
+    let c1 = 1.70158;
+    let c3 = c1 + 1.0;
+    return c3 * t * t * t - c1 * t * t;
+}
+
+fn EaseOutBack(t: f32): f32 {
+    let c1 = 1.70158;
+    let c3 = c1 + 1.0;
+    let t1 = t - 1.0;
+    return 1.0 + c3 * t1 * t1 * t1 + c1 * t1 * t1;
+}
+
+fn EaseInOutBack(t: f32): f32 {
+    let c1 = 1.70158;
+    let c2 = c1 * 1.525;
+    if (t < 0.5) {
+        return 0.5 * (4.0 * t * t * ((c2 + 1.0) * 2.0 * t - c2));
+    }
+    let t1 = 2.0 * t - 2.0;
+    return 0.5 * (t1 * t1 * ((c2 + 1.0) * t1 + c2) + 2.0);
+}
+
+fn EaseOutBounce(t: f32): f32 {
+    let n1 = 7.5625;
+    let d1 = 2.75;
+
+    if (t < 1.0 / d1) {
+        return n1 * t * t;
+    } else if (t < 2.0 / d1) {
+        let t1 = t - 1.5 / d1;
+        return n1 * t1 * t1 + 0.75;
+    } else if (t < 2.5 / d1) {
+        let t1 = t - 2.25 / d1;
+        return n1 * t1 * t1 + 0.9375;
+    } else {
+        let t1 = t - 2.625 / d1;
+        return n1 * t1 * t1 + 0.984375;
+    }
+}
+
+fn EaseInBounce(t: f32): f32 {
+    return 1.0 - EaseOutBounce(1.0 - t);
+}
+
+fn EaseInOutBounce(t: f32): f32 {
+    if (t < 0.5) {
+        return 0.5 * (1.0 - EaseOutBounce(1.0 - 2.0 * t));
+    }
+    return 0.5 * (1.0 + EaseOutBounce(2.0 * t - 1.0));
+}
+
+// ============================================================================
+// Linear Easing Tests
+// ============================================================================
+
+print("=== Linear Easing Tests ===");
+
+assert_eq_f32("EaseLinear at 0", EaseLinear(0.0), 0.0, 0.001);
+assert_eq_f32("EaseLinear at 0.5", EaseLinear(0.5), 0.5, 0.001);
+assert_eq_f32("EaseLinear at 1", EaseLinear(1.0), 1.0, 0.001);
+assert_eq_f32("EaseLinear at 0.25", EaseLinear(0.25), 0.25, 0.001);
+
+// ============================================================================
+// Quadratic Easing Tests
+// ============================================================================
+
+print("");
+print("=== Quadratic Easing Tests ===");
+
+// All easing functions should start at 0 and end at 1
+assert_eq_f32("EaseInQuad at 0", EaseInQuad(0.0), 0.0, 0.001);
+assert_eq_f32("EaseInQuad at 1", EaseInQuad(1.0), 1.0, 0.001);
+assert_eq_f32("EaseOutQuad at 0", EaseOutQuad(0.0), 0.0, 0.001);
+assert_eq_f32("EaseOutQuad at 1", EaseOutQuad(1.0), 1.0, 0.001);
+assert_eq_f32("EaseInOutQuad at 0", EaseInOutQuad(0.0), 0.0, 0.001);
+assert_eq_f32("EaseInOutQuad at 1", EaseInOutQuad(1.0), 1.0, 0.001);
+assert_eq_f32("EaseInOutQuad at 0.5", EaseInOutQuad(0.5), 0.5, 0.001);
+
+// EaseIn should be slower at start (below linear)
+assert_in_range("EaseInQuad at 0.5 slower", EaseInQuad(0.5), 0.0, 0.5);
+
+// EaseOut should be faster at start (above linear)
+assert_in_range("EaseOutQuad at 0.5 faster", EaseOutQuad(0.5), 0.5, 1.0);
+
+// ============================================================================
+// Cubic Easing Tests
+// ============================================================================
+
+print("");
+print("=== Cubic Easing Tests ===");
+
+assert_eq_f32("EaseInCubic at 0", EaseInCubic(0.0), 0.0, 0.001);
+assert_eq_f32("EaseInCubic at 1", EaseInCubic(1.0), 1.0, 0.001);
+assert_eq_f32("EaseOutCubic at 0", EaseOutCubic(0.0), 0.0, 0.001);
+assert_eq_f32("EaseOutCubic at 1", EaseOutCubic(1.0), 1.0, 0.001);
+assert_eq_f32("EaseInOutCubic at 0", EaseInOutCubic(0.0), 0.0, 0.001);
+assert_eq_f32("EaseInOutCubic at 1", EaseInOutCubic(1.0), 1.0, 0.001);
+assert_eq_f32("EaseInOutCubic at 0.5", EaseInOutCubic(0.5), 0.5, 0.001);
+
+// ============================================================================
+// Quartic Easing Tests
+// ============================================================================
+
+print("");
+print("=== Quartic Easing Tests ===");
+
+assert_eq_f32("EaseInQuart at 0", EaseInQuart(0.0), 0.0, 0.001);
+assert_eq_f32("EaseInQuart at 1", EaseInQuart(1.0), 1.0, 0.001);
+assert_eq_f32("EaseOutQuart at 0", EaseOutQuart(0.0), 0.0, 0.001);
+assert_eq_f32("EaseOutQuart at 1", EaseOutQuart(1.0), 1.0, 0.001);
+assert_eq_f32("EaseInOutQuart at 0", EaseInOutQuart(0.0), 0.0, 0.001);
+assert_eq_f32("EaseInOutQuart at 1", EaseInOutQuart(1.0), 1.0, 0.001);
+assert_eq_f32("EaseInOutQuart at 0.5", EaseInOutQuart(0.5), 0.5, 0.001);
+
+// ============================================================================
+// Quintic Easing Tests
+// ============================================================================
+
+print("");
+print("=== Quintic Easing Tests ===");
+
+assert_eq_f32("EaseInQuint at 0", EaseInQuint(0.0), 0.0, 0.001);
+assert_eq_f32("EaseInQuint at 1", EaseInQuint(1.0), 1.0, 0.001);
+assert_eq_f32("EaseOutQuint at 0", EaseOutQuint(0.0), 0.0, 0.001);
+assert_eq_f32("EaseOutQuint at 1", EaseOutQuint(1.0), 1.0, 0.001);
+assert_eq_f32("EaseInOutQuint at 0", EaseInOutQuint(0.0), 0.0, 0.001);
+assert_eq_f32("EaseInOutQuint at 1", EaseInOutQuint(1.0), 1.0, 0.001);
+assert_eq_f32("EaseInOutQuint at 0.5", EaseInOutQuint(0.5), 0.5, 0.001);
+
+// ============================================================================
+// Sine Easing Tests
+// ============================================================================
+
+print("");
+print("=== Sine Easing Tests ===");
+
+assert_eq_f32("EaseInSine at 0", EaseInSine(0.0), 0.0, 0.001);
+assert_eq_f32("EaseInSine at 1", EaseInSine(1.0), 1.0, 0.001);
+assert_eq_f32("EaseOutSine at 0", EaseOutSine(0.0), 0.0, 0.001);
+assert_eq_f32("EaseOutSine at 1", EaseOutSine(1.0), 1.0, 0.001);
+assert_eq_f32("EaseInOutSine at 0", EaseInOutSine(0.0), 0.0, 0.001);
+assert_eq_f32("EaseInOutSine at 1", EaseInOutSine(1.0), 1.0, 0.001);
+assert_eq_f32("EaseInOutSine at 0.5", EaseInOutSine(0.5), 0.5, 0.001);
+
+// ============================================================================
+// Circular Easing Tests
+// ============================================================================
+
+print("");
+print("=== Circular Easing Tests ===");
+
+assert_eq_f32("EaseInCirc at 0", EaseInCirc(0.0), 0.0, 0.001);
+assert_eq_f32("EaseInCirc at 1", EaseInCirc(1.0), 1.0, 0.001);
+assert_eq_f32("EaseOutCirc at 0", EaseOutCirc(0.0), 0.0, 0.001);
+assert_eq_f32("EaseOutCirc at 1", EaseOutCirc(1.0), 1.0, 0.001);
+assert_eq_f32("EaseInOutCirc at 0", EaseInOutCirc(0.0), 0.0, 0.001);
+assert_eq_f32("EaseInOutCirc at 1", EaseInOutCirc(1.0), 1.0, 0.001);
+assert_eq_f32("EaseInOutCirc at 0.5", EaseInOutCirc(0.5), 0.5, 0.001);
+
+// ============================================================================
+// Back Easing Tests (overshoots)
+// ============================================================================
+
+print("");
+print("=== Back Easing Tests ===");
+
+assert_eq_f32("EaseInBack at 0", EaseInBack(0.0), 0.0, 0.001);
+assert_eq_f32("EaseInBack at 1", EaseInBack(1.0), 1.0, 0.001);
+assert_eq_f32("EaseOutBack at 0", EaseOutBack(0.0), 0.0, 0.001);
+assert_eq_f32("EaseOutBack at 1", EaseOutBack(1.0), 1.0, 0.001);
+assert_eq_f32("EaseInOutBack at 0", EaseInOutBack(0.0), 0.0, 0.001);
+assert_eq_f32("EaseInOutBack at 1", EaseInOutBack(1.0), 1.0, 0.001);
+
+// Back easing should overshoot - EaseInBack goes negative at start
+assert_in_range("EaseInBack overshoots negative", EaseInBack(0.25), -0.5, 0.0);
+
+// EaseOutBack should overshoot past 1
+assert_in_range("EaseOutBack overshoots positive", EaseOutBack(0.75), 1.0, 1.5);
+
+// ============================================================================
+// Bounce Easing Tests
+// ============================================================================
+
+print("");
+print("=== Bounce Easing Tests ===");
+
+assert_eq_f32("EaseOutBounce at 0", EaseOutBounce(0.0), 0.0, 0.001);
+assert_eq_f32("EaseOutBounce at 1", EaseOutBounce(1.0), 1.0, 0.001);
+assert_eq_f32("EaseInBounce at 0", EaseInBounce(0.0), 0.0, 0.001);
+assert_eq_f32("EaseInBounce at 1", EaseInBounce(1.0), 1.0, 0.001);
+assert_eq_f32("EaseInOutBounce at 0", EaseInOutBounce(0.0), 0.0, 0.001);
+assert_eq_f32("EaseInOutBounce at 1", EaseInOutBounce(1.0), 1.0, 0.001);
+assert_eq_f32("EaseInOutBounce at 0.5", EaseInOutBounce(0.5), 0.5, 0.001);
+
+// Bounce should always stay between 0 and 1 (no overshooting)
+assert_in_range("EaseOutBounce in range", EaseOutBounce(0.5), 0.0, 1.0);
+assert_in_range("EaseInBounce in range", EaseInBounce(0.5), 0.0, 1.0);
+
+// ============================================================================
+// Easing Monotonicity Tests (for non-back, non-elastic)
+// ============================================================================
+
+print("");
+print("=== Easing Monotonicity Tests ===");
+
+// Standard easing functions should be monotonically increasing
+let t1 = EaseInQuad(0.25);
+let t2 = EaseInQuad(0.50);
+let t3 = EaseInQuad(0.75);
+if (t1 < t2 && t2 < t3) {
+    print("[PASS] EaseInQuad is monotonically increasing");
+    tests_passed = tests_passed + 1;
+} else {
+    print("[FAIL] EaseInQuad is not monotonically increasing");
+    tests_failed = tests_failed + 1;
+}
+
+t1 = EaseOutCubic(0.25);
+t2 = EaseOutCubic(0.50);
+t3 = EaseOutCubic(0.75);
+if (t1 < t2 && t2 < t3) {
+    print("[PASS] EaseOutCubic is monotonically increasing");
+    tests_passed = tests_passed + 1;
+} else {
+    print("[FAIL] EaseOutCubic is not monotonically increasing");
+    tests_failed = tests_failed + 1;
+}
+
+// ============================================================================
+// Summary
+// ============================================================================
+
+print("");
+print("=== Test Summary ===");
+print("Passed: " + tests_passed);
+print("Failed: " + tests_failed);
+
+if (tests_failed > 0) {
+    exit(1);
+}

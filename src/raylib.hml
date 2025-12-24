@@ -162,6 +162,61 @@ extern fn DrawText(text: string, posX: i32, posY: i32, fontSize: i32, color: u32
 extern fn MeasureText(text: string, fontSize: i32): i32;
 
 // ============================================================================
+// Core - Timing
+// ============================================================================
+
+extern fn WaitTime(seconds: f64): void;
+
+// ============================================================================
+// Core - Random
+// ============================================================================
+
+extern fn GetRandomValue(min: i32, max: i32): i32;
+extern fn SetRandomSeed(seed: u32): void;
+
+// ============================================================================
+// Core - Misc
+// ============================================================================
+
+extern fn TakeScreenshot(fileName: string): void;
+extern fn SetConfigFlags(flags: u32): void;
+extern fn OpenURL(url: string): void;
+
+// ============================================================================
+// Core - Clipboard
+// ============================================================================
+
+extern fn SetClipboardText(text: string): void;
+extern fn GetClipboardText(): string;
+
+// ============================================================================
+// Shapes - Advanced Drawing
+// ============================================================================
+
+extern fn DrawCircleSector(centerX: i32, centerY: i32, radius: f32, startAngle: f32, endAngle: f32, segments: i32, color: u32): void;
+extern fn DrawCircleSectorLines(centerX: i32, centerY: i32, radius: f32, startAngle: f32, endAngle: f32, segments: i32, color: u32): void;
+extern fn DrawRing(centerX: i32, centerY: i32, innerRadius: f32, outerRadius: f32, startAngle: f32, endAngle: f32, segments: i32, color: u32): void;
+extern fn DrawRingLines(centerX: i32, centerY: i32, innerRadius: f32, outerRadius: f32, startAngle: f32, endAngle: f32, segments: i32, color: u32): void;
+extern fn DrawRectangleRounded(posX: i32, posY: i32, width: i32, height: i32, roundness: f32, segments: i32, color: u32): void;
+extern fn DrawRectangleRoundedLines(posX: i32, posY: i32, width: i32, height: i32, roundness: f32, segments: i32, color: u32): void;
+extern fn DrawRectangleLinesEx(posX: i32, posY: i32, width: i32, height: i32, lineThick: f32, color: u32): void;
+extern fn DrawPoly(centerX: i32, centerY: i32, sides: i32, radius: f32, rotation: f32, color: u32): void;
+extern fn DrawPolyLines(centerX: i32, centerY: i32, sides: i32, radius: f32, rotation: f32, color: u32): void;
+extern fn DrawPolyLinesEx(centerX: i32, centerY: i32, sides: i32, radius: f32, rotation: f32, lineThick: f32, color: u32): void;
+
+// ============================================================================
+// Shapes - Splines
+// ============================================================================
+
+extern fn DrawLineBezier(startPosX: i32, startPosY: i32, endPosX: i32, endPosY: i32, thick: f32, color: u32): void;
+
+// ============================================================================
+// Text - Extended
+// ============================================================================
+
+extern fn DrawFPS(posX: i32, posY: i32): void;
+
+// ============================================================================
 // Audio - Device Management
 // ============================================================================
 
@@ -458,6 +513,40 @@ export let BLEND_CUSTOM: i32            = 6;
 export let BLEND_CUSTOM_SEPARATE: i32   = 7;
 
 // ============================================================================
+// Config Flags (for SetConfigFlags before InitWindow)
+// ============================================================================
+
+export let FLAG_VSYNC_HINT: u32               = 0x00000040;
+export let FLAG_FULLSCREEN_MODE: u32          = 0x00000002;
+export let FLAG_WINDOW_RESIZABLE: u32         = 0x00000004;
+export let FLAG_WINDOW_UNDECORATED: u32       = 0x00000008;
+export let FLAG_WINDOW_HIDDEN: u32            = 0x00000080;
+export let FLAG_WINDOW_MINIMIZED: u32         = 0x00000200;
+export let FLAG_WINDOW_MAXIMIZED: u32         = 0x00000400;
+export let FLAG_WINDOW_UNFOCUSED: u32         = 0x00000800;
+export let FLAG_WINDOW_TOPMOST: u32           = 0x00001000;
+export let FLAG_WINDOW_ALWAYS_RUN: u32        = 0x00000100;
+export let FLAG_WINDOW_TRANSPARENT: u32       = 0x00000010;
+export let FLAG_WINDOW_HIGHDPI: u32           = 0x00002000;
+export let FLAG_WINDOW_MOUSE_PASSTHROUGH: u32 = 0x00004000;
+export let FLAG_BORDERLESS_WINDOWED_MODE: u32 = 0x00008000;
+export let FLAG_MSAA_4X_HINT: u32             = 0x00000020;
+export let FLAG_INTERLACED_HINT: u32          = 0x00010000;
+
+// ============================================================================
+// Log Level Constants
+// ============================================================================
+
+export let LOG_ALL: i32     = 0;
+export let LOG_TRACE: i32   = 1;
+export let LOG_DEBUG: i32   = 2;
+export let LOG_INFO: i32    = 3;
+export let LOG_WARNING: i32 = 4;
+export let LOG_ERROR: i32   = 5;
+export let LOG_FATAL: i32   = 6;
+export let LOG_NONE: i32    = 7;
+
+// ============================================================================
 // Collision Detection Helpers
 // ============================================================================
 
@@ -592,4 +681,617 @@ export fn Deg2Rad(degrees: f32): f32 {
 // Radians to degrees
 export fn Rad2Deg(radians: f32): f32 {
     return radians * 57.29577951308232087680;
+}
+
+// ============================================================================
+// Extended Math Utility Functions
+// ============================================================================
+
+// Sign of a float (-1, 0, or 1)
+export fn Sign(value: f32): f32 {
+    if (value > 0.0) { return 1.0; }
+    if (value < 0.0) { return -1.0; }
+    return 0.0;
+}
+
+// Sign of an integer (-1, 0, or 1)
+export fn SignInt(value: i32): i32 {
+    if (value > 0) { return 1; }
+    if (value < 0) { return -1; }
+    return 0;
+}
+
+// Absolute value of float
+export fn Abs(value: f32): f32 {
+    if (value < 0.0) { return -value; }
+    return value;
+}
+
+// Absolute value of integer
+export fn AbsInt(value: i32): i32 {
+    if (value < 0) { return -value; }
+    return value;
+}
+
+// Minimum of two floats
+export fn Min(a: f32, b: f32): f32 {
+    if (a < b) { return a; }
+    return b;
+}
+
+// Maximum of two floats
+export fn Max(a: f32, b: f32): f32 {
+    if (a > b) { return a; }
+    return b;
+}
+
+// Minimum of two integers
+export fn MinInt(a: i32, b: i32): i32 {
+    if (a < b) { return a; }
+    return b;
+}
+
+// Maximum of two integers
+export fn MaxInt(a: i32, b: i32): i32 {
+    if (a > b) { return a; }
+    return b;
+}
+
+// Floor of a float (returns integer)
+export fn FloorInt(value: f32): i32 {
+    let i: i32 = value;
+    if (value < 0.0 && value != i) { return i - 1; }
+    return i;
+}
+
+// Ceiling of a float (returns integer)
+export fn CeilInt(value: f32): i32 {
+    let i: i32 = value;
+    if (value > 0.0 && value != i) { return i + 1; }
+    return i;
+}
+
+// Round to nearest integer
+export fn RoundInt(value: f32): i32 {
+    if (value >= 0.0) { return FloorInt(value + 0.5); }
+    return CeilInt(value - 0.5);
+}
+
+// Smooth step interpolation (Hermite)
+export fn SmoothStep(edge0: f32, edge1: f32, x: f32): f32 {
+    let t = Clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+    return t * t * (3.0 - 2.0 * t);
+}
+
+// Inverse lerp - find t given start, end, and value
+export fn InverseLerp(start: f32, end: f32, value: f32): f32 {
+    if (start == end) { return 0.0; }
+    return (value - start) / (end - start);
+}
+
+// Move towards target value by a maximum delta
+export fn MoveTowards(current: f32, target: f32, maxDelta: f32): f32 {
+    let diff = target - current;
+    if (Abs(diff) <= maxDelta) { return target; }
+    return current + Sign(diff) * maxDelta;
+}
+
+// Move towards target integer by a maximum delta
+export fn MoveTowardsInt(current: i32, target: i32, maxDelta: i32): i32 {
+    let diff = target - current;
+    if (AbsInt(diff) <= maxDelta) { return target; }
+    return current + SignInt(diff) * maxDelta;
+}
+
+// Check if value is approximately equal (within epsilon)
+export fn Approximately(a: f32, b: f32, epsilon: f32): i32 {
+    let diff = a - b;
+    if (diff < 0.0) { diff = -diff; }
+    if (diff <= epsilon) { return 1; }
+    return 0;
+}
+
+// Check if value is within range [min, max]
+export fn InRange(value: f32, min: f32, max: f32): i32 {
+    if (value >= min && value <= max) { return 1; }
+    return 0;
+}
+
+// Check if integer is within range [min, max]
+export fn InRangeInt(value: i32, min: i32, max: i32): i32 {
+    if (value >= min && value <= max) { return 1; }
+    return 0;
+}
+
+// Wrap integer within range [min, max)
+export fn WrapInt(value: i32, min: i32, max: i32): i32 {
+    let range = max - min;
+    let result = value - min;
+    while (result < 0) { result = result + range; }
+    while (result >= range) { result = result - range; }
+    return result + min;
+}
+
+// ============================================================================
+// Extended Vector2 Utility Functions
+// ============================================================================
+
+// Vector2 normalize (returns components via out parameters pattern - using tuple simulation)
+// Since Hemlock doesn't have multiple return values, we return length and caller can divide
+export fn Vector2LengthSq(x: f32, y: f32): f32 {
+    return x * x + y * y;
+}
+
+// Normalize vector and return new length (x and y should be divided by length externally)
+export fn Vector2NormalizeGetLength(x: f32, y: f32): f32 {
+    let length = Vector2Length(x, y);
+    if (length == 0.0) { return 0.0; }
+    return length;
+}
+
+// Scale vector components
+export fn Vector2ScaleX(x: f32, scale: f32): f32 {
+    return x * scale;
+}
+
+export fn Vector2ScaleY(y: f32, scale: f32): f32 {
+    return y * scale;
+}
+
+// Add two vectors (return X component)
+export fn Vector2AddX(x1: f32, x2: f32): f32 {
+    return x1 + x2;
+}
+
+// Add two vectors (return Y component)
+export fn Vector2AddY(y1: f32, y2: f32): f32 {
+    return y1 + y2;
+}
+
+// Subtract vectors (return X component)
+export fn Vector2SubtractX(x1: f32, x2: f32): f32 {
+    return x1 - x2;
+}
+
+// Subtract vectors (return Y component)
+export fn Vector2SubtractY(y1: f32, y2: f32): f32 {
+    return y1 - y2;
+}
+
+// Negate vector (return X component)
+export fn Vector2NegateX(x: f32): f32 {
+    return -x;
+}
+
+// Negate vector (return Y component)
+export fn Vector2NegateY(y: f32): f32 {
+    return -y;
+}
+
+// Rotate vector (return X component)
+export fn Vector2RotateX(x: f32, y: f32, angle: f32): f32 {
+    let rad = Deg2Rad(angle);
+    let cosA = cos(rad);
+    let sinA = sin(rad);
+    return x * cosA - y * sinA;
+}
+
+// Rotate vector (return Y component)
+export fn Vector2RotateY(x: f32, y: f32, angle: f32): f32 {
+    let rad = Deg2Rad(angle);
+    let cosA = cos(rad);
+    let sinA = sin(rad);
+    return x * sinA + y * cosA;
+}
+
+// Lerp between two points (return X component)
+export fn Vector2LerpX(x1: f32, x2: f32, amount: f32): f32 {
+    return Lerp(x1, x2, amount);
+}
+
+// Lerp between two points (return Y component)
+export fn Vector2LerpY(y1: f32, y2: f32, amount: f32): f32 {
+    return Lerp(y1, y2, amount);
+}
+
+// Reflect vector off a normal (return X component)
+export fn Vector2ReflectX(vx: f32, vy: f32, nx: f32, ny: f32): f32 {
+    let dot = Vector2Dot(vx, vy, nx, ny);
+    return vx - 2.0 * dot * nx;
+}
+
+// Reflect vector off a normal (return Y component)
+export fn Vector2ReflectY(vx: f32, vy: f32, nx: f32, ny: f32): f32 {
+    let dot = Vector2Dot(vx, vy, nx, ny);
+    return vy - 2.0 * dot * ny;
+}
+
+// Get angle between two vectors in degrees
+export fn Vector2Angle(x1: f32, y1: f32, x2: f32, y2: f32): f32 {
+    let dot = Vector2Dot(x1, y1, x2, y2);
+    let len1 = Vector2Length(x1, y1);
+    let len2 = Vector2Length(x2, y2);
+    if (len1 == 0.0 || len2 == 0.0) { return 0.0; }
+    let cosAngle = dot / (len1 * len2);
+    // Clamp to avoid acos domain errors
+    if (cosAngle > 1.0) { cosAngle = 1.0; }
+    if (cosAngle < -1.0) { cosAngle = -1.0; }
+    return Rad2Deg(acos(cosAngle));
+}
+
+// Get angle of vector from positive X axis in degrees
+export fn Vector2AngleFromX(x: f32, y: f32): f32 {
+    return Rad2Deg(atan2(y, x));
+}
+
+// Move point towards target by max distance (return X component)
+export fn Vector2MoveTowardsX(currentX: f32, currentY: f32, targetX: f32, targetY: f32, maxDistance: f32): f32 {
+    let dx = targetX - currentX;
+    let dy = targetY - currentY;
+    let dist = Vector2Length(dx, dy);
+    if (dist <= maxDistance || dist == 0.0) { return targetX; }
+    return currentX + dx / dist * maxDistance;
+}
+
+// Move point towards target by max distance (return Y component)
+export fn Vector2MoveTowardsY(currentX: f32, currentY: f32, targetX: f32, targetY: f32, maxDistance: f32): f32 {
+    let dx = targetX - currentX;
+    let dy = targetY - currentY;
+    let dist = Vector2Length(dx, dy);
+    if (dist <= maxDistance || dist == 0.0) { return targetY; }
+    return currentY + dy / dist * maxDistance;
+}
+
+// ============================================================================
+// Extended Collision Detection
+// ============================================================================
+
+// Check if two line segments intersect
+export fn CheckCollisionLinesXY(p1x: f32, p1y: f32, p2x: f32, p2y: f32, p3x: f32, p3y: f32, p4x: f32, p4y: f32): i32 {
+    let d1x = p2x - p1x;
+    let d1y = p2y - p1y;
+    let d2x = p4x - p3x;
+    let d2y = p4y - p3y;
+
+    let cross = d1x * d2y - d1y * d2x;
+    if (cross == 0.0) { return 0; } // Parallel lines
+
+    let dx = p3x - p1x;
+    let dy = p3y - p1y;
+
+    let t = (dx * d2y - dy * d2x) / cross;
+    let u = (dx * d1y - dy * d1x) / cross;
+
+    if (t >= 0.0 && t <= 1.0 && u >= 0.0 && u <= 1.0) {
+        return 1;
+    }
+    return 0;
+}
+
+// Check if point is inside triangle (using barycentric coordinates)
+export fn CheckCollisionPointTriangleXY(px: f32, py: f32, ax: f32, ay: f32, bx: f32, by: f32, cx: f32, cy: f32): i32 {
+    let v0x = cx - ax;
+    let v0y = cy - ay;
+    let v1x = bx - ax;
+    let v1y = by - ay;
+    let v2x = px - ax;
+    let v2y = py - ay;
+
+    let dot00 = v0x * v0x + v0y * v0y;
+    let dot01 = v0x * v1x + v0y * v1y;
+    let dot02 = v0x * v2x + v0y * v2y;
+    let dot11 = v1x * v1x + v1y * v1y;
+    let dot12 = v1x * v2x + v1y * v2y;
+
+    let invDenom = 1.0 / (dot00 * dot11 - dot01 * dot01);
+    let u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+    let v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+
+    if (u >= 0.0 && v >= 0.0 && u + v <= 1.0) {
+        return 1;
+    }
+    return 0;
+}
+
+// Check if point is on line segment (within tolerance)
+export fn CheckCollisionPointLineXY(px: f32, py: f32, p1x: f32, p1y: f32, p2x: f32, p2y: f32, threshold: f32): i32 {
+    let d1 = Vector2Distance(px, py, p1x, p1y);
+    let d2 = Vector2Distance(px, py, p2x, p2y);
+    let lineLen = Vector2Distance(p1x, p1y, p2x, p2y);
+
+    if (d1 + d2 >= lineLen - threshold && d1 + d2 <= lineLen + threshold) {
+        return 1;
+    }
+    return 0;
+}
+
+// ============================================================================
+// Easing Functions
+// ============================================================================
+
+// Linear (no easing)
+export fn EaseLinear(t: f32): f32 {
+    return t;
+}
+
+// Quadratic easing
+export fn EaseInQuad(t: f32): f32 {
+    return t * t;
+}
+
+export fn EaseOutQuad(t: f32): f32 {
+    return t * (2.0 - t);
+}
+
+export fn EaseInOutQuad(t: f32): f32 {
+    if (t < 0.5) {
+        return 2.0 * t * t;
+    }
+    return -1.0 + (4.0 - 2.0 * t) * t;
+}
+
+// Cubic easing
+export fn EaseInCubic(t: f32): f32 {
+    return t * t * t;
+}
+
+export fn EaseOutCubic(t: f32): f32 {
+    let t1 = t - 1.0;
+    return t1 * t1 * t1 + 1.0;
+}
+
+export fn EaseInOutCubic(t: f32): f32 {
+    if (t < 0.5) {
+        return 4.0 * t * t * t;
+    }
+    let t1 = 2.0 * t - 2.0;
+    return 0.5 * t1 * t1 * t1 + 1.0;
+}
+
+// Quartic easing
+export fn EaseInQuart(t: f32): f32 {
+    return t * t * t * t;
+}
+
+export fn EaseOutQuart(t: f32): f32 {
+    let t1 = t - 1.0;
+    return 1.0 - t1 * t1 * t1 * t1;
+}
+
+export fn EaseInOutQuart(t: f32): f32 {
+    if (t < 0.5) {
+        return 8.0 * t * t * t * t;
+    }
+    let t1 = t - 1.0;
+    return 1.0 - 8.0 * t1 * t1 * t1 * t1;
+}
+
+// Quintic easing
+export fn EaseInQuint(t: f32): f32 {
+    return t * t * t * t * t;
+}
+
+export fn EaseOutQuint(t: f32): f32 {
+    let t1 = t - 1.0;
+    return 1.0 + t1 * t1 * t1 * t1 * t1;
+}
+
+export fn EaseInOutQuint(t: f32): f32 {
+    if (t < 0.5) {
+        return 16.0 * t * t * t * t * t;
+    }
+    let t1 = 2.0 * t - 2.0;
+    return 0.5 * t1 * t1 * t1 * t1 * t1 + 1.0;
+}
+
+// Sine easing
+export fn EaseInSine(t: f32): f32 {
+    return 1.0 - cos(t * 1.5707963267948966);
+}
+
+export fn EaseOutSine(t: f32): f32 {
+    return sin(t * 1.5707963267948966);
+}
+
+export fn EaseInOutSine(t: f32): f32 {
+    return 0.5 * (1.0 - cos(3.141592653589793 * t));
+}
+
+// Exponential easing
+export fn EaseInExpo(t: f32): f32 {
+    if (t == 0.0) { return 0.0; }
+    return pow(2.0, 10.0 * (t - 1.0));
+}
+
+export fn EaseOutExpo(t: f32): f32 {
+    if (t == 1.0) { return 1.0; }
+    return 1.0 - pow(2.0, -10.0 * t);
+}
+
+export fn EaseInOutExpo(t: f32): f32 {
+    if (t == 0.0) { return 0.0; }
+    if (t == 1.0) { return 1.0; }
+    if (t < 0.5) {
+        return 0.5 * pow(2.0, 20.0 * t - 10.0);
+    }
+    return 1.0 - 0.5 * pow(2.0, -20.0 * t + 10.0);
+}
+
+// Circular easing
+export fn EaseInCirc(t: f32): f32 {
+    return 1.0 - sqrt(1.0 - t * t);
+}
+
+export fn EaseOutCirc(t: f32): f32 {
+    let t1 = t - 1.0;
+    return sqrt(1.0 - t1 * t1);
+}
+
+export fn EaseInOutCirc(t: f32): f32 {
+    if (t < 0.5) {
+        return 0.5 * (1.0 - sqrt(1.0 - 4.0 * t * t));
+    }
+    let t1 = 2.0 * t - 2.0;
+    return 0.5 * (sqrt(1.0 - t1 * t1) + 1.0);
+}
+
+// Back easing (overshoots)
+export fn EaseInBack(t: f32): f32 {
+    let c1 = 1.70158;
+    let c3 = c1 + 1.0;
+    return c3 * t * t * t - c1 * t * t;
+}
+
+export fn EaseOutBack(t: f32): f32 {
+    let c1 = 1.70158;
+    let c3 = c1 + 1.0;
+    let t1 = t - 1.0;
+    return 1.0 + c3 * t1 * t1 * t1 + c1 * t1 * t1;
+}
+
+export fn EaseInOutBack(t: f32): f32 {
+    let c1 = 1.70158;
+    let c2 = c1 * 1.525;
+    if (t < 0.5) {
+        return 0.5 * (4.0 * t * t * ((c2 + 1.0) * 2.0 * t - c2));
+    }
+    let t1 = 2.0 * t - 2.0;
+    return 0.5 * (t1 * t1 * ((c2 + 1.0) * t1 + c2) + 2.0);
+}
+
+// Bounce easing
+export fn EaseOutBounce(t: f32): f32 {
+    let n1 = 7.5625;
+    let d1 = 2.75;
+
+    if (t < 1.0 / d1) {
+        return n1 * t * t;
+    } else if (t < 2.0 / d1) {
+        let t1 = t - 1.5 / d1;
+        return n1 * t1 * t1 + 0.75;
+    } else if (t < 2.5 / d1) {
+        let t1 = t - 2.25 / d1;
+        return n1 * t1 * t1 + 0.9375;
+    } else {
+        let t1 = t - 2.625 / d1;
+        return n1 * t1 * t1 + 0.984375;
+    }
+}
+
+export fn EaseInBounce(t: f32): f32 {
+    return 1.0 - EaseOutBounce(1.0 - t);
+}
+
+export fn EaseInOutBounce(t: f32): f32 {
+    if (t < 0.5) {
+        return 0.5 * (1.0 - EaseOutBounce(1.0 - 2.0 * t));
+    }
+    return 0.5 * (1.0 + EaseOutBounce(2.0 * t - 1.0));
+}
+
+// Elastic easing
+export fn EaseInElastic(t: f32): f32 {
+    if (t == 0.0) { return 0.0; }
+    if (t == 1.0) { return 1.0; }
+    let c4 = 6.283185307179586 / 3.0;
+    return -pow(2.0, 10.0 * t - 10.0) * sin((t * 10.0 - 10.75) * c4);
+}
+
+export fn EaseOutElastic(t: f32): f32 {
+    if (t == 0.0) { return 0.0; }
+    if (t == 1.0) { return 1.0; }
+    let c4 = 6.283185307179586 / 3.0;
+    return pow(2.0, -10.0 * t) * sin((t * 10.0 - 0.75) * c4) + 1.0;
+}
+
+export fn EaseInOutElastic(t: f32): f32 {
+    if (t == 0.0) { return 0.0; }
+    if (t == 1.0) { return 1.0; }
+    let c5 = 6.283185307179586 / 4.5;
+    if (t < 0.5) {
+        return -0.5 * pow(2.0, 20.0 * t - 10.0) * sin((20.0 * t - 11.125) * c5);
+    }
+    return 0.5 * pow(2.0, -20.0 * t + 10.0) * sin((20.0 * t - 11.125) * c5) + 1.0;
+}
+
+// ============================================================================
+// Color Utility Functions (Extended)
+// ============================================================================
+
+// Blend two colors (alpha blend)
+export fn ColorBlend(color1: u32, color2: u32, factor: f32): u32 {
+    let r1: i32 = color1 & 0xFF;
+    let g1: i32 = (color1 >> 8) & 0xFF;
+    let b1: i32 = (color1 >> 16) & 0xFF;
+    let a1: i32 = (color1 >> 24) & 0xFF;
+
+    let r2: i32 = color2 & 0xFF;
+    let g2: i32 = (color2 >> 8) & 0xFF;
+    let b2: i32 = (color2 >> 16) & 0xFF;
+    let a2: i32 = (color2 >> 24) & 0xFF;
+
+    let r: i32 = Lerp(r1, r2, factor);
+    let g: i32 = Lerp(g1, g2, factor);
+    let b: i32 = Lerp(b1, b2, factor);
+    let a: i32 = Lerp(a1, a2, factor);
+
+    return Color(r, g, b, a);
+}
+
+// Invert a color (keep alpha)
+export fn ColorInvert(color: u32): u32 {
+    let r: u8 = 255 - ColorGetR(color);
+    let g: u8 = 255 - ColorGetG(color);
+    let b: u8 = 255 - ColorGetB(color);
+    let a: u8 = ColorGetA(color);
+    return Color(r, g, b, a);
+}
+
+// Convert color to grayscale
+export fn ColorToGrayscale(color: u32): u32 {
+    let r: i32 = ColorGetR(color);
+    let g: i32 = ColorGetG(color);
+    let b: i32 = ColorGetB(color);
+    let a: u8 = ColorGetA(color);
+    // Standard luminance formula
+    let gray: i32 = (r * 299 + g * 587 + b * 114) / 1000;
+    return Color(gray, gray, gray, a);
+}
+
+// Tint a color (multiply RGB by another color)
+export fn ColorTint(color: u32, tint: u32): u32 {
+    let r1: i32 = ColorGetR(color);
+    let g1: i32 = ColorGetG(color);
+    let b1: i32 = ColorGetB(color);
+    let a1: u8 = ColorGetA(color);
+
+    let r2: i32 = ColorGetR(tint);
+    let g2: i32 = ColorGetG(tint);
+    let b2: i32 = ColorGetB(tint);
+
+    let r: i32 = (r1 * r2) / 255;
+    let g: i32 = (g1 * g2) / 255;
+    let b: i32 = (b1 * b2) / 255;
+
+    return Color(r, g, b, a1);
+}
+
+// Contrast adjustment (-1.0 to 1.0)
+export fn ColorContrast(color: u32, contrast: f32): u32 {
+    let r: f32 = ColorGetR(color);
+    let g: f32 = ColorGetG(color);
+    let b: f32 = ColorGetB(color);
+    let a: u8 = ColorGetA(color);
+
+    let factor = (1.0 + contrast) / (1.0 - contrast);
+
+    r = (r / 255.0 - 0.5) * factor + 0.5;
+    g = (g / 255.0 - 0.5) * factor + 0.5;
+    b = (b / 255.0 - 0.5) * factor + 0.5;
+
+    let ri: i32 = Clamp(r * 255.0, 0.0, 255.0);
+    let gi: i32 = Clamp(g * 255.0, 0.0, 255.0);
+    let bi: i32 = Clamp(b * 255.0, 0.0, 255.0);
+
+    return Color(ri, gi, bi, a);
 }

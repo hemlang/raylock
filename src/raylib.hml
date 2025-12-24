@@ -78,7 +78,8 @@ export extern fn EndScissorMode(): void;
 
 export extern fn rlBegin(mode: i32): void;       // Begin vertex definition
 export extern fn rlEnd(): void;                   // End vertex definition
-export extern fn rlVertex2f(x: f32, y: f32): void;  // Define vertex position
+export extern fn rlVertex2f(x: f32, y: f32): void;  // Define vertex position (float)
+export extern fn rlVertex2i(x: i32, y: i32): void;  // Define vertex position (int)
 export extern fn rlColor4ub(r: u8, g: u8, b: u8, a: u8): void;  // Define vertex color
 
 // rlgl drawing modes
@@ -494,6 +495,49 @@ export fn ColorGetA(color: u32): u8 {
 // ============================================================================
 // Shape Drawing Helpers (using rlgl to avoid Vector2 struct issues)
 // ============================================================================
+
+// Draw a filled circle using pixels (workaround for ARM64 FFI float parameter bug)
+// Note: DrawCircle doesn't work because Hemlock's FFI doesn't correctly pass floats on ARM64
+export fn DrawCircleFill(centerX: i32, centerY: i32, radius: i32, color: u32) {
+    let r2 = radius * radius;
+    let y = -radius;
+    while (y <= radius) {
+        let x = -radius;
+        while (x <= radius) {
+            if (x * x + y * y <= r2) {
+                DrawPixel(centerX + x, centerY + y, color);
+            }
+            x = x + 1;
+        }
+        y = y + 1;
+    }
+}
+
+// Draw a circle outline using pixels (workaround for ARM64 FFI float parameter bug)
+export fn DrawCircleOutline(centerX: i32, centerY: i32, radius: i32, color: u32) {
+    // Midpoint circle algorithm
+    let x = radius;
+    let y = 0;
+    let err = 0;
+
+    while (x >= y) {
+        DrawPixel(centerX + x, centerY + y, color);
+        DrawPixel(centerX + y, centerY + x, color);
+        DrawPixel(centerX - y, centerY + x, color);
+        DrawPixel(centerX - x, centerY + y, color);
+        DrawPixel(centerX - x, centerY - y, color);
+        DrawPixel(centerX - y, centerY - x, color);
+        DrawPixel(centerX + y, centerY - x, color);
+        DrawPixel(centerX + x, centerY - y, color);
+
+        y = y + 1;
+        err = err + 1 + 2 * y;
+        if (2 * (err - x) + 1 > 0) {
+            x = x - 1;
+            err = err + 1 - 2 * x;
+        }
+    }
+}
 
 // Draw a filled triangle using rlgl primitives
 // This works around raylib's DrawTriangle which expects Vector2 structs

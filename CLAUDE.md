@@ -112,15 +112,34 @@ fn myFunc(x: i32) -> i32 {
 ### String Type
 Use `string` not `str` for string types.
 
+### ARM64 Float Parameter Bug - Use Integer-Based Helpers
+On ARM64 Macs (Apple Silicon), Hemlock's FFI doesn't correctly pass float parameters to C functions - they go in integer registers instead of floating-point registers. This breaks many raylib functions.
+
+**What works:** Functions with only int params before Color (DrawRectangle, DrawPixel, DrawLine, DrawText)
+**What fails:** Functions with float params (DrawCircle, DrawEllipse, rlVertex2f, etc.)
+
+**Use these workarounds:**
+
+```hemlock
+// BAD - DrawCircle doesn't render (float param FFI bug)
+DrawCircle(200, 200, 50.0, RED);
+
+// GOOD - Use DrawCircleFill helper (pixel-based, takes ints)
+DrawCircleFill(200, 200, 50, RED);
+
+// Also available:
+DrawCircleOutline(200, 200, 50, GREEN);  // Circle outline
+```
+
 ### DrawTriangle Does NOT Work - Use DrawTriangleFill Instead
-The raylib `DrawTriangle` function expects `Vector2` structs, but Hemlock's FFI cannot properly pass C structs. **Use `DrawTriangleFill` instead**, which is a helper function that uses low-level rlgl calls.
+The raylib `DrawTriangle` function expects `Vector2` structs, but Hemlock's FFI cannot properly pass C structs. Note: DrawTriangleFill also doesn't work on ARM64 due to the float parameter bug above.
 
 ```hemlock
 // BAD - DrawTriangle won't render (Vector2 struct issue)
 DrawTriangle(100.0, 200.0, 50.0, 100.0, 150.0, 100.0, RED);
 
-// GOOD - Use DrawTriangleFill helper
-DrawTriangleFill(100.0, 200.0, 150.0, 100.0, 50.0, 100.0, RED);
+// DrawTriangleFill also broken on ARM64 (uses floats)
+// For triangles, use DrawLine to draw outlines or DrawPixel for fills
 ```
 
 **Important: Counter-Clockwise Winding Order Required**

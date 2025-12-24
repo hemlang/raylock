@@ -424,13 +424,17 @@ while (WindowShouldClose() == 0) {
         drawRow = drawRow + 1;
     }
 
-    // Draw paddle
-    DrawRectangle(paddleX, paddleY, paddleWidth, paddleHeight, WHITE);
-    DrawRectangle(paddleX + 2, paddleY + 2, paddleWidth - 4, paddleHeight - 6, SKYBLUE);
+    // Draw paddle (convert float to int for rendering)
+    let px: i32 = paddleX;
+    let py: i32 = paddleY;
+    DrawRectangle(px, py, paddleWidth, paddleHeight, WHITE);
+    DrawRectangle(px + 2, py + 2, paddleWidth - 4, paddleHeight - 6, SKYBLUE);
 
-    // Draw ball
-    DrawCircle(ballX, ballY, ballRadius, WHITE);
-    DrawCircle(ballX - 2.0, ballY - 2.0, ballRadius * 0.4, LIGHTGRAY);
+    // Draw ball (convert float to int for rendering)
+    let bx: i32 = ballX;
+    let by: i32 = ballY;
+    DrawRectangle(bx - 8, by - 8, 16, 16, WHITE);
+    DrawRectangle(bx - 6, by - 6, 4, 4, LIGHTGRAY);
 
     // Draw UI bar at top
     DrawRectangle(0, 0, screenWidth, 25, DARKGRAY);

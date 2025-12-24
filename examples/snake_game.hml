@@ -362,30 +362,30 @@ fn drawSegment(i: i32, isHead: i32) {
         DrawRectangle(x + 1, y + 1, cellSize - 2, cellSize - 2, DARKGREEN);
         DrawRectangle(x + 2, y + 2, cellSize - 4, cellSize - 4, GREEN);
 
-        // Eyes based on direction
+        // Eyes based on direction (using rectangles since DrawCircle has issues)
         if (direction == 0) { // Right
-            DrawCircle(x + 14, y + 6, 3.0, WHITE);
-            DrawCircle(x + 14, y + 14, 3.0, WHITE);
-            DrawCircle(x + 15, y + 6, 1.5, BLACK);
-            DrawCircle(x + 15, y + 14, 1.5, BLACK);
+            DrawRectangle(x + 12, y + 4, 5, 5, WHITE);
+            DrawRectangle(x + 12, y + 12, 5, 5, WHITE);
+            DrawRectangle(x + 14, y + 5, 2, 3, BLACK);
+            DrawRectangle(x + 14, y + 13, 2, 3, BLACK);
         }
         if (direction == 1) { // Down
-            DrawCircle(x + 6, y + 14, 3.0, WHITE);
-            DrawCircle(x + 14, y + 14, 3.0, WHITE);
-            DrawCircle(x + 6, y + 15, 1.5, BLACK);
-            DrawCircle(x + 14, y + 15, 1.5, BLACK);
+            DrawRectangle(x + 4, y + 12, 5, 5, WHITE);
+            DrawRectangle(x + 12, y + 12, 5, 5, WHITE);
+            DrawRectangle(x + 5, y + 14, 3, 2, BLACK);
+            DrawRectangle(x + 13, y + 14, 3, 2, BLACK);
         }
         if (direction == 2) { // Left
-            DrawCircle(x + 6, y + 6, 3.0, WHITE);
-            DrawCircle(x + 6, y + 14, 3.0, WHITE);
-            DrawCircle(x + 5, y + 6, 1.5, BLACK);
-            DrawCircle(x + 5, y + 14, 1.5, BLACK);
+            DrawRectangle(x + 4, y + 4, 5, 5, WHITE);
+            DrawRectangle(x + 4, y + 12, 5, 5, WHITE);
+            DrawRectangle(x + 4, y + 5, 2, 3, BLACK);
+            DrawRectangle(x + 4, y + 13, 2, 3, BLACK);
         }
         if (direction == 3) { // Up
-            DrawCircle(x + 6, y + 6, 3.0, WHITE);
-            DrawCircle(x + 14, y + 6, 3.0, WHITE);
-            DrawCircle(x + 6, y + 5, 1.5, BLACK);
-            DrawCircle(x + 14, y + 5, 1.5, BLACK);
+            DrawRectangle(x + 4, y + 4, 5, 5, WHITE);
+            DrawRectangle(x + 12, y + 4, 5, 5, WHITE);
+            DrawRectangle(x + 5, y + 4, 3, 2, BLACK);
+            DrawRectangle(x + 13, y + 4, 3, 2, BLACK);
         }
     } else {
         // Body segment with gradient effect
@@ -524,11 +524,12 @@ while (WindowShouldClose() == 0) {
         gx = gx + 1;
     }
 
-    // Draw food (apple)
+    // Draw food (apple) - using rectangles since DrawCircle has issues
     let fx = foodX * cellSize;
     let fy = foodY * cellSize;
-    DrawCircle(fx + cellSize / 2, fy + cellSize / 2, 8.0, RED);
-    DrawCircle(fx + cellSize / 2 - 2, fy + cellSize / 2 - 2, 3.0, ORANGE);
+    // Apple body
+    DrawRectangle(fx + 4, fy + 4, cellSize - 8, cellSize - 8, RED);
+    DrawRectangle(fx + 6, fy + 6, 4, 4, ORANGE);
     // Stem
     DrawRectangle(fx + cellSize / 2 - 1, fy + 2, 2, 4, DARKGREEN);
 

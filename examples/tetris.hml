@@ -535,18 +535,18 @@ fn drawBlock(x: i32, y: i32, color: u32) {
     DrawRectangle(px + 2, py + 2, 2, cellSize - 4, WHITE);
 }
 
-// Draw piece preview
+// Draw piece preview at absolute screen position (ox, oy)
 fn drawPreview(t: i32, ox: i32, oy: i32) {
-    let color = getPieceColor(t);
-    let i = 0;
-    while (i < 4) {
-        let block = getPieceBlock(t, 0, i);
-        let bx = block % 10;
-        let by = block / 10;
-        let px = ox + bx * 20;
-        let py = oy + by * 20;
-        DrawRectangle(px, py, 18, 18, color);
-        i = i + 1;
+    let previewColor = getPieceColor(t);
+    let previewIdx = 0;
+    while (previewIdx < 4) {
+        let previewBlock = getPieceBlock(t, 0, previewIdx);
+        let previewBx = previewBlock % 10;
+        let previewBy = previewBlock / 10;
+        let previewPx = ox + previewBx * 20;
+        let previewPy = oy + previewBy * 20;
+        DrawRectangle(previewPx, previewPy, 18, 18, previewColor);
+        previewIdx = previewIdx + 1;
     }
 }
 

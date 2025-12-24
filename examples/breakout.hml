@@ -414,14 +414,14 @@ while (WindowShouldClose() == 0) {
     ClearBackground(BLACK);
 
     // Draw bricks
-    let row = 0;
-    while (row < brickRows) {
-        let col = 0;
-        while (col < brickCols) {
-            drawBrick(row, col);
-            col = col + 1;
+    let drawRow = 0;
+    while (drawRow < brickRows) {
+        let drawCol = 0;
+        while (drawCol < brickCols) {
+            drawBrick(drawRow, drawCol);
+            drawCol = drawCol + 1;
         }
-        row = row + 1;
+        drawRow = drawRow + 1;
     }
 
     // Draw paddle

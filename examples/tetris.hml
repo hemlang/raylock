@@ -1,0 +1,828 @@
+// Tetris - Classic falling block puzzle game
+// Controls: Arrow keys to move/rotate, Down to soft drop, SPACE for hard drop, R to restart
+// Demonstrates: grid-based game, rotation, line clearing, classic game mechanics
+
+import {
+    InitWindow, CloseWindow, WindowShouldClose, SetTargetFPS, GetFPS, GetFrameTime,
+    BeginDrawing, EndDrawing, ClearBackground,
+    DrawRectangle, DrawRectangleLines, DrawText,
+    IsKeyPressed, IsKeyDown, GetRandomValue,
+    RAYWHITE, RED, GREEN, BLUE, YELLOW, ORANGE, PURPLE, PINK, SKYBLUE,
+    DARKGRAY, LIGHTGRAY, BLACK, WHITE, MAROON, LIME, GOLD,
+    KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, KEY_SPACE, KEY_R, KEY_P,
+    KEY_A, KEY_D, KEY_W, KEY_S
+} from "../src/raylib.hml";
+
+// Board dimensions
+let boardWidth = 10;
+let boardHeight = 20;
+let cellSize = 28;
+
+// Screen layout
+let boardOffsetX = 50;
+let boardOffsetY = 50;
+let screenWidth = 450;
+let screenHeight = 650;
+
+// Board state - 10x20 grid (0 = empty, 1-7 = piece color)
+// Row 0 (top)
+let c00=0;let c01=0;let c02=0;let c03=0;let c04=0;let c05=0;let c06=0;let c07=0;let c08=0;let c09=0;
+let c10=0;let c11=0;let c12=0;let c13=0;let c14=0;let c15=0;let c16=0;let c17=0;let c18=0;let c19=0;
+let c20=0;let c21=0;let c22=0;let c23=0;let c24=0;let c25=0;let c26=0;let c27=0;let c28=0;let c29=0;
+let c30=0;let c31=0;let c32=0;let c33=0;let c34=0;let c35=0;let c36=0;let c37=0;let c38=0;let c39=0;
+let c40=0;let c41=0;let c42=0;let c43=0;let c44=0;let c45=0;let c46=0;let c47=0;let c48=0;let c49=0;
+let c50=0;let c51=0;let c52=0;let c53=0;let c54=0;let c55=0;let c56=0;let c57=0;let c58=0;let c59=0;
+let c60=0;let c61=0;let c62=0;let c63=0;let c64=0;let c65=0;let c66=0;let c67=0;let c68=0;let c69=0;
+let c70=0;let c71=0;let c72=0;let c73=0;let c74=0;let c75=0;let c76=0;let c77=0;let c78=0;let c79=0;
+let c80=0;let c81=0;let c82=0;let c83=0;let c84=0;let c85=0;let c86=0;let c87=0;let c88=0;let c89=0;
+let c90=0;let c91=0;let c92=0;let c93=0;let c94=0;let c95=0;let c96=0;let c97=0;let c98=0;let c99=0;
+let c100=0;let c101=0;let c102=0;let c103=0;let c104=0;let c105=0;let c106=0;let c107=0;let c108=0;let c109=0;
+let c110=0;let c111=0;let c112=0;let c113=0;let c114=0;let c115=0;let c116=0;let c117=0;let c118=0;let c119=0;
+let c120=0;let c121=0;let c122=0;let c123=0;let c124=0;let c125=0;let c126=0;let c127=0;let c128=0;let c129=0;
+let c130=0;let c131=0;let c132=0;let c133=0;let c134=0;let c135=0;let c136=0;let c137=0;let c138=0;let c139=0;
+let c140=0;let c141=0;let c142=0;let c143=0;let c144=0;let c145=0;let c146=0;let c147=0;let c148=0;let c149=0;
+let c150=0;let c151=0;let c152=0;let c153=0;let c154=0;let c155=0;let c156=0;let c157=0;let c158=0;let c159=0;
+let c160=0;let c161=0;let c162=0;let c163=0;let c164=0;let c165=0;let c166=0;let c167=0;let c168=0;let c169=0;
+let c170=0;let c171=0;let c172=0;let c173=0;let c174=0;let c175=0;let c176=0;let c177=0;let c178=0;let c179=0;
+let c180=0;let c181=0;let c182=0;let c183=0;let c184=0;let c185=0;let c186=0;let c187=0;let c188=0;let c189=0;
+let c190=0;let c191=0;let c192=0;let c193=0;let c194=0;let c195=0;let c196=0;let c197=0;let c198=0;let c199=0;
+
+// Current piece state
+let pieceType = 0;    // 1-7 for I,O,T,S,Z,J,L
+let pieceX = 3;       // Position on board
+let pieceY = 0;
+let pieceRot = 0;     // 0-3 rotation state
+
+// Next piece
+let nextPiece = 0;
+
+// Game state
+let score = 0;
+let highScore = 0;
+let lines = 0;
+let level = 1;
+let gameOver = 0;
+let paused = 0;
+
+// Timing
+let fallTimer: f32 = 0.0;
+let fallDelay: f32 = 0.5;
+let moveTimer: f32 = 0.0;
+let moveDelay: f32 = 0.08;
+
+// Get cell value
+fn getCell(row: i32, col: i32): i32 {
+    let idx = row * 10 + col;
+    if (idx == 0) { return c00; } if (idx == 1) { return c01; } if (idx == 2) { return c02; }
+    if (idx == 3) { return c03; } if (idx == 4) { return c04; } if (idx == 5) { return c05; }
+    if (idx == 6) { return c06; } if (idx == 7) { return c07; } if (idx == 8) { return c08; }
+    if (idx == 9) { return c09; } if (idx == 10) { return c10; } if (idx == 11) { return c11; }
+    if (idx == 12) { return c12; } if (idx == 13) { return c13; } if (idx == 14) { return c14; }
+    if (idx == 15) { return c15; } if (idx == 16) { return c16; } if (idx == 17) { return c17; }
+    if (idx == 18) { return c18; } if (idx == 19) { return c19; } if (idx == 20) { return c20; }
+    if (idx == 21) { return c21; } if (idx == 22) { return c22; } if (idx == 23) { return c23; }
+    if (idx == 24) { return c24; } if (idx == 25) { return c25; } if (idx == 26) { return c26; }
+    if (idx == 27) { return c27; } if (idx == 28) { return c28; } if (idx == 29) { return c29; }
+    if (idx == 30) { return c30; } if (idx == 31) { return c31; } if (idx == 32) { return c32; }
+    if (idx == 33) { return c33; } if (idx == 34) { return c34; } if (idx == 35) { return c35; }
+    if (idx == 36) { return c36; } if (idx == 37) { return c37; } if (idx == 38) { return c38; }
+    if (idx == 39) { return c39; } if (idx == 40) { return c40; } if (idx == 41) { return c41; }
+    if (idx == 42) { return c42; } if (idx == 43) { return c43; } if (idx == 44) { return c44; }
+    if (idx == 45) { return c45; } if (idx == 46) { return c46; } if (idx == 47) { return c47; }
+    if (idx == 48) { return c48; } if (idx == 49) { return c49; } if (idx == 50) { return c50; }
+    if (idx == 51) { return c51; } if (idx == 52) { return c52; } if (idx == 53) { return c53; }
+    if (idx == 54) { return c54; } if (idx == 55) { return c55; } if (idx == 56) { return c56; }
+    if (idx == 57) { return c57; } if (idx == 58) { return c58; } if (idx == 59) { return c59; }
+    if (idx == 60) { return c60; } if (idx == 61) { return c61; } if (idx == 62) { return c62; }
+    if (idx == 63) { return c63; } if (idx == 64) { return c64; } if (idx == 65) { return c65; }
+    if (idx == 66) { return c66; } if (idx == 67) { return c67; } if (idx == 68) { return c68; }
+    if (idx == 69) { return c69; } if (idx == 70) { return c70; } if (idx == 71) { return c71; }
+    if (idx == 72) { return c72; } if (idx == 73) { return c73; } if (idx == 74) { return c74; }
+    if (idx == 75) { return c75; } if (idx == 76) { return c76; } if (idx == 77) { return c77; }
+    if (idx == 78) { return c78; } if (idx == 79) { return c79; } if (idx == 80) { return c80; }
+    if (idx == 81) { return c81; } if (idx == 82) { return c82; } if (idx == 83) { return c83; }
+    if (idx == 84) { return c84; } if (idx == 85) { return c85; } if (idx == 86) { return c86; }
+    if (idx == 87) { return c87; } if (idx == 88) { return c88; } if (idx == 89) { return c89; }
+    if (idx == 90) { return c90; } if (idx == 91) { return c91; } if (idx == 92) { return c92; }
+    if (idx == 93) { return c93; } if (idx == 94) { return c94; } if (idx == 95) { return c95; }
+    if (idx == 96) { return c96; } if (idx == 97) { return c97; } if (idx == 98) { return c98; }
+    if (idx == 99) { return c99; } if (idx == 100) { return c100; } if (idx == 101) { return c101; }
+    if (idx == 102) { return c102; } if (idx == 103) { return c103; } if (idx == 104) { return c104; }
+    if (idx == 105) { return c105; } if (idx == 106) { return c106; } if (idx == 107) { return c107; }
+    if (idx == 108) { return c108; } if (idx == 109) { return c109; } if (idx == 110) { return c110; }
+    if (idx == 111) { return c111; } if (idx == 112) { return c112; } if (idx == 113) { return c113; }
+    if (idx == 114) { return c114; } if (idx == 115) { return c115; } if (idx == 116) { return c116; }
+    if (idx == 117) { return c117; } if (idx == 118) { return c118; } if (idx == 119) { return c119; }
+    if (idx == 120) { return c120; } if (idx == 121) { return c121; } if (idx == 122) { return c122; }
+    if (idx == 123) { return c123; } if (idx == 124) { return c124; } if (idx == 125) { return c125; }
+    if (idx == 126) { return c126; } if (idx == 127) { return c127; } if (idx == 128) { return c128; }
+    if (idx == 129) { return c129; } if (idx == 130) { return c130; } if (idx == 131) { return c131; }
+    if (idx == 132) { return c132; } if (idx == 133) { return c133; } if (idx == 134) { return c134; }
+    if (idx == 135) { return c135; } if (idx == 136) { return c136; } if (idx == 137) { return c137; }
+    if (idx == 138) { return c138; } if (idx == 139) { return c139; } if (idx == 140) { return c140; }
+    if (idx == 141) { return c141; } if (idx == 142) { return c142; } if (idx == 143) { return c143; }
+    if (idx == 144) { return c144; } if (idx == 145) { return c145; } if (idx == 146) { return c146; }
+    if (idx == 147) { return c147; } if (idx == 148) { return c148; } if (idx == 149) { return c149; }
+    if (idx == 150) { return c150; } if (idx == 151) { return c151; } if (idx == 152) { return c152; }
+    if (idx == 153) { return c153; } if (idx == 154) { return c154; } if (idx == 155) { return c155; }
+    if (idx == 156) { return c156; } if (idx == 157) { return c157; } if (idx == 158) { return c158; }
+    if (idx == 159) { return c159; } if (idx == 160) { return c160; } if (idx == 161) { return c161; }
+    if (idx == 162) { return c162; } if (idx == 163) { return c163; } if (idx == 164) { return c164; }
+    if (idx == 165) { return c165; } if (idx == 166) { return c166; } if (idx == 167) { return c167; }
+    if (idx == 168) { return c168; } if (idx == 169) { return c169; } if (idx == 170) { return c170; }
+    if (idx == 171) { return c171; } if (idx == 172) { return c172; } if (idx == 173) { return c173; }
+    if (idx == 174) { return c174; } if (idx == 175) { return c175; } if (idx == 176) { return c176; }
+    if (idx == 177) { return c177; } if (idx == 178) { return c178; } if (idx == 179) { return c179; }
+    if (idx == 180) { return c180; } if (idx == 181) { return c181; } if (idx == 182) { return c182; }
+    if (idx == 183) { return c183; } if (idx == 184) { return c184; } if (idx == 185) { return c185; }
+    if (idx == 186) { return c186; } if (idx == 187) { return c187; } if (idx == 188) { return c188; }
+    if (idx == 189) { return c189; } if (idx == 190) { return c190; } if (idx == 191) { return c191; }
+    if (idx == 192) { return c192; } if (idx == 193) { return c193; } if (idx == 194) { return c194; }
+    if (idx == 195) { return c195; } if (idx == 196) { return c196; } if (idx == 197) { return c197; }
+    if (idx == 198) { return c198; } if (idx == 199) { return c199; }
+    return 0;
+}
+
+// Set cell value
+fn setCell(row: i32, col: i32, val: i32) {
+    let idx = row * 10 + col;
+    if (idx == 0) { c00 = val; } if (idx == 1) { c01 = val; } if (idx == 2) { c02 = val; }
+    if (idx == 3) { c03 = val; } if (idx == 4) { c04 = val; } if (idx == 5) { c05 = val; }
+    if (idx == 6) { c06 = val; } if (idx == 7) { c07 = val; } if (idx == 8) { c08 = val; }
+    if (idx == 9) { c09 = val; } if (idx == 10) { c10 = val; } if (idx == 11) { c11 = val; }
+    if (idx == 12) { c12 = val; } if (idx == 13) { c13 = val; } if (idx == 14) { c14 = val; }
+    if (idx == 15) { c15 = val; } if (idx == 16) { c16 = val; } if (idx == 17) { c17 = val; }
+    if (idx == 18) { c18 = val; } if (idx == 19) { c19 = val; } if (idx == 20) { c20 = val; }
+    if (idx == 21) { c21 = val; } if (idx == 22) { c22 = val; } if (idx == 23) { c23 = val; }
+    if (idx == 24) { c24 = val; } if (idx == 25) { c25 = val; } if (idx == 26) { c26 = val; }
+    if (idx == 27) { c27 = val; } if (idx == 28) { c28 = val; } if (idx == 29) { c29 = val; }
+    if (idx == 30) { c30 = val; } if (idx == 31) { c31 = val; } if (idx == 32) { c32 = val; }
+    if (idx == 33) { c33 = val; } if (idx == 34) { c34 = val; } if (idx == 35) { c35 = val; }
+    if (idx == 36) { c36 = val; } if (idx == 37) { c37 = val; } if (idx == 38) { c38 = val; }
+    if (idx == 39) { c39 = val; } if (idx == 40) { c40 = val; } if (idx == 41) { c41 = val; }
+    if (idx == 42) { c42 = val; } if (idx == 43) { c43 = val; } if (idx == 44) { c44 = val; }
+    if (idx == 45) { c45 = val; } if (idx == 46) { c46 = val; } if (idx == 47) { c47 = val; }
+    if (idx == 48) { c48 = val; } if (idx == 49) { c49 = val; } if (idx == 50) { c50 = val; }
+    if (idx == 51) { c51 = val; } if (idx == 52) { c52 = val; } if (idx == 53) { c53 = val; }
+    if (idx == 54) { c54 = val; } if (idx == 55) { c55 = val; } if (idx == 56) { c56 = val; }
+    if (idx == 57) { c57 = val; } if (idx == 58) { c58 = val; } if (idx == 59) { c59 = val; }
+    if (idx == 60) { c60 = val; } if (idx == 61) { c61 = val; } if (idx == 62) { c62 = val; }
+    if (idx == 63) { c63 = val; } if (idx == 64) { c64 = val; } if (idx == 65) { c65 = val; }
+    if (idx == 66) { c66 = val; } if (idx == 67) { c67 = val; } if (idx == 68) { c68 = val; }
+    if (idx == 69) { c69 = val; } if (idx == 70) { c70 = val; } if (idx == 71) { c71 = val; }
+    if (idx == 72) { c72 = val; } if (idx == 73) { c73 = val; } if (idx == 74) { c74 = val; }
+    if (idx == 75) { c75 = val; } if (idx == 76) { c76 = val; } if (idx == 77) { c77 = val; }
+    if (idx == 78) { c78 = val; } if (idx == 79) { c79 = val; } if (idx == 80) { c80 = val; }
+    if (idx == 81) { c81 = val; } if (idx == 82) { c82 = val; } if (idx == 83) { c83 = val; }
+    if (idx == 84) { c84 = val; } if (idx == 85) { c85 = val; } if (idx == 86) { c86 = val; }
+    if (idx == 87) { c87 = val; } if (idx == 88) { c88 = val; } if (idx == 89) { c89 = val; }
+    if (idx == 90) { c90 = val; } if (idx == 91) { c91 = val; } if (idx == 92) { c92 = val; }
+    if (idx == 93) { c93 = val; } if (idx == 94) { c94 = val; } if (idx == 95) { c95 = val; }
+    if (idx == 96) { c96 = val; } if (idx == 97) { c97 = val; } if (idx == 98) { c98 = val; }
+    if (idx == 99) { c99 = val; } if (idx == 100) { c100 = val; } if (idx == 101) { c101 = val; }
+    if (idx == 102) { c102 = val; } if (idx == 103) { c103 = val; } if (idx == 104) { c104 = val; }
+    if (idx == 105) { c105 = val; } if (idx == 106) { c106 = val; } if (idx == 107) { c107 = val; }
+    if (idx == 108) { c108 = val; } if (idx == 109) { c109 = val; } if (idx == 110) { c110 = val; }
+    if (idx == 111) { c111 = val; } if (idx == 112) { c112 = val; } if (idx == 113) { c113 = val; }
+    if (idx == 114) { c114 = val; } if (idx == 115) { c115 = val; } if (idx == 116) { c116 = val; }
+    if (idx == 117) { c117 = val; } if (idx == 118) { c118 = val; } if (idx == 119) { c119 = val; }
+    if (idx == 120) { c120 = val; } if (idx == 121) { c121 = val; } if (idx == 122) { c122 = val; }
+    if (idx == 123) { c123 = val; } if (idx == 124) { c124 = val; } if (idx == 125) { c125 = val; }
+    if (idx == 126) { c126 = val; } if (idx == 127) { c127 = val; } if (idx == 128) { c128 = val; }
+    if (idx == 129) { c129 = val; } if (idx == 130) { c130 = val; } if (idx == 131) { c131 = val; }
+    if (idx == 132) { c132 = val; } if (idx == 133) { c133 = val; } if (idx == 134) { c134 = val; }
+    if (idx == 135) { c135 = val; } if (idx == 136) { c136 = val; } if (idx == 137) { c137 = val; }
+    if (idx == 138) { c138 = val; } if (idx == 139) { c139 = val; } if (idx == 140) { c140 = val; }
+    if (idx == 141) { c141 = val; } if (idx == 142) { c142 = val; } if (idx == 143) { c143 = val; }
+    if (idx == 144) { c144 = val; } if (idx == 145) { c145 = val; } if (idx == 146) { c146 = val; }
+    if (idx == 147) { c147 = val; } if (idx == 148) { c148 = val; } if (idx == 149) { c149 = val; }
+    if (idx == 150) { c150 = val; } if (idx == 151) { c151 = val; } if (idx == 152) { c152 = val; }
+    if (idx == 153) { c153 = val; } if (idx == 154) { c154 = val; } if (idx == 155) { c155 = val; }
+    if (idx == 156) { c156 = val; } if (idx == 157) { c157 = val; } if (idx == 158) { c158 = val; }
+    if (idx == 159) { c159 = val; } if (idx == 160) { c160 = val; } if (idx == 161) { c161 = val; }
+    if (idx == 162) { c162 = val; } if (idx == 163) { c163 = val; } if (idx == 164) { c164 = val; }
+    if (idx == 165) { c165 = val; } if (idx == 166) { c166 = val; } if (idx == 167) { c167 = val; }
+    if (idx == 168) { c168 = val; } if (idx == 169) { c169 = val; } if (idx == 170) { c170 = val; }
+    if (idx == 171) { c171 = val; } if (idx == 172) { c172 = val; } if (idx == 173) { c173 = val; }
+    if (idx == 174) { c174 = val; } if (idx == 175) { c175 = val; } if (idx == 176) { c176 = val; }
+    if (idx == 177) { c177 = val; } if (idx == 178) { c178 = val; } if (idx == 179) { c179 = val; }
+    if (idx == 180) { c180 = val; } if (idx == 181) { c181 = val; } if (idx == 182) { c182 = val; }
+    if (idx == 183) { c183 = val; } if (idx == 184) { c184 = val; } if (idx == 185) { c185 = val; }
+    if (idx == 186) { c186 = val; } if (idx == 187) { c187 = val; } if (idx == 188) { c188 = val; }
+    if (idx == 189) { c189 = val; } if (idx == 190) { c190 = val; } if (idx == 191) { c191 = val; }
+    if (idx == 192) { c192 = val; } if (idx == 193) { c193 = val; } if (idx == 194) { c194 = val; }
+    if (idx == 195) { c195 = val; } if (idx == 196) { c196 = val; } if (idx == 197) { c197 = val; }
+    if (idx == 198) { c198 = val; } if (idx == 199) { c199 = val; }
+}
+
+// Get color for piece type
+fn getPieceColor(t: i32): u32 {
+    if (t == 1) { return SKYBLUE; }     // I
+    if (t == 2) { return YELLOW; }   // O
+    if (t == 3) { return PURPLE; }   // T
+    if (t == 4) { return GREEN; }    // S
+    if (t == 5) { return RED; }      // Z
+    if (t == 6) { return BLUE; }     // J
+    if (t == 7) { return ORANGE; }   // L
+    return DARKGRAY;
+}
+
+// Get piece block position (each piece has 4 blocks)
+// Returns relative x,y for block i (0-3) based on piece type and rotation
+// Encoded as: x + y*10 (so we can extract x = val%10, y = val/10)
+fn getPieceBlock(t: i32, rot: i32, block: i32): i32 {
+    // I piece
+    if (t == 1) {
+        if (rot == 0) {
+            if (block == 0) { return 0; }  // (0,0)
+            if (block == 1) { return 1; }  // (1,0)
+            if (block == 2) { return 2; }  // (2,0)
+            if (block == 3) { return 3; }  // (3,0)
+        }
+        if (rot == 1) {
+            if (block == 0) { return 0; }   // (0,0)
+            if (block == 1) { return 10; }  // (0,1)
+            if (block == 2) { return 20; }  // (0,2)
+            if (block == 3) { return 30; }  // (0,3)
+        }
+        if (rot == 2) {
+            if (block == 0) { return 0; }
+            if (block == 1) { return 1; }
+            if (block == 2) { return 2; }
+            if (block == 3) { return 3; }
+        }
+        if (rot == 3) {
+            if (block == 0) { return 0; }
+            if (block == 1) { return 10; }
+            if (block == 2) { return 20; }
+            if (block == 3) { return 30; }
+        }
+    }
+    // O piece (no rotation)
+    if (t == 2) {
+        if (block == 0) { return 0; }   // (0,0)
+        if (block == 1) { return 1; }   // (1,0)
+        if (block == 2) { return 10; }  // (0,1)
+        if (block == 3) { return 11; }  // (1,1)
+    }
+    // T piece
+    if (t == 3) {
+        if (rot == 0) {
+            if (block == 0) { return 1; }   // (1,0)
+            if (block == 1) { return 10; }  // (0,1)
+            if (block == 2) { return 11; }  // (1,1)
+            if (block == 3) { return 12; }  // (2,1)
+        }
+        if (rot == 1) {
+            if (block == 0) { return 0; }   // (0,0)
+            if (block == 1) { return 10; }  // (0,1)
+            if (block == 2) { return 11; }  // (1,1)
+            if (block == 3) { return 20; }  // (0,2)
+        }
+        if (rot == 2) {
+            if (block == 0) { return 0; }   // (0,0)
+            if (block == 1) { return 1; }   // (1,0)
+            if (block == 2) { return 2; }   // (2,0)
+            if (block == 3) { return 11; }  // (1,1)
+        }
+        if (rot == 3) {
+            if (block == 0) { return 1; }   // (1,0)
+            if (block == 1) { return 10; }  // (0,1)
+            if (block == 2) { return 11; }  // (1,1)
+            if (block == 3) { return 21; }  // (1,2)
+        }
+    }
+    // S piece
+    if (t == 4) {
+        if (rot == 0) {
+            if (block == 0) { return 1; }   // (1,0)
+            if (block == 1) { return 2; }   // (2,0)
+            if (block == 2) { return 10; }  // (0,1)
+            if (block == 3) { return 11; }  // (1,1)
+        }
+        if (rot == 1) {
+            if (block == 0) { return 0; }   // (0,0)
+            if (block == 1) { return 10; }  // (0,1)
+            if (block == 2) { return 11; }  // (1,1)
+            if (block == 3) { return 21; }  // (1,2)
+        }
+        if (rot == 2) {
+            if (block == 0) { return 1; }
+            if (block == 1) { return 2; }
+            if (block == 2) { return 10; }
+            if (block == 3) { return 11; }
+        }
+        if (rot == 3) {
+            if (block == 0) { return 0; }
+            if (block == 1) { return 10; }
+            if (block == 2) { return 11; }
+            if (block == 3) { return 21; }
+        }
+    }
+    // Z piece
+    if (t == 5) {
+        if (rot == 0) {
+            if (block == 0) { return 0; }   // (0,0)
+            if (block == 1) { return 1; }   // (1,0)
+            if (block == 2) { return 11; }  // (1,1)
+            if (block == 3) { return 12; }  // (2,1)
+        }
+        if (rot == 1) {
+            if (block == 0) { return 1; }   // (1,0)
+            if (block == 1) { return 10; }  // (0,1)
+            if (block == 2) { return 11; }  // (1,1)
+            if (block == 3) { return 20; }  // (0,2)
+        }
+        if (rot == 2) {
+            if (block == 0) { return 0; }
+            if (block == 1) { return 1; }
+            if (block == 2) { return 11; }
+            if (block == 3) { return 12; }
+        }
+        if (rot == 3) {
+            if (block == 0) { return 1; }
+            if (block == 1) { return 10; }
+            if (block == 2) { return 11; }
+            if (block == 3) { return 20; }
+        }
+    }
+    // J piece
+    if (t == 6) {
+        if (rot == 0) {
+            if (block == 0) { return 0; }   // (0,0)
+            if (block == 1) { return 10; }  // (0,1)
+            if (block == 2) { return 11; }  // (1,1)
+            if (block == 3) { return 12; }  // (2,1)
+        }
+        if (rot == 1) {
+            if (block == 0) { return 0; }   // (0,0)
+            if (block == 1) { return 1; }   // (1,0)
+            if (block == 2) { return 10; }  // (0,1)
+            if (block == 3) { return 20; }  // (0,2)
+        }
+        if (rot == 2) {
+            if (block == 0) { return 0; }   // (0,0)
+            if (block == 1) { return 1; }   // (1,0)
+            if (block == 2) { return 2; }   // (2,0)
+            if (block == 3) { return 12; }  // (2,1)
+        }
+        if (rot == 3) {
+            if (block == 0) { return 1; }   // (1,0)
+            if (block == 1) { return 11; }  // (1,1)
+            if (block == 2) { return 20; }  // (0,2)
+            if (block == 3) { return 21; }  // (1,2)
+        }
+    }
+    // L piece
+    if (t == 7) {
+        if (rot == 0) {
+            if (block == 0) { return 2; }   // (2,0)
+            if (block == 1) { return 10; }  // (0,1)
+            if (block == 2) { return 11; }  // (1,1)
+            if (block == 3) { return 12; }  // (2,1)
+        }
+        if (rot == 1) {
+            if (block == 0) { return 0; }   // (0,0)
+            if (block == 1) { return 10; }  // (0,1)
+            if (block == 2) { return 20; }  // (0,2)
+            if (block == 3) { return 21; }  // (1,2)
+        }
+        if (rot == 2) {
+            if (block == 0) { return 0; }   // (0,0)
+            if (block == 1) { return 1; }   // (1,0)
+            if (block == 2) { return 2; }   // (2,0)
+            if (block == 3) { return 10; }  // (0,1)
+        }
+        if (rot == 3) {
+            if (block == 0) { return 0; }   // (0,0)
+            if (block == 1) { return 1; }   // (1,0)
+            if (block == 2) { return 11; }  // (1,1)
+            if (block == 3) { return 21; }  // (1,2)
+        }
+    }
+    return 0;
+}
+
+// Check if piece fits at position
+fn pieceFits(t: i32, rot: i32, px: i32, py: i32): i32 {
+    let i = 0;
+    while (i < 4) {
+        let block = getPieceBlock(t, rot, i);
+        let bx = block % 10;
+        let by = block / 10;
+        let x = px + bx;
+        let y = py + by;
+
+        // Check bounds
+        if (x < 0) { return 0; }
+        if (x >= boardWidth) { return 0; }
+        if (y >= boardHeight) { return 0; }
+
+        // Check collision with placed pieces (only if on board)
+        if (y >= 0) {
+            if (getCell(y, x) != 0) { return 0; }
+        }
+
+        i = i + 1;
+    }
+    return 1;
+}
+
+// Place piece on board
+fn placePiece() {
+    let i = 0;
+    while (i < 4) {
+        let block = getPieceBlock(pieceType, pieceRot, i);
+        let bx = block % 10;
+        let by = block / 10;
+        let x = pieceX + bx;
+        let y = pieceY + by;
+        if (y >= 0) {
+            setCell(y, x, pieceType);
+        }
+        i = i + 1;
+    }
+}
+
+// Clear completed lines
+fn clearLines(): i32 {
+    let cleared = 0;
+    let row = boardHeight - 1;
+
+    while (row >= 0) {
+        // Check if row is full
+        let full = 1;
+        let col = 0;
+        while (col < boardWidth) {
+            if (getCell(row, col) == 0) {
+                full = 0;
+            }
+            col = col + 1;
+        }
+
+        if (full != 0) {
+            cleared = cleared + 1;
+            // Move all rows above down
+            let r = row;
+            while (r > 0) {
+                let c = 0;
+                while (c < boardWidth) {
+                    setCell(r, c, getCell(r - 1, c));
+                    c = c + 1;
+                }
+                r = r - 1;
+            }
+            // Clear top row
+            let c = 0;
+            while (c < boardWidth) {
+                setCell(0, c, 0);
+                c = c + 1;
+            }
+        } else {
+            row = row - 1;
+        }
+    }
+    return cleared;
+}
+
+// Spawn new piece
+fn spawnPiece() {
+    if (nextPiece == 0) {
+        nextPiece = GetRandomValue(1, 7);
+    }
+    pieceType = nextPiece;
+    nextPiece = GetRandomValue(1, 7);
+    pieceX = 3;
+    pieceY = 0;
+    pieceRot = 0;
+
+    // Check if spawn position is blocked
+    if (pieceFits(pieceType, pieceRot, pieceX, pieceY) == 0) {
+        gameOver = 1;
+    }
+}
+
+// Clear board
+fn clearBoard() {
+    let i = 0;
+    while (i < 200) {
+        let row = i / 10;
+        let col = i % 10;
+        setCell(row, col, 0);
+        i = i + 1;
+    }
+}
+
+// Reset game
+fn resetGame() {
+    clearBoard();
+    score = 0;
+    lines = 0;
+    level = 1;
+    fallDelay = 0.5;
+    gameOver = 0;
+    nextPiece = 0;
+    spawnPiece();
+}
+
+// Draw a single block
+fn drawBlock(x: i32, y: i32, color: u32) {
+    let px = boardOffsetX + x * cellSize;
+    let py = boardOffsetY + y * cellSize;
+    DrawRectangle(px + 1, py + 1, cellSize - 2, cellSize - 2, color);
+    // Highlight
+    DrawRectangle(px + 2, py + 2, cellSize - 4, 2, WHITE);
+    DrawRectangle(px + 2, py + 2, 2, cellSize - 4, WHITE);
+}
+
+// Draw piece preview
+fn drawPreview(t: i32, ox: i32, oy: i32) {
+    let color = getPieceColor(t);
+    let i = 0;
+    while (i < 4) {
+        let block = getPieceBlock(t, 0, i);
+        let bx = block % 10;
+        let by = block / 10;
+        let px = ox + bx * 20;
+        let py = oy + by * 20;
+        DrawRectangle(px, py, 18, 18, color);
+        i = i + 1;
+    }
+}
+
+InitWindow(screenWidth, screenHeight, "Tetris - Hemlock + Raylib");
+SetTargetFPS(60);
+
+spawnPiece();
+
+while (WindowShouldClose() == 0) {
+    let dt = GetFrameTime();
+
+    // Restart
+    if (IsKeyPressed(KEY_R) != 0) {
+        if (score > highScore) { highScore = score; }
+        resetGame();
+    }
+
+    // Pause
+    if (IsKeyPressed(KEY_P) != 0) {
+        if (paused == 0) { paused = 1; }
+        else { paused = 0; }
+    }
+
+    if (paused == 0) {
+        if (gameOver == 0) {
+            // Rotation
+            if (IsKeyPressed(KEY_UP) != 0) {
+                let newRot = pieceRot + 1;
+                if (newRot > 3) { newRot = 0; }
+                if (pieceFits(pieceType, newRot, pieceX, pieceY) != 0) {
+                    pieceRot = newRot;
+                }
+            }
+            if (IsKeyPressed(KEY_W) != 0) {
+                let newRot = pieceRot + 1;
+                if (newRot > 3) { newRot = 0; }
+                if (pieceFits(pieceType, newRot, pieceX, pieceY) != 0) {
+                    pieceRot = newRot;
+                }
+            }
+
+            // Horizontal movement
+            moveTimer = moveTimer + dt;
+            if (IsKeyPressed(KEY_LEFT) != 0) {
+                if (pieceFits(pieceType, pieceRot, pieceX - 1, pieceY) != 0) {
+                    pieceX = pieceX - 1;
+                }
+                moveTimer = 0.0;
+            }
+            if (IsKeyPressed(KEY_A) != 0) {
+                if (pieceFits(pieceType, pieceRot, pieceX - 1, pieceY) != 0) {
+                    pieceX = pieceX - 1;
+                }
+                moveTimer = 0.0;
+            }
+            if (IsKeyPressed(KEY_RIGHT) != 0) {
+                if (pieceFits(pieceType, pieceRot, pieceX + 1, pieceY) != 0) {
+                    pieceX = pieceX + 1;
+                }
+                moveTimer = 0.0;
+            }
+            if (IsKeyPressed(KEY_D) != 0) {
+                if (pieceFits(pieceType, pieceRot, pieceX + 1, pieceY) != 0) {
+                    pieceX = pieceX + 1;
+                }
+                moveTimer = 0.0;
+            }
+
+            // Held movement
+            if (moveTimer > moveDelay) {
+                if (IsKeyDown(KEY_LEFT) != 0) {
+                    if (pieceFits(pieceType, pieceRot, pieceX - 1, pieceY) != 0) {
+                        pieceX = pieceX - 1;
+                    }
+                    moveTimer = 0.0;
+                }
+                if (IsKeyDown(KEY_A) != 0) {
+                    if (pieceFits(pieceType, pieceRot, pieceX - 1, pieceY) != 0) {
+                        pieceX = pieceX - 1;
+                    }
+                    moveTimer = 0.0;
+                }
+                if (IsKeyDown(KEY_RIGHT) != 0) {
+                    if (pieceFits(pieceType, pieceRot, pieceX + 1, pieceY) != 0) {
+                        pieceX = pieceX + 1;
+                    }
+                    moveTimer = 0.0;
+                }
+                if (IsKeyDown(KEY_D) != 0) {
+                    if (pieceFits(pieceType, pieceRot, pieceX + 1, pieceY) != 0) {
+                        pieceX = pieceX + 1;
+                    }
+                    moveTimer = 0.0;
+                }
+            }
+
+            // Soft drop
+            if (IsKeyDown(KEY_DOWN) != 0) {
+                fallTimer = fallTimer + dt * 10.0;
+            }
+            if (IsKeyDown(KEY_S) != 0) {
+                fallTimer = fallTimer + dt * 10.0;
+            }
+
+            // Hard drop
+            if (IsKeyPressed(KEY_SPACE) != 0) {
+                while (pieceFits(pieceType, pieceRot, pieceX, pieceY + 1) != 0) {
+                    pieceY = pieceY + 1;
+                    score = score + 2;
+                }
+                placePiece();
+                let cleared = clearLines();
+                if (cleared > 0) {
+                    lines = lines + cleared;
+                    // Scoring: 100, 300, 500, 800 for 1-4 lines
+                    if (cleared == 1) { score = score + 100 * level; }
+                    if (cleared == 2) { score = score + 300 * level; }
+                    if (cleared == 3) { score = score + 500 * level; }
+                    if (cleared == 4) { score = score + 800 * level; }
+                    // Level up every 10 lines
+                    level = (lines / 10) + 1;
+                    if (level > 15) { level = 15; }
+                    fallDelay = 0.5 - (level - 1) * 0.03;
+                    if (fallDelay < 0.05) { fallDelay = 0.05; }
+                }
+                spawnPiece();
+            }
+
+            // Natural fall
+            fallTimer = fallTimer + dt;
+            if (fallTimer >= fallDelay) {
+                fallTimer = 0.0;
+                if (pieceFits(pieceType, pieceRot, pieceX, pieceY + 1) != 0) {
+                    pieceY = pieceY + 1;
+                } else {
+                    placePiece();
+                    let cleared = clearLines();
+                    if (cleared > 0) {
+                        lines = lines + cleared;
+                        if (cleared == 1) { score = score + 100 * level; }
+                        if (cleared == 2) { score = score + 300 * level; }
+                        if (cleared == 3) { score = score + 500 * level; }
+                        if (cleared == 4) { score = score + 800 * level; }
+                        level = (lines / 10) + 1;
+                        if (level > 15) { level = 15; }
+                        fallDelay = 0.5 - (level - 1) * 0.03;
+                        if (fallDelay < 0.05) { fallDelay = 0.05; }
+                    }
+                    spawnPiece();
+                }
+            }
+        }
+    }
+
+    // Draw
+    BeginDrawing();
+    ClearBackground(BLACK);
+
+    // Draw board background
+    DrawRectangle(boardOffsetX - 2, boardOffsetY - 2, boardWidth * cellSize + 4, boardHeight * cellSize + 4, DARKGRAY);
+    DrawRectangle(boardOffsetX, boardOffsetY, boardWidth * cellSize, boardHeight * cellSize, BLACK);
+
+    // Draw grid lines
+    let gx = 0;
+    while (gx <= boardWidth) {
+        DrawRectangle(boardOffsetX + gx * cellSize, boardOffsetY, 1, boardHeight * cellSize, DARKGRAY);
+        gx = gx + 1;
+    }
+    let gy = 0;
+    while (gy <= boardHeight) {
+        DrawRectangle(boardOffsetX, boardOffsetY + gy * cellSize, boardWidth * cellSize, 1, DARKGRAY);
+        gy = gy + 1;
+    }
+
+    // Draw placed pieces
+    let row = 0;
+    while (row < boardHeight) {
+        let col = 0;
+        while (col < boardWidth) {
+            let cell = getCell(row, col);
+            if (cell != 0) {
+                drawBlock(col, row, getPieceColor(cell));
+            }
+            col = col + 1;
+        }
+        row = row + 1;
+    }
+
+    // Draw ghost piece (preview where piece will land)
+    let ghostY = pieceY;
+    while (pieceFits(pieceType, pieceRot, pieceX, ghostY + 1) != 0) {
+        ghostY = ghostY + 1;
+    }
+    if (ghostY != pieceY) {
+        let i = 0;
+        while (i < 4) {
+            let block = getPieceBlock(pieceType, pieceRot, i);
+            let bx = block % 10;
+            let by = block / 10;
+            let x = pieceX + bx;
+            let y = ghostY + by;
+            if (y >= 0) {
+                let px = boardOffsetX + x * cellSize;
+                let py = boardOffsetY + y * cellSize;
+                DrawRectangleLines(px + 2, py + 2, cellSize - 4, cellSize - 4, LIGHTGRAY);
+            }
+            i = i + 1;
+        }
+    }
+
+    // Draw current piece
+    let color = getPieceColor(pieceType);
+    let pi = 0;
+    while (pi < 4) {
+        let block = getPieceBlock(pieceType, pieceRot, pi);
+        let bx = block % 10;
+        let by = block / 10;
+        let x = pieceX + bx;
+        let y = pieceY + by;
+        if (y >= 0) {
+            drawBlock(x, y, color);
+        }
+        pi = pi + 1;
+    }
+
+    // Draw UI panel
+    let panelX = boardOffsetX + boardWidth * cellSize + 20;
+    DrawText("TETRIS", panelX, 50, 28, WHITE);
+
+    DrawText("Score", panelX, 110, 16, LIGHTGRAY);
+    DrawText("" + score, panelX, 130, 24, WHITE);
+
+    DrawText("High Score", panelX, 170, 16, LIGHTGRAY);
+    DrawText("" + highScore, panelX, 190, 20, GOLD);
+
+    DrawText("Level", panelX, 240, 16, LIGHTGRAY);
+    DrawText("" + level, panelX, 260, 24, SKYBLUE);
+
+    DrawText("Lines", panelX, 300, 16, LIGHTGRAY);
+    DrawText("" + lines, panelX, 320, 24, GREEN);
+
+    // Draw next piece preview
+    DrawText("Next", panelX, 370, 16, LIGHTGRAY);
+    DrawRectangle(panelX, 395, 85, 85, DARKGRAY);
+    drawPreview(nextPiece, panelX + 15, 410);
+
+    // Controls
+    DrawText("Controls:", panelX, 500, 14, LIGHTGRAY);
+    DrawText("Arrows: Move", panelX, 520, 12, DARKGRAY);
+    DrawText("Up/W: Rotate", panelX, 535, 12, DARKGRAY);
+    DrawText("Down/S: Soft drop", panelX, 550, 12, DARKGRAY);
+    DrawText("Space: Hard drop", panelX, 565, 12, DARKGRAY);
+    DrawText("P: Pause", panelX, 580, 12, DARKGRAY);
+    DrawText("R: Restart", panelX, 595, 12, DARKGRAY);
+
+    DrawText("FPS: " + GetFPS(), panelX, screenHeight - 30, 14, GREEN);
+
+    // Pause overlay
+    if (paused != 0) {
+        DrawRectangle(boardOffsetX, boardOffsetY + boardHeight * cellSize / 2 - 30, boardWidth * cellSize, 60, BLACK);
+        DrawText("PAUSED", boardOffsetX + 70, boardOffsetY + boardHeight * cellSize / 2 - 15, 36, YELLOW);
+    }
+
+    // Game over overlay
+    if (gameOver != 0) {
+        DrawRectangle(boardOffsetX, boardOffsetY + boardHeight * cellSize / 2 - 50, boardWidth * cellSize, 100, BLACK);
+        DrawText("GAME OVER", boardOffsetX + 40, boardOffsetY + boardHeight * cellSize / 2 - 35, 32, RED);
+        DrawText("Press R to restart", boardOffsetX + 45, boardOffsetY + boardHeight * cellSize / 2 + 10, 18, LIGHTGRAY);
+    }
+
+    EndDrawing();
+}
+
+if (score > highScore) {
+    highScore = score;
+}
+
+CloseWindow();
+print("Thanks for playing Tetris!");

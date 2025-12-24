@@ -1,0 +1,505 @@
+// Breakout - Classic brick-breaking arcade game
+// Controls: Mouse or Arrow Keys to move paddle, SPACE to launch ball, R to restart
+// Demonstrates: collision detection, game states, multiple objects, score/lives
+
+import {
+    // Functions
+    InitWindow, CloseWindow, WindowShouldClose, SetTargetFPS, GetFPS, GetFrameTime,
+    BeginDrawing, EndDrawing, ClearBackground,
+    DrawCircle, DrawRectangle, DrawRectangleLines, DrawRectangleGradientV, DrawText,
+    IsKeyPressed, IsKeyDown, GetMouseX, HideCursor, GetRandomValue,
+    // Colors
+    RAYWHITE, RED, GREEN, LIME, BLUE, YELLOW, ORANGE, PURPLE, PINK, SKYBLUE,
+    DARKGRAY, LIGHTGRAY, BLACK, WHITE, GOLD, MAROON, DARKGREEN, DARKBLUE, VIOLET,
+    // Keys
+    KEY_LEFT, KEY_RIGHT, KEY_SPACE, KEY_R, KEY_P,
+    // Collision helpers
+    CheckCollisionCircleRecXY
+} from "../src/raylib.hml";
+
+// Screen dimensions
+let screenWidth = 800;
+let screenHeight = 600;
+
+// Paddle settings
+let paddleWidth = 100;
+let paddleHeight = 15;
+let paddleX: f32 = 350.0;
+let paddleY: f32 = 550.0;
+let paddleSpeed: f32 = 600.0;
+
+// Ball settings
+let ballX: f32 = 400.0;
+let ballY: f32 = 530.0;
+let ballVX: f32 = 250.0;
+let ballVY: f32 = -350.0;
+let ballRadius: f32 = 8.0;
+let ballLaunched = 0;
+
+// Brick grid (10 columns x 6 rows = 60 bricks)
+let brickCols = 10;
+let brickRows = 6;
+let brickWidth = 70;
+let brickHeight = 25;
+let brickPadding = 5;
+let brickOffsetX = 40;
+let brickOffsetY = 60;
+
+// Brick states (1 = alive, 0 = destroyed)
+// Row 0
+let b00 = 1; let b01 = 1; let b02 = 1; let b03 = 1; let b04 = 1;
+let b05 = 1; let b06 = 1; let b07 = 1; let b08 = 1; let b09 = 1;
+// Row 1
+let b10 = 1; let b11 = 1; let b12 = 1; let b13 = 1; let b14 = 1;
+let b15 = 1; let b16 = 1; let b17 = 1; let b18 = 1; let b19 = 1;
+// Row 2
+let b20 = 1; let b21 = 1; let b22 = 1; let b23 = 1; let b24 = 1;
+let b25 = 1; let b26 = 1; let b27 = 1; let b28 = 1; let b29 = 1;
+// Row 3
+let b30 = 1; let b31 = 1; let b32 = 1; let b33 = 1; let b34 = 1;
+let b35 = 1; let b36 = 1; let b37 = 1; let b38 = 1; let b39 = 1;
+// Row 4
+let b40 = 1; let b41 = 1; let b42 = 1; let b43 = 1; let b44 = 1;
+let b45 = 1; let b46 = 1; let b47 = 1; let b48 = 1; let b49 = 1;
+// Row 5
+let b50 = 1; let b51 = 1; let b52 = 1; let b53 = 1; let b54 = 1;
+let b55 = 1; let b56 = 1; let b57 = 1; let b58 = 1; let b59 = 1;
+
+// Game state
+let score = 0;
+let highScore = 0;
+let lives = 3;
+let gameOver = 0;
+let gameWon = 0;
+let paused = 0;
+let bricksRemaining = 60;
+
+// Get brick state by row and column
+fn getBrick(row: i32, col: i32): i32 {
+    if (row == 0) {
+        if (col == 0) { return b00; } if (col == 1) { return b01; }
+        if (col == 2) { return b02; } if (col == 3) { return b03; }
+        if (col == 4) { return b04; } if (col == 5) { return b05; }
+        if (col == 6) { return b06; } if (col == 7) { return b07; }
+        if (col == 8) { return b08; } if (col == 9) { return b09; }
+    }
+    if (row == 1) {
+        if (col == 0) { return b10; } if (col == 1) { return b11; }
+        if (col == 2) { return b12; } if (col == 3) { return b13; }
+        if (col == 4) { return b14; } if (col == 5) { return b15; }
+        if (col == 6) { return b16; } if (col == 7) { return b17; }
+        if (col == 8) { return b18; } if (col == 9) { return b19; }
+    }
+    if (row == 2) {
+        if (col == 0) { return b20; } if (col == 1) { return b21; }
+        if (col == 2) { return b22; } if (col == 3) { return b23; }
+        if (col == 4) { return b24; } if (col == 5) { return b25; }
+        if (col == 6) { return b26; } if (col == 7) { return b27; }
+        if (col == 8) { return b28; } if (col == 9) { return b29; }
+    }
+    if (row == 3) {
+        if (col == 0) { return b30; } if (col == 1) { return b31; }
+        if (col == 2) { return b32; } if (col == 3) { return b33; }
+        if (col == 4) { return b34; } if (col == 5) { return b35; }
+        if (col == 6) { return b36; } if (col == 7) { return b37; }
+        if (col == 8) { return b38; } if (col == 9) { return b39; }
+    }
+    if (row == 4) {
+        if (col == 0) { return b40; } if (col == 1) { return b41; }
+        if (col == 2) { return b42; } if (col == 3) { return b43; }
+        if (col == 4) { return b44; } if (col == 5) { return b45; }
+        if (col == 6) { return b46; } if (col == 7) { return b47; }
+        if (col == 8) { return b48; } if (col == 9) { return b49; }
+    }
+    if (row == 5) {
+        if (col == 0) { return b50; } if (col == 1) { return b51; }
+        if (col == 2) { return b52; } if (col == 3) { return b53; }
+        if (col == 4) { return b54; } if (col == 5) { return b55; }
+        if (col == 6) { return b56; } if (col == 7) { return b57; }
+        if (col == 8) { return b58; } if (col == 9) { return b59; }
+    }
+    return 0;
+}
+
+// Set brick state by row and column
+fn setBrick(row: i32, col: i32, val: i32) {
+    if (row == 0) {
+        if (col == 0) { b00 = val; } if (col == 1) { b01 = val; }
+        if (col == 2) { b02 = val; } if (col == 3) { b03 = val; }
+        if (col == 4) { b04 = val; } if (col == 5) { b05 = val; }
+        if (col == 6) { b06 = val; } if (col == 7) { b07 = val; }
+        if (col == 8) { b08 = val; } if (col == 9) { b09 = val; }
+    }
+    if (row == 1) {
+        if (col == 0) { b10 = val; } if (col == 1) { b11 = val; }
+        if (col == 2) { b12 = val; } if (col == 3) { b13 = val; }
+        if (col == 4) { b14 = val; } if (col == 5) { b15 = val; }
+        if (col == 6) { b16 = val; } if (col == 7) { b17 = val; }
+        if (col == 8) { b18 = val; } if (col == 9) { b19 = val; }
+    }
+    if (row == 2) {
+        if (col == 0) { b20 = val; } if (col == 1) { b21 = val; }
+        if (col == 2) { b22 = val; } if (col == 3) { b23 = val; }
+        if (col == 4) { b24 = val; } if (col == 5) { b25 = val; }
+        if (col == 6) { b26 = val; } if (col == 7) { b27 = val; }
+        if (col == 8) { b28 = val; } if (col == 9) { b29 = val; }
+    }
+    if (row == 3) {
+        if (col == 0) { b30 = val; } if (col == 1) { b31 = val; }
+        if (col == 2) { b32 = val; } if (col == 3) { b33 = val; }
+        if (col == 4) { b34 = val; } if (col == 5) { b35 = val; }
+        if (col == 6) { b36 = val; } if (col == 7) { b37 = val; }
+        if (col == 8) { b38 = val; } if (col == 9) { b39 = val; }
+    }
+    if (row == 4) {
+        if (col == 0) { b40 = val; } if (col == 1) { b41 = val; }
+        if (col == 2) { b42 = val; } if (col == 3) { b43 = val; }
+        if (col == 4) { b44 = val; } if (col == 5) { b45 = val; }
+        if (col == 6) { b46 = val; } if (col == 7) { b47 = val; }
+        if (col == 8) { b48 = val; } if (col == 9) { b49 = val; }
+    }
+    if (row == 5) {
+        if (col == 0) { b50 = val; } if (col == 1) { b51 = val; }
+        if (col == 2) { b52 = val; } if (col == 3) { b53 = val; }
+        if (col == 4) { b54 = val; } if (col == 5) { b55 = val; }
+        if (col == 6) { b56 = val; } if (col == 7) { b57 = val; }
+        if (col == 8) { b58 = val; } if (col == 9) { b59 = val; }
+    }
+}
+
+// Get brick color based on row
+fn getBrickColor(row: i32): u32 {
+    if (row == 0) { return RED; }
+    if (row == 1) { return ORANGE; }
+    if (row == 2) { return YELLOW; }
+    if (row == 3) { return GREEN; }
+    if (row == 4) { return SKYBLUE; }
+    if (row == 5) { return VIOLET; }
+    return WHITE;
+}
+
+// Get brick X position
+fn getBrickX(col: i32): i32 {
+    return brickOffsetX + col * (brickWidth + brickPadding);
+}
+
+// Get brick Y position
+fn getBrickY(row: i32): i32 {
+    return brickOffsetY + row * (brickHeight + brickPadding);
+}
+
+// Reset ball to paddle
+fn resetBall() {
+    ballX = paddleX + paddleWidth / 2;
+    ballY = paddleY - ballRadius - 2.0;
+    ballVX = 250.0;
+    ballVY = -350.0;
+    ballLaunched = 0;
+}
+
+// Reset all bricks
+fn resetBricks() {
+    b00 = 1; b01 = 1; b02 = 1; b03 = 1; b04 = 1; b05 = 1; b06 = 1; b07 = 1; b08 = 1; b09 = 1;
+    b10 = 1; b11 = 1; b12 = 1; b13 = 1; b14 = 1; b15 = 1; b16 = 1; b17 = 1; b18 = 1; b19 = 1;
+    b20 = 1; b21 = 1; b22 = 1; b23 = 1; b24 = 1; b25 = 1; b26 = 1; b27 = 1; b28 = 1; b29 = 1;
+    b30 = 1; b31 = 1; b32 = 1; b33 = 1; b34 = 1; b35 = 1; b36 = 1; b37 = 1; b38 = 1; b39 = 1;
+    b40 = 1; b41 = 1; b42 = 1; b43 = 1; b44 = 1; b45 = 1; b46 = 1; b47 = 1; b48 = 1; b49 = 1;
+    b50 = 1; b51 = 1; b52 = 1; b53 = 1; b54 = 1; b55 = 1; b56 = 1; b57 = 1; b58 = 1; b59 = 1;
+    bricksRemaining = 60;
+}
+
+// Full game reset
+fn resetGame() {
+    paddleX = 350.0;
+    resetBricks();
+    resetBall();
+    score = 0;
+    lives = 3;
+    gameOver = 0;
+    gameWon = 0;
+}
+
+// Draw a single brick
+fn drawBrick(row: i32, col: i32) {
+    if (getBrick(row, col) != 0) {
+        let x = getBrickX(col);
+        let y = getBrickY(row);
+        let color = getBrickColor(row);
+
+        // Main brick
+        DrawRectangle(x, y, brickWidth, brickHeight, color);
+        // Highlight (top)
+        DrawRectangle(x, y, brickWidth, 3, WHITE);
+        // Shadow (bottom)
+        DrawRectangle(x, y + brickHeight - 2, brickWidth, 2, DARKGRAY);
+    }
+}
+
+InitWindow(screenWidth, screenHeight, "Breakout - Hemlock + Raylib");
+SetTargetFPS(60);
+
+while (WindowShouldClose() == 0) {
+    let dt = GetFrameTime();
+
+    // Handle restart
+    if (IsKeyPressed(KEY_R) != 0) {
+        if (score > highScore) {
+            highScore = score;
+        }
+        resetGame();
+    }
+
+    // Handle pause
+    if (IsKeyPressed(KEY_P) != 0) {
+        if (paused == 0) { paused = 1; }
+        else { paused = 0; }
+    }
+
+    // Launch ball with space
+    if (IsKeyPressed(KEY_SPACE) != 0) {
+        if (ballLaunched == 0) {
+            if (gameOver == 0) {
+                if (gameWon == 0) {
+                    ballLaunched = 1;
+                    // Randomize initial X velocity direction
+                    if (GetRandomValue(0, 1) == 0) {
+                        ballVX = -ballVX;
+                    }
+                }
+            }
+        }
+    }
+
+    if (paused == 0) {
+        if (gameOver == 0) {
+            if (gameWon == 0) {
+                // Paddle movement with keyboard
+                if (IsKeyDown(KEY_LEFT) != 0) {
+                    paddleX = paddleX - paddleSpeed * dt;
+                }
+                if (IsKeyDown(KEY_RIGHT) != 0) {
+                    paddleX = paddleX + paddleSpeed * dt;
+                }
+
+                // Paddle movement with mouse
+                let mouseX = GetMouseX();
+                let targetX: f32 = mouseX - paddleWidth / 2;
+
+                // Smooth paddle movement towards mouse
+                let diff = targetX - paddleX;
+                if (diff > 5.0) {
+                    paddleX = paddleX + paddleSpeed * dt;
+                }
+                if (diff < -5.0) {
+                    paddleX = paddleX - paddleSpeed * dt;
+                }
+
+                // Clamp paddle to screen
+                if (paddleX < 0.0) { paddleX = 0.0; }
+                if (paddleX > screenWidth - paddleWidth) { paddleX = screenWidth - paddleWidth; }
+
+                // Ball follows paddle if not launched
+                if (ballLaunched == 0) {
+                    ballX = paddleX + paddleWidth / 2;
+                    ballY = paddleY - ballRadius - 2.0;
+                } else {
+                    // Update ball position
+                    ballX = ballX + ballVX * dt;
+                    ballY = ballY + ballVY * dt;
+
+                    // Wall collisions
+                    if (ballX - ballRadius < 0.0) {
+                        ballX = ballRadius;
+                        ballVX = -ballVX;
+                    }
+                    if (ballX + ballRadius > screenWidth) {
+                        ballX = screenWidth - ballRadius;
+                        ballVX = -ballVX;
+                    }
+                    if (ballY - ballRadius < 0.0) {
+                        ballY = ballRadius;
+                        ballVY = -ballVY;
+                    }
+
+                    // Ball fell off bottom
+                    if (ballY > screenHeight + ballRadius) {
+                        lives = lives - 1;
+                        if (lives <= 0) {
+                            gameOver = 1;
+                        } else {
+                            resetBall();
+                        }
+                    }
+
+                    // Paddle collision
+                    let paddleCollision = CheckCollisionCircleRecXY(
+                        ballX, ballY, ballRadius,
+                        paddleX, paddleY, paddleWidth, paddleHeight
+                    );
+                    if (paddleCollision != 0) {
+                        if (ballVY > 0.0) {  // Only if moving down
+                            ballY = paddleY - ballRadius;
+                            ballVY = -ballVY;
+
+                            // Adjust X velocity based on where ball hit paddle
+                            let hitPos = (ballX - paddleX) / paddleWidth;  // 0 to 1
+                            let angle = (hitPos - 0.5) * 2.0;  // -1 to 1
+                            ballVX = angle * 400.0;
+
+                            // Speed up ball slightly
+                            if (ballVY > -600.0) {
+                                ballVY = ballVY * 1.02;
+                            }
+                        }
+                    }
+
+                    // Brick collisions
+                    let row = 0;
+                    while (row < brickRows) {
+                        let col = 0;
+                        while (col < brickCols) {
+                            if (getBrick(row, col) != 0) {
+                                let bx = getBrickX(col);
+                                let by = getBrickY(row);
+
+                                let brickHit = CheckCollisionCircleRecXY(
+                                    ballX, ballY, ballRadius,
+                                    bx, by, brickWidth, brickHeight
+                                );
+
+                                if (brickHit != 0) {
+                                    setBrick(row, col, 0);
+                                    bricksRemaining = bricksRemaining - 1;
+
+                                    // Score based on row (higher rows = more points)
+                                    score = score + (6 - row) * 10;
+
+                                    // Determine bounce direction
+                                    let ballCenterX = ballX;
+                                    let ballCenterY = ballY;
+                                    let brickCenterX = bx + brickWidth / 2;
+                                    let brickCenterY = by + brickHeight / 2;
+
+                                    let diffX = ballCenterX - brickCenterX;
+                                    let diffY = ballCenterY - brickCenterY;
+
+                                    // Simple bounce logic
+                                    if (diffX < 0.0) { diffX = -diffX; }
+                                    if (diffY < 0.0) { diffY = -diffY; }
+
+                                    let aspectRatio = brickWidth / brickHeight;
+                                    if (diffX > diffY * aspectRatio) {
+                                        ballVX = -ballVX;
+                                    } else {
+                                        ballVY = -ballVY;
+                                    }
+                                }
+                            }
+                            col = col + 1;
+                        }
+                        row = row + 1;
+                    }
+
+                    // Check win condition
+                    if (bricksRemaining <= 0) {
+                        gameWon = 1;
+                    }
+                }
+            }
+        }
+    }
+
+    // Draw
+    BeginDrawing();
+    ClearBackground(BLACK);
+
+    // Draw bricks
+    let row = 0;
+    while (row < brickRows) {
+        let col = 0;
+        while (col < brickCols) {
+            drawBrick(row, col);
+            col = col + 1;
+        }
+        row = row + 1;
+    }
+
+    // Draw paddle
+    DrawRectangle(paddleX, paddleY, paddleWidth, paddleHeight, WHITE);
+    DrawRectangle(paddleX + 2, paddleY + 2, paddleWidth - 4, paddleHeight - 6, SKYBLUE);
+
+    // Draw ball
+    DrawCircle(ballX, ballY, ballRadius, WHITE);
+    DrawCircle(ballX - 2.0, ballY - 2.0, ballRadius * 0.4, LIGHTGRAY);
+
+    // Draw UI bar at top
+    DrawRectangle(0, 0, screenWidth, 25, DARKGRAY);
+    DrawText("BREAKOUT", 10, 4, 18, WHITE);
+    DrawText("Score: " + score, 150, 5, 16, YELLOW);
+    DrawText("High: " + highScore, 300, 5, 16, GOLD);
+
+    // Draw lives
+    DrawText("Lives:", 450, 5, 16, WHITE);
+    let li = 0;
+    while (li < lives) {
+        DrawCircle(520 + li * 20, 12, 6.0, RED);
+        li = li + 1;
+    }
+
+    DrawText("FPS: " + GetFPS(), screenWidth - 80, 5, 16, GREEN);
+
+    // Instructions
+    if (ballLaunched == 0) {
+        if (gameOver == 0) {
+            if (gameWon == 0) {
+                DrawText("Press SPACE to launch ball", screenWidth / 2 - 130, screenHeight - 40, 20, LIGHTGRAY);
+            }
+        }
+    }
+
+    // Pause overlay
+    if (paused != 0) {
+        DrawRectangle(screenWidth / 2 - 100, screenHeight / 2 - 40, 200, 80, BLACK);
+        DrawRectangleLines(screenWidth / 2 - 100, screenHeight / 2 - 40, 200, 80, WHITE);
+        DrawText("PAUSED", screenWidth / 2 - 50, screenHeight / 2 - 15, 30, YELLOW);
+        DrawText("Press P to resume", screenWidth / 2 - 80, screenHeight / 2 + 20, 16, LIGHTGRAY);
+    }
+
+    // Game over overlay
+    if (gameOver != 0) {
+        DrawRectangle(screenWidth / 2 - 150, screenHeight / 2 - 80, 300, 160, BLACK);
+        DrawRectangleLines(screenWidth / 2 - 150, screenHeight / 2 - 80, 300, 160, RED);
+
+        DrawText("GAME OVER", screenWidth / 2 - 95, screenHeight / 2 - 60, 36, RED);
+        DrawText("Final Score: " + score, screenWidth / 2 - 70, screenHeight / 2 - 10, 20, WHITE);
+
+        if (score > highScore) {
+            DrawText("NEW HIGH SCORE!", screenWidth / 2 - 90, screenHeight / 2 + 20, 20, GOLD);
+        }
+
+        DrawText("Press R to Restart", screenWidth / 2 - 85, screenHeight / 2 + 55, 18, LIGHTGRAY);
+    }
+
+    // Win overlay
+    if (gameWon != 0) {
+        DrawRectangle(screenWidth / 2 - 150, screenHeight / 2 - 80, 300, 160, BLACK);
+        DrawRectangleLines(screenWidth / 2 - 150, screenHeight / 2 - 80, 300, 160, GOLD);
+
+        DrawText("YOU WIN!", screenWidth / 2 - 75, screenHeight / 2 - 60, 36, GOLD);
+        DrawText("Final Score: " + score, screenWidth / 2 - 70, screenHeight / 2 - 10, 20, WHITE);
+        DrawText("Lives Remaining: " + lives, screenWidth / 2 - 85, screenHeight / 2 + 20, 20, GREEN);
+        DrawText("Press R to Play Again", screenWidth / 2 - 95, screenHeight / 2 + 55, 18, LIGHTGRAY);
+    }
+
+    // Controls hint
+    DrawText("Mouse/Arrows: Move | SPACE: Launch | P: Pause | R: Restart", 10, screenHeight - 22, 14, DARKGRAY);
+
+    EndDrawing();
+}
+
+if (score > highScore) {
+    highScore = score;
+}
+
+CloseWindow();
+print("Thanks for playing Breakout!");

@@ -1,0 +1,583 @@
+// Snake Game - Classic arcade game
+// Controls: Arrow keys to move, R to restart, ESC to quit
+// Demonstrates: game state, grid-based movement, collision detection, scoring
+
+import {
+    // Functions
+    InitWindow, CloseWindow, WindowShouldClose, SetTargetFPS, GetFPS, GetFrameTime,
+    BeginDrawing, EndDrawing, ClearBackground,
+    DrawCircle, DrawRectangle, DrawRectangleLines, DrawText,
+    IsKeyPressed, GetRandomValue,
+    // Colors
+    RAYWHITE, RED, GREEN, LIME, DARKGREEN, BLUE, YELLOW, ORANGE, PURPLE, DARKGRAY, LIGHTGRAY, BLACK, WHITE,
+    // Keys
+    KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_R, KEY_ESCAPE, KEY_W, KEY_A, KEY_S, KEY_D
+} from "../src/raylib.hml";
+
+// Screen dimensions
+let screenWidth = 800;
+let screenHeight = 600;
+
+// Grid settings
+let cellSize = 20;
+let gridWidth = 40;  // 800 / 20
+let gridHeight = 30; // 600 / 20
+
+// Snake segments (grid positions) - max 100 segments
+// Each segment stores grid x,y position
+let snakeLen = 3;
+
+// Snake head and body positions (grid coordinates)
+let seg0X = 20; let seg0Y = 15;  // Head
+let seg1X = 19; let seg1Y = 15;
+let seg2X = 18; let seg2Y = 15;
+let seg3X = 0; let seg3Y = 0;
+let seg4X = 0; let seg4Y = 0;
+let seg5X = 0; let seg5Y = 0;
+let seg6X = 0; let seg6Y = 0;
+let seg7X = 0; let seg7Y = 0;
+let seg8X = 0; let seg8Y = 0;
+let seg9X = 0; let seg9Y = 0;
+let seg10X = 0; let seg10Y = 0;
+let seg11X = 0; let seg11Y = 0;
+let seg12X = 0; let seg12Y = 0;
+let seg13X = 0; let seg13Y = 0;
+let seg14X = 0; let seg14Y = 0;
+let seg15X = 0; let seg15Y = 0;
+let seg16X = 0; let seg16Y = 0;
+let seg17X = 0; let seg17Y = 0;
+let seg18X = 0; let seg18Y = 0;
+let seg19X = 0; let seg19Y = 0;
+let seg20X = 0; let seg20Y = 0;
+let seg21X = 0; let seg21Y = 0;
+let seg22X = 0; let seg22Y = 0;
+let seg23X = 0; let seg23Y = 0;
+let seg24X = 0; let seg24Y = 0;
+let seg25X = 0; let seg25Y = 0;
+let seg26X = 0; let seg26Y = 0;
+let seg27X = 0; let seg27Y = 0;
+let seg28X = 0; let seg28Y = 0;
+let seg29X = 0; let seg29Y = 0;
+let seg30X = 0; let seg30Y = 0;
+let seg31X = 0; let seg31Y = 0;
+let seg32X = 0; let seg32Y = 0;
+let seg33X = 0; let seg33Y = 0;
+let seg34X = 0; let seg34Y = 0;
+let seg35X = 0; let seg35Y = 0;
+let seg36X = 0; let seg36Y = 0;
+let seg37X = 0; let seg37Y = 0;
+let seg38X = 0; let seg38Y = 0;
+let seg39X = 0; let seg39Y = 0;
+let seg40X = 0; let seg40Y = 0;
+let seg41X = 0; let seg41Y = 0;
+let seg42X = 0; let seg42Y = 0;
+let seg43X = 0; let seg43Y = 0;
+let seg44X = 0; let seg44Y = 0;
+let seg45X = 0; let seg45Y = 0;
+let seg46X = 0; let seg46Y = 0;
+let seg47X = 0; let seg47Y = 0;
+let seg48X = 0; let seg48Y = 0;
+let seg49X = 0; let seg49Y = 0;
+
+// Direction: 0=right, 1=down, 2=left, 3=up
+let direction = 0;
+let nextDirection = 0;
+
+// Food position
+let foodX = 30;
+let foodY = 15;
+
+// Game state
+let score = 0;
+let highScore = 0;
+let gameOver = 0;
+let moveTimer: f32 = 0.0;
+let moveDelay: f32 = 0.12; // Seconds between moves
+
+// Helper to get segment X position by index
+fn getSegX(i: i32): i32 {
+    if (i == 0) { return seg0X; }
+    if (i == 1) { return seg1X; }
+    if (i == 2) { return seg2X; }
+    if (i == 3) { return seg3X; }
+    if (i == 4) { return seg4X; }
+    if (i == 5) { return seg5X; }
+    if (i == 6) { return seg6X; }
+    if (i == 7) { return seg7X; }
+    if (i == 8) { return seg8X; }
+    if (i == 9) { return seg9X; }
+    if (i == 10) { return seg10X; }
+    if (i == 11) { return seg11X; }
+    if (i == 12) { return seg12X; }
+    if (i == 13) { return seg13X; }
+    if (i == 14) { return seg14X; }
+    if (i == 15) { return seg15X; }
+    if (i == 16) { return seg16X; }
+    if (i == 17) { return seg17X; }
+    if (i == 18) { return seg18X; }
+    if (i == 19) { return seg19X; }
+    if (i == 20) { return seg20X; }
+    if (i == 21) { return seg21X; }
+    if (i == 22) { return seg22X; }
+    if (i == 23) { return seg23X; }
+    if (i == 24) { return seg24X; }
+    if (i == 25) { return seg25X; }
+    if (i == 26) { return seg26X; }
+    if (i == 27) { return seg27X; }
+    if (i == 28) { return seg28X; }
+    if (i == 29) { return seg29X; }
+    if (i == 30) { return seg30X; }
+    if (i == 31) { return seg31X; }
+    if (i == 32) { return seg32X; }
+    if (i == 33) { return seg33X; }
+    if (i == 34) { return seg34X; }
+    if (i == 35) { return seg35X; }
+    if (i == 36) { return seg36X; }
+    if (i == 37) { return seg37X; }
+    if (i == 38) { return seg38X; }
+    if (i == 39) { return seg39X; }
+    if (i == 40) { return seg40X; }
+    if (i == 41) { return seg41X; }
+    if (i == 42) { return seg42X; }
+    if (i == 43) { return seg43X; }
+    if (i == 44) { return seg44X; }
+    if (i == 45) { return seg45X; }
+    if (i == 46) { return seg46X; }
+    if (i == 47) { return seg47X; }
+    if (i == 48) { return seg48X; }
+    if (i == 49) { return seg49X; }
+    return 0;
+}
+
+// Helper to get segment Y position by index
+fn getSegY(i: i32): i32 {
+    if (i == 0) { return seg0Y; }
+    if (i == 1) { return seg1Y; }
+    if (i == 2) { return seg2Y; }
+    if (i == 3) { return seg3Y; }
+    if (i == 4) { return seg4Y; }
+    if (i == 5) { return seg5Y; }
+    if (i == 6) { return seg6Y; }
+    if (i == 7) { return seg7Y; }
+    if (i == 8) { return seg8Y; }
+    if (i == 9) { return seg9Y; }
+    if (i == 10) { return seg10Y; }
+    if (i == 11) { return seg11Y; }
+    if (i == 12) { return seg12Y; }
+    if (i == 13) { return seg13Y; }
+    if (i == 14) { return seg14Y; }
+    if (i == 15) { return seg15Y; }
+    if (i == 16) { return seg16Y; }
+    if (i == 17) { return seg17Y; }
+    if (i == 18) { return seg18Y; }
+    if (i == 19) { return seg19Y; }
+    if (i == 20) { return seg20Y; }
+    if (i == 21) { return seg21Y; }
+    if (i == 22) { return seg22Y; }
+    if (i == 23) { return seg23Y; }
+    if (i == 24) { return seg24Y; }
+    if (i == 25) { return seg25Y; }
+    if (i == 26) { return seg26Y; }
+    if (i == 27) { return seg27Y; }
+    if (i == 28) { return seg28Y; }
+    if (i == 29) { return seg29Y; }
+    if (i == 30) { return seg30Y; }
+    if (i == 31) { return seg31Y; }
+    if (i == 32) { return seg32Y; }
+    if (i == 33) { return seg33Y; }
+    if (i == 34) { return seg34Y; }
+    if (i == 35) { return seg35Y; }
+    if (i == 36) { return seg36Y; }
+    if (i == 37) { return seg37Y; }
+    if (i == 38) { return seg38Y; }
+    if (i == 39) { return seg39Y; }
+    if (i == 40) { return seg40Y; }
+    if (i == 41) { return seg41Y; }
+    if (i == 42) { return seg42Y; }
+    if (i == 43) { return seg43Y; }
+    if (i == 44) { return seg44Y; }
+    if (i == 45) { return seg45Y; }
+    if (i == 46) { return seg46Y; }
+    if (i == 47) { return seg47Y; }
+    if (i == 48) { return seg48Y; }
+    if (i == 49) { return seg49Y; }
+    return 0;
+}
+
+// Helper to set segment X position by index
+fn setSegX(i: i32, val: i32) {
+    if (i == 0) { seg0X = val; }
+    if (i == 1) { seg1X = val; }
+    if (i == 2) { seg2X = val; }
+    if (i == 3) { seg3X = val; }
+    if (i == 4) { seg4X = val; }
+    if (i == 5) { seg5X = val; }
+    if (i == 6) { seg6X = val; }
+    if (i == 7) { seg7X = val; }
+    if (i == 8) { seg8X = val; }
+    if (i == 9) { seg9X = val; }
+    if (i == 10) { seg10X = val; }
+    if (i == 11) { seg11X = val; }
+    if (i == 12) { seg12X = val; }
+    if (i == 13) { seg13X = val; }
+    if (i == 14) { seg14X = val; }
+    if (i == 15) { seg15X = val; }
+    if (i == 16) { seg16X = val; }
+    if (i == 17) { seg17X = val; }
+    if (i == 18) { seg18X = val; }
+    if (i == 19) { seg19X = val; }
+    if (i == 20) { seg20X = val; }
+    if (i == 21) { seg21X = val; }
+    if (i == 22) { seg22X = val; }
+    if (i == 23) { seg23X = val; }
+    if (i == 24) { seg24X = val; }
+    if (i == 25) { seg25X = val; }
+    if (i == 26) { seg26X = val; }
+    if (i == 27) { seg27X = val; }
+    if (i == 28) { seg28X = val; }
+    if (i == 29) { seg29X = val; }
+    if (i == 30) { seg30X = val; }
+    if (i == 31) { seg31X = val; }
+    if (i == 32) { seg32X = val; }
+    if (i == 33) { seg33X = val; }
+    if (i == 34) { seg34X = val; }
+    if (i == 35) { seg35X = val; }
+    if (i == 36) { seg36X = val; }
+    if (i == 37) { seg37X = val; }
+    if (i == 38) { seg38X = val; }
+    if (i == 39) { seg39X = val; }
+    if (i == 40) { seg40X = val; }
+    if (i == 41) { seg41X = val; }
+    if (i == 42) { seg42X = val; }
+    if (i == 43) { seg43X = val; }
+    if (i == 44) { seg44X = val; }
+    if (i == 45) { seg45X = val; }
+    if (i == 46) { seg46X = val; }
+    if (i == 47) { seg47X = val; }
+    if (i == 48) { seg48X = val; }
+    if (i == 49) { seg49X = val; }
+}
+
+// Helper to set segment Y position by index
+fn setSegY(i: i32, val: i32) {
+    if (i == 0) { seg0Y = val; }
+    if (i == 1) { seg1Y = val; }
+    if (i == 2) { seg2Y = val; }
+    if (i == 3) { seg3Y = val; }
+    if (i == 4) { seg4Y = val; }
+    if (i == 5) { seg5Y = val; }
+    if (i == 6) { seg6Y = val; }
+    if (i == 7) { seg7Y = val; }
+    if (i == 8) { seg8Y = val; }
+    if (i == 9) { seg9Y = val; }
+    if (i == 10) { seg10Y = val; }
+    if (i == 11) { seg11Y = val; }
+    if (i == 12) { seg12Y = val; }
+    if (i == 13) { seg13Y = val; }
+    if (i == 14) { seg14Y = val; }
+    if (i == 15) { seg15Y = val; }
+    if (i == 16) { seg16Y = val; }
+    if (i == 17) { seg17Y = val; }
+    if (i == 18) { seg18Y = val; }
+    if (i == 19) { seg19Y = val; }
+    if (i == 20) { seg20Y = val; }
+    if (i == 21) { seg21Y = val; }
+    if (i == 22) { seg22Y = val; }
+    if (i == 23) { seg23Y = val; }
+    if (i == 24) { seg24Y = val; }
+    if (i == 25) { seg25Y = val; }
+    if (i == 26) { seg26Y = val; }
+    if (i == 27) { seg27Y = val; }
+    if (i == 28) { seg28Y = val; }
+    if (i == 29) { seg29Y = val; }
+    if (i == 30) { seg30Y = val; }
+    if (i == 31) { seg31Y = val; }
+    if (i == 32) { seg32Y = val; }
+    if (i == 33) { seg33Y = val; }
+    if (i == 34) { seg34Y = val; }
+    if (i == 35) { seg35Y = val; }
+    if (i == 36) { seg36Y = val; }
+    if (i == 37) { seg37Y = val; }
+    if (i == 38) { seg38Y = val; }
+    if (i == 39) { seg39Y = val; }
+    if (i == 40) { seg40Y = val; }
+    if (i == 41) { seg41Y = val; }
+    if (i == 42) { seg42Y = val; }
+    if (i == 43) { seg43Y = val; }
+    if (i == 44) { seg44Y = val; }
+    if (i == 45) { seg45Y = val; }
+    if (i == 46) { seg46Y = val; }
+    if (i == 47) { seg47Y = val; }
+    if (i == 48) { seg48Y = val; }
+    if (i == 49) { seg49Y = val; }
+}
+
+// Reset game state
+fn resetGame() {
+    snakeLen = 3;
+    seg0X = 20; seg0Y = 15;
+    seg1X = 19; seg1Y = 15;
+    seg2X = 18; seg2Y = 15;
+    direction = 0;
+    nextDirection = 0;
+    foodX = GetRandomValue(1, gridWidth - 2);
+    foodY = GetRandomValue(1, gridHeight - 2);
+    score = 0;
+    gameOver = 0;
+    moveTimer = 0.0;
+}
+
+// Check if position collides with snake body
+fn collidesWithSnake(x: i32, y: i32, startIdx: i32): i32 {
+    let i = startIdx;
+    while (i < snakeLen) {
+        if (getSegX(i) == x) {
+            if (getSegY(i) == y) {
+                return 1;
+            }
+        }
+        i = i + 1;
+    }
+    return 0;
+}
+
+// Spawn food at random position not on snake
+fn spawnFood() {
+    foodX = GetRandomValue(1, gridWidth - 2);
+    foodY = GetRandomValue(1, gridHeight - 2);
+    // Keep trying until food is not on snake
+    while (collidesWithSnake(foodX, foodY, 0) != 0) {
+        foodX = GetRandomValue(1, gridWidth - 2);
+        foodY = GetRandomValue(1, gridHeight - 2);
+    }
+}
+
+// Draw a single segment
+fn drawSegment(i: i32, isHead: i32) {
+    let x = getSegX(i) * cellSize;
+    let y = getSegY(i) * cellSize;
+
+    if (isHead != 0) {
+        // Draw head with eyes
+        DrawRectangle(x + 1, y + 1, cellSize - 2, cellSize - 2, DARKGREEN);
+        DrawRectangle(x + 2, y + 2, cellSize - 4, cellSize - 4, GREEN);
+
+        // Eyes based on direction
+        if (direction == 0) { // Right
+            DrawCircle(x + 14, y + 6, 3.0, WHITE);
+            DrawCircle(x + 14, y + 14, 3.0, WHITE);
+            DrawCircle(x + 15, y + 6, 1.5, BLACK);
+            DrawCircle(x + 15, y + 14, 1.5, BLACK);
+        }
+        if (direction == 1) { // Down
+            DrawCircle(x + 6, y + 14, 3.0, WHITE);
+            DrawCircle(x + 14, y + 14, 3.0, WHITE);
+            DrawCircle(x + 6, y + 15, 1.5, BLACK);
+            DrawCircle(x + 14, y + 15, 1.5, BLACK);
+        }
+        if (direction == 2) { // Left
+            DrawCircle(x + 6, y + 6, 3.0, WHITE);
+            DrawCircle(x + 6, y + 14, 3.0, WHITE);
+            DrawCircle(x + 5, y + 6, 1.5, BLACK);
+            DrawCircle(x + 5, y + 14, 1.5, BLACK);
+        }
+        if (direction == 3) { // Up
+            DrawCircle(x + 6, y + 6, 3.0, WHITE);
+            DrawCircle(x + 14, y + 6, 3.0, WHITE);
+            DrawCircle(x + 6, y + 5, 1.5, BLACK);
+            DrawCircle(x + 14, y + 5, 1.5, BLACK);
+        }
+    } else {
+        // Body segment with gradient effect
+        DrawRectangle(x + 1, y + 1, cellSize - 2, cellSize - 2, DARKGREEN);
+        DrawRectangle(x + 3, y + 3, cellSize - 6, cellSize - 6, GREEN);
+    }
+}
+
+InitWindow(screenWidth, screenHeight, "Snake Game - Hemlock + Raylib");
+SetTargetFPS(60);
+
+// Initial food spawn
+spawnFood();
+
+while (WindowShouldClose() == 0) {
+    let dt = GetFrameTime();
+
+    // Handle restart
+    if (IsKeyPressed(KEY_R) != 0) {
+        if (score > highScore) {
+            highScore = score;
+        }
+        resetGame();
+        spawnFood();
+    }
+
+    // Input handling (queue direction change)
+    if (gameOver == 0) {
+        if (IsKeyPressed(KEY_RIGHT) != 0) {
+            if (direction != 2) { nextDirection = 0; }
+        }
+        if (IsKeyPressed(KEY_D) != 0) {
+            if (direction != 2) { nextDirection = 0; }
+        }
+        if (IsKeyPressed(KEY_DOWN) != 0) {
+            if (direction != 3) { nextDirection = 1; }
+        }
+        if (IsKeyPressed(KEY_S) != 0) {
+            if (direction != 3) { nextDirection = 1; }
+        }
+        if (IsKeyPressed(KEY_LEFT) != 0) {
+            if (direction != 0) { nextDirection = 2; }
+        }
+        if (IsKeyPressed(KEY_A) != 0) {
+            if (direction != 0) { nextDirection = 2; }
+        }
+        if (IsKeyPressed(KEY_UP) != 0) {
+            if (direction != 1) { nextDirection = 3; }
+        }
+        if (IsKeyPressed(KEY_W) != 0) {
+            if (direction != 1) { nextDirection = 3; }
+        }
+    }
+
+    // Update game
+    if (gameOver == 0) {
+        moveTimer = moveTimer + dt;
+
+        if (moveTimer >= moveDelay) {
+            moveTimer = 0.0;
+            direction = nextDirection;
+
+            // Calculate new head position
+            let newHeadX = seg0X;
+            let newHeadY = seg0Y;
+
+            if (direction == 0) { newHeadX = newHeadX + 1; }
+            if (direction == 1) { newHeadY = newHeadY + 1; }
+            if (direction == 2) { newHeadX = newHeadX - 1; }
+            if (direction == 3) { newHeadY = newHeadY - 1; }
+
+            // Check wall collision
+            if (newHeadX < 0) { gameOver = 1; }
+            if (newHeadX >= gridWidth) { gameOver = 1; }
+            if (newHeadY < 0) { gameOver = 1; }
+            if (newHeadY >= gridHeight) { gameOver = 1; }
+
+            // Check self collision
+            if (collidesWithSnake(newHeadX, newHeadY, 0) != 0) {
+                gameOver = 1;
+            }
+
+            if (gameOver == 0) {
+                // Check food collision
+                let ateFood = 0;
+                if (newHeadX == foodX) {
+                    if (newHeadY == foodY) {
+                        ateFood = 1;
+                        score = score + 10;
+                        // Speed up slightly
+                        if (moveDelay > 0.05) {
+                            moveDelay = moveDelay - 0.002;
+                        }
+                    }
+                }
+
+                // Move snake: shift all segments back
+                let i = snakeLen - 1;
+                while (i > 0) {
+                    setSegX(i, getSegX(i - 1));
+                    setSegY(i, getSegY(i - 1));
+                    i = i - 1;
+                }
+
+                // Set new head position
+                seg0X = newHeadX;
+                seg0Y = newHeadY;
+
+                // Grow snake if ate food
+                if (ateFood != 0) {
+                    if (snakeLen < 50) {
+                        snakeLen = snakeLen + 1;
+                    }
+                    spawnFood();
+                }
+            }
+        }
+    }
+
+    // Draw
+    BeginDrawing();
+    ClearBackground(DARKGRAY);
+
+    // Draw grid background
+    let gx = 0;
+    while (gx < gridWidth) {
+        let gy = 0;
+        while (gy < gridHeight) {
+            let cellColor = LIGHTGRAY;
+            if ((gx + gy) % 2 == 0) {
+                cellColor = RAYWHITE;
+            }
+            DrawRectangle(gx * cellSize, gy * cellSize, cellSize, cellSize, cellColor);
+            gy = gy + 1;
+        }
+        gx = gx + 1;
+    }
+
+    // Draw food (apple)
+    let fx = foodX * cellSize;
+    let fy = foodY * cellSize;
+    DrawCircle(fx + cellSize / 2, fy + cellSize / 2, 8.0, RED);
+    DrawCircle(fx + cellSize / 2 - 2, fy + cellSize / 2 - 2, 3.0, ORANGE);
+    // Stem
+    DrawRectangle(fx + cellSize / 2 - 1, fy + 2, 2, 4, DARKGREEN);
+
+    // Draw snake
+    let si = snakeLen - 1;
+    while (si >= 0) {
+        if (si == 0) {
+            drawSegment(si, 1);
+        } else {
+            drawSegment(si, 0);
+        }
+        si = si - 1;
+    }
+
+    // Draw UI
+    DrawRectangle(0, 0, screenWidth, 30, BLACK);
+    DrawText("SNAKE", 10, 5, 20, GREEN);
+    DrawText("Score: " + score, 120, 7, 16, WHITE);
+    DrawText("High Score: " + highScore, 250, 7, 16, YELLOW);
+    DrawText("FPS: " + GetFPS(), screenWidth - 80, 7, 16, GREEN);
+
+    // Draw controls hint
+    DrawText("Arrow Keys/WASD: Move | R: Restart", screenWidth / 2 - 150, screenHeight - 25, 16, DARKGRAY);
+
+    // Game over overlay
+    if (gameOver != 0) {
+        // Semi-transparent overlay
+        DrawRectangle(0, 0, screenWidth, screenHeight, BLACK);
+
+        // Draw game over text with shadow
+        DrawText("GAME OVER", screenWidth / 2 - 142, screenHeight / 2 - 52, 48, DARKGRAY);
+        DrawText("GAME OVER", screenWidth / 2 - 140, screenHeight / 2 - 50, 48, RED);
+
+        DrawText("Score: " + score, screenWidth / 2 - 50, screenHeight / 2 + 20, 24, WHITE);
+
+        if (score > highScore) {
+            DrawText("NEW HIGH SCORE!", screenWidth / 2 - 100, screenHeight / 2 + 60, 24, YELLOW);
+        }
+
+        DrawText("Press R to Restart", screenWidth / 2 - 90, screenHeight / 2 + 110, 20, LIGHTGRAY);
+    }
+
+    EndDrawing();
+}
+
+// Update high score before closing
+if (score > highScore) {
+    highScore = score;
+}
+
+CloseWindow();
+print("Thanks for playing Snake!");

@@ -1,0 +1,768 @@
+// Particle Effects Demo - Beautiful visual effects showcase
+// Controls: Click to create explosions, 1-5 to change effect type, SPACE for fireworks
+// Demonstrates: particle systems, color blending, visual effects, mouse interaction
+
+import {
+    // Functions
+    InitWindow, CloseWindow, WindowShouldClose, SetTargetFPS, GetFPS, GetFrameTime,
+    BeginDrawing, EndDrawing, ClearBackground,
+    DrawCircle, DrawRectangle, DrawLine, DrawLineEx, DrawText,
+    IsKeyPressed, IsMouseButtonPressed, GetMouseX, GetMouseY, GetRandomValue,
+    // Color helpers
+    Color, ColorAlpha,
+    // Colors
+    RAYWHITE, RED, GREEN, LIME, BLUE, YELLOW, ORANGE, PURPLE, PINK, SKYBLUE,
+    DARKGRAY, LIGHTGRAY, BLACK, WHITE, GOLD, MAROON, VIOLET, MAGENTA,
+    // Keys
+    KEY_ONE, KEY_TWO, KEY_THREE, KEY_FOUR, KEY_FIVE, KEY_SPACE, KEY_C,
+    // Mouse
+    MOUSE_BUTTON_LEFT
+} from "../src/raylib.hml";
+
+// Screen dimensions
+let screenWidth = 900;
+let screenHeight = 700;
+
+// Maximum particles
+let MAX_PARTICLES = 200;
+
+// Particle data (position, velocity, life, color, size)
+// Using separate variables for each particle property
+let p0X: f32 = 0.0; let p0Y: f32 = 0.0; let p0VX: f32 = 0.0; let p0VY: f32 = 0.0; let p0Life: f32 = 0.0; let p0Size: f32 = 0.0; let p0R = 255; let p0G = 255; let p0B = 255;
+let p1X: f32 = 0.0; let p1Y: f32 = 0.0; let p1VX: f32 = 0.0; let p1VY: f32 = 0.0; let p1Life: f32 = 0.0; let p1Size: f32 = 0.0; let p1R = 255; let p1G = 255; let p1B = 255;
+let p2X: f32 = 0.0; let p2Y: f32 = 0.0; let p2VX: f32 = 0.0; let p2VY: f32 = 0.0; let p2Life: f32 = 0.0; let p2Size: f32 = 0.0; let p2R = 255; let p2G = 255; let p2B = 255;
+let p3X: f32 = 0.0; let p3Y: f32 = 0.0; let p3VX: f32 = 0.0; let p3VY: f32 = 0.0; let p3Life: f32 = 0.0; let p3Size: f32 = 0.0; let p3R = 255; let p3G = 255; let p3B = 255;
+let p4X: f32 = 0.0; let p4Y: f32 = 0.0; let p4VX: f32 = 0.0; let p4VY: f32 = 0.0; let p4Life: f32 = 0.0; let p4Size: f32 = 0.0; let p4R = 255; let p4G = 255; let p4B = 255;
+let p5X: f32 = 0.0; let p5Y: f32 = 0.0; let p5VX: f32 = 0.0; let p5VY: f32 = 0.0; let p5Life: f32 = 0.0; let p5Size: f32 = 0.0; let p5R = 255; let p5G = 255; let p5B = 255;
+let p6X: f32 = 0.0; let p6Y: f32 = 0.0; let p6VX: f32 = 0.0; let p6VY: f32 = 0.0; let p6Life: f32 = 0.0; let p6Size: f32 = 0.0; let p6R = 255; let p6G = 255; let p6B = 255;
+let p7X: f32 = 0.0; let p7Y: f32 = 0.0; let p7VX: f32 = 0.0; let p7VY: f32 = 0.0; let p7Life: f32 = 0.0; let p7Size: f32 = 0.0; let p7R = 255; let p7G = 255; let p7B = 255;
+let p8X: f32 = 0.0; let p8Y: f32 = 0.0; let p8VX: f32 = 0.0; let p8VY: f32 = 0.0; let p8Life: f32 = 0.0; let p8Size: f32 = 0.0; let p8R = 255; let p8G = 255; let p8B = 255;
+let p9X: f32 = 0.0; let p9Y: f32 = 0.0; let p9VX: f32 = 0.0; let p9VY: f32 = 0.0; let p9Life: f32 = 0.0; let p9Size: f32 = 0.0; let p9R = 255; let p9G = 255; let p9B = 255;
+let p10X: f32 = 0.0; let p10Y: f32 = 0.0; let p10VX: f32 = 0.0; let p10VY: f32 = 0.0; let p10Life: f32 = 0.0; let p10Size: f32 = 0.0; let p10R = 255; let p10G = 255; let p10B = 255;
+let p11X: f32 = 0.0; let p11Y: f32 = 0.0; let p11VX: f32 = 0.0; let p11VY: f32 = 0.0; let p11Life: f32 = 0.0; let p11Size: f32 = 0.0; let p11R = 255; let p11G = 255; let p11B = 255;
+let p12X: f32 = 0.0; let p12Y: f32 = 0.0; let p12VX: f32 = 0.0; let p12VY: f32 = 0.0; let p12Life: f32 = 0.0; let p12Size: f32 = 0.0; let p12R = 255; let p12G = 255; let p12B = 255;
+let p13X: f32 = 0.0; let p13Y: f32 = 0.0; let p13VX: f32 = 0.0; let p13VY: f32 = 0.0; let p13Life: f32 = 0.0; let p13Size: f32 = 0.0; let p13R = 255; let p13G = 255; let p13B = 255;
+let p14X: f32 = 0.0; let p14Y: f32 = 0.0; let p14VX: f32 = 0.0; let p14VY: f32 = 0.0; let p14Life: f32 = 0.0; let p14Size: f32 = 0.0; let p14R = 255; let p14G = 255; let p14B = 255;
+let p15X: f32 = 0.0; let p15Y: f32 = 0.0; let p15VX: f32 = 0.0; let p15VY: f32 = 0.0; let p15Life: f32 = 0.0; let p15Size: f32 = 0.0; let p15R = 255; let p15G = 255; let p15B = 255;
+let p16X: f32 = 0.0; let p16Y: f32 = 0.0; let p16VX: f32 = 0.0; let p16VY: f32 = 0.0; let p16Life: f32 = 0.0; let p16Size: f32 = 0.0; let p16R = 255; let p16G = 255; let p16B = 255;
+let p17X: f32 = 0.0; let p17Y: f32 = 0.0; let p17VX: f32 = 0.0; let p17VY: f32 = 0.0; let p17Life: f32 = 0.0; let p17Size: f32 = 0.0; let p17R = 255; let p17G = 255; let p17B = 255;
+let p18X: f32 = 0.0; let p18Y: f32 = 0.0; let p18VX: f32 = 0.0; let p18VY: f32 = 0.0; let p18Life: f32 = 0.0; let p18Size: f32 = 0.0; let p18R = 255; let p18G = 255; let p18B = 255;
+let p19X: f32 = 0.0; let p19Y: f32 = 0.0; let p19VX: f32 = 0.0; let p19VY: f32 = 0.0; let p19Life: f32 = 0.0; let p19Size: f32 = 0.0; let p19R = 255; let p19G = 255; let p19B = 255;
+let p20X: f32 = 0.0; let p20Y: f32 = 0.0; let p20VX: f32 = 0.0; let p20VY: f32 = 0.0; let p20Life: f32 = 0.0; let p20Size: f32 = 0.0; let p20R = 255; let p20G = 255; let p20B = 255;
+let p21X: f32 = 0.0; let p21Y: f32 = 0.0; let p21VX: f32 = 0.0; let p21VY: f32 = 0.0; let p21Life: f32 = 0.0; let p21Size: f32 = 0.0; let p21R = 255; let p21G = 255; let p21B = 255;
+let p22X: f32 = 0.0; let p22Y: f32 = 0.0; let p22VX: f32 = 0.0; let p22VY: f32 = 0.0; let p22Life: f32 = 0.0; let p22Size: f32 = 0.0; let p22R = 255; let p22G = 255; let p22B = 255;
+let p23X: f32 = 0.0; let p23Y: f32 = 0.0; let p23VX: f32 = 0.0; let p23VY: f32 = 0.0; let p23Life: f32 = 0.0; let p23Size: f32 = 0.0; let p23R = 255; let p23G = 255; let p23B = 255;
+let p24X: f32 = 0.0; let p24Y: f32 = 0.0; let p24VX: f32 = 0.0; let p24VY: f32 = 0.0; let p24Life: f32 = 0.0; let p24Size: f32 = 0.0; let p24R = 255; let p24G = 255; let p24B = 255;
+let p25X: f32 = 0.0; let p25Y: f32 = 0.0; let p25VX: f32 = 0.0; let p25VY: f32 = 0.0; let p25Life: f32 = 0.0; let p25Size: f32 = 0.0; let p25R = 255; let p25G = 255; let p25B = 255;
+let p26X: f32 = 0.0; let p26Y: f32 = 0.0; let p26VX: f32 = 0.0; let p26VY: f32 = 0.0; let p26Life: f32 = 0.0; let p26Size: f32 = 0.0; let p26R = 255; let p26G = 255; let p26B = 255;
+let p27X: f32 = 0.0; let p27Y: f32 = 0.0; let p27VX: f32 = 0.0; let p27VY: f32 = 0.0; let p27Life: f32 = 0.0; let p27Size: f32 = 0.0; let p27R = 255; let p27G = 255; let p27B = 255;
+let p28X: f32 = 0.0; let p28Y: f32 = 0.0; let p28VX: f32 = 0.0; let p28VY: f32 = 0.0; let p28Life: f32 = 0.0; let p28Size: f32 = 0.0; let p28R = 255; let p28G = 255; let p28B = 255;
+let p29X: f32 = 0.0; let p29Y: f32 = 0.0; let p29VX: f32 = 0.0; let p29VY: f32 = 0.0; let p29Life: f32 = 0.0; let p29Size: f32 = 0.0; let p29R = 255; let p29G = 255; let p29B = 255;
+let p30X: f32 = 0.0; let p30Y: f32 = 0.0; let p30VX: f32 = 0.0; let p30VY: f32 = 0.0; let p30Life: f32 = 0.0; let p30Size: f32 = 0.0; let p30R = 255; let p30G = 255; let p30B = 255;
+let p31X: f32 = 0.0; let p31Y: f32 = 0.0; let p31VX: f32 = 0.0; let p31VY: f32 = 0.0; let p31Life: f32 = 0.0; let p31Size: f32 = 0.0; let p31R = 255; let p31G = 255; let p31B = 255;
+let p32X: f32 = 0.0; let p32Y: f32 = 0.0; let p32VX: f32 = 0.0; let p32VY: f32 = 0.0; let p32Life: f32 = 0.0; let p32Size: f32 = 0.0; let p32R = 255; let p32G = 255; let p32B = 255;
+let p33X: f32 = 0.0; let p33Y: f32 = 0.0; let p33VX: f32 = 0.0; let p33VY: f32 = 0.0; let p33Life: f32 = 0.0; let p33Size: f32 = 0.0; let p33R = 255; let p33G = 255; let p33B = 255;
+let p34X: f32 = 0.0; let p34Y: f32 = 0.0; let p34VX: f32 = 0.0; let p34VY: f32 = 0.0; let p34Life: f32 = 0.0; let p34Size: f32 = 0.0; let p34R = 255; let p34G = 255; let p34B = 255;
+let p35X: f32 = 0.0; let p35Y: f32 = 0.0; let p35VX: f32 = 0.0; let p35VY: f32 = 0.0; let p35Life: f32 = 0.0; let p35Size: f32 = 0.0; let p35R = 255; let p35G = 255; let p35B = 255;
+let p36X: f32 = 0.0; let p36Y: f32 = 0.0; let p36VX: f32 = 0.0; let p36VY: f32 = 0.0; let p36Life: f32 = 0.0; let p36Size: f32 = 0.0; let p36R = 255; let p36G = 255; let p36B = 255;
+let p37X: f32 = 0.0; let p37Y: f32 = 0.0; let p37VX: f32 = 0.0; let p37VY: f32 = 0.0; let p37Life: f32 = 0.0; let p37Size: f32 = 0.0; let p37R = 255; let p37G = 255; let p37B = 255;
+let p38X: f32 = 0.0; let p38Y: f32 = 0.0; let p38VX: f32 = 0.0; let p38VY: f32 = 0.0; let p38Life: f32 = 0.0; let p38Size: f32 = 0.0; let p38R = 255; let p38G = 255; let p38B = 255;
+let p39X: f32 = 0.0; let p39Y: f32 = 0.0; let p39VX: f32 = 0.0; let p39VY: f32 = 0.0; let p39Life: f32 = 0.0; let p39Size: f32 = 0.0; let p39R = 255; let p39G = 255; let p39B = 255;
+let p40X: f32 = 0.0; let p40Y: f32 = 0.0; let p40VX: f32 = 0.0; let p40VY: f32 = 0.0; let p40Life: f32 = 0.0; let p40Size: f32 = 0.0; let p40R = 255; let p40G = 255; let p40B = 255;
+let p41X: f32 = 0.0; let p41Y: f32 = 0.0; let p41VX: f32 = 0.0; let p41VY: f32 = 0.0; let p41Life: f32 = 0.0; let p41Size: f32 = 0.0; let p41R = 255; let p41G = 255; let p41B = 255;
+let p42X: f32 = 0.0; let p42Y: f32 = 0.0; let p42VX: f32 = 0.0; let p42VY: f32 = 0.0; let p42Life: f32 = 0.0; let p42Size: f32 = 0.0; let p42R = 255; let p42G = 255; let p42B = 255;
+let p43X: f32 = 0.0; let p43Y: f32 = 0.0; let p43VX: f32 = 0.0; let p43VY: f32 = 0.0; let p43Life: f32 = 0.0; let p43Size: f32 = 0.0; let p43R = 255; let p43G = 255; let p43B = 255;
+let p44X: f32 = 0.0; let p44Y: f32 = 0.0; let p44VX: f32 = 0.0; let p44VY: f32 = 0.0; let p44Life: f32 = 0.0; let p44Size: f32 = 0.0; let p44R = 255; let p44G = 255; let p44B = 255;
+let p45X: f32 = 0.0; let p45Y: f32 = 0.0; let p45VX: f32 = 0.0; let p45VY: f32 = 0.0; let p45Life: f32 = 0.0; let p45Size: f32 = 0.0; let p45R = 255; let p45G = 255; let p45B = 255;
+let p46X: f32 = 0.0; let p46Y: f32 = 0.0; let p46VX: f32 = 0.0; let p46VY: f32 = 0.0; let p46Life: f32 = 0.0; let p46Size: f32 = 0.0; let p46R = 255; let p46G = 255; let p46B = 255;
+let p47X: f32 = 0.0; let p47Y: f32 = 0.0; let p47VX: f32 = 0.0; let p47VY: f32 = 0.0; let p47Life: f32 = 0.0; let p47Size: f32 = 0.0; let p47R = 255; let p47G = 255; let p47B = 255;
+let p48X: f32 = 0.0; let p48Y: f32 = 0.0; let p48VX: f32 = 0.0; let p48VY: f32 = 0.0; let p48Life: f32 = 0.0; let p48Size: f32 = 0.0; let p48R = 255; let p48G = 255; let p48B = 255;
+let p49X: f32 = 0.0; let p49Y: f32 = 0.0; let p49VX: f32 = 0.0; let p49VY: f32 = 0.0; let p49Life: f32 = 0.0; let p49Size: f32 = 0.0; let p49R = 255; let p49G = 255; let p49B = 255;
+
+// Current effect type: 1=explosion, 2=fire, 3=sparkle, 4=snow, 5=rainbow
+let effectType = 1;
+let effectNames0 = "Explosion";
+let effectNames1 = "Fire Fountain";
+let effectNames2 = "Sparkles";
+let effectNames3 = "Snow";
+let effectNames4 = "Rainbow Burst";
+
+// Particle index for round-robin spawning
+let nextParticle = 0;
+
+// Getters for particle properties
+fn getPX(i: i32): f32 {
+    if (i == 0) { return p0X; } if (i == 1) { return p1X; } if (i == 2) { return p2X; }
+    if (i == 3) { return p3X; } if (i == 4) { return p4X; } if (i == 5) { return p5X; }
+    if (i == 6) { return p6X; } if (i == 7) { return p7X; } if (i == 8) { return p8X; }
+    if (i == 9) { return p9X; } if (i == 10) { return p10X; } if (i == 11) { return p11X; }
+    if (i == 12) { return p12X; } if (i == 13) { return p13X; } if (i == 14) { return p14X; }
+    if (i == 15) { return p15X; } if (i == 16) { return p16X; } if (i == 17) { return p17X; }
+    if (i == 18) { return p18X; } if (i == 19) { return p19X; } if (i == 20) { return p20X; }
+    if (i == 21) { return p21X; } if (i == 22) { return p22X; } if (i == 23) { return p23X; }
+    if (i == 24) { return p24X; } if (i == 25) { return p25X; } if (i == 26) { return p26X; }
+    if (i == 27) { return p27X; } if (i == 28) { return p28X; } if (i == 29) { return p29X; }
+    if (i == 30) { return p30X; } if (i == 31) { return p31X; } if (i == 32) { return p32X; }
+    if (i == 33) { return p33X; } if (i == 34) { return p34X; } if (i == 35) { return p35X; }
+    if (i == 36) { return p36X; } if (i == 37) { return p37X; } if (i == 38) { return p38X; }
+    if (i == 39) { return p39X; } if (i == 40) { return p40X; } if (i == 41) { return p41X; }
+    if (i == 42) { return p42X; } if (i == 43) { return p43X; } if (i == 44) { return p44X; }
+    if (i == 45) { return p45X; } if (i == 46) { return p46X; } if (i == 47) { return p47X; }
+    if (i == 48) { return p48X; } if (i == 49) { return p49X; }
+    return 0.0;
+}
+
+fn getPY(i: i32): f32 {
+    if (i == 0) { return p0Y; } if (i == 1) { return p1Y; } if (i == 2) { return p2Y; }
+    if (i == 3) { return p3Y; } if (i == 4) { return p4Y; } if (i == 5) { return p5Y; }
+    if (i == 6) { return p6Y; } if (i == 7) { return p7Y; } if (i == 8) { return p8Y; }
+    if (i == 9) { return p9Y; } if (i == 10) { return p10Y; } if (i == 11) { return p11Y; }
+    if (i == 12) { return p12Y; } if (i == 13) { return p13Y; } if (i == 14) { return p14Y; }
+    if (i == 15) { return p15Y; } if (i == 16) { return p16Y; } if (i == 17) { return p17Y; }
+    if (i == 18) { return p18Y; } if (i == 19) { return p19Y; } if (i == 20) { return p20Y; }
+    if (i == 21) { return p21Y; } if (i == 22) { return p22Y; } if (i == 23) { return p23Y; }
+    if (i == 24) { return p24Y; } if (i == 25) { return p25Y; } if (i == 26) { return p26Y; }
+    if (i == 27) { return p27Y; } if (i == 28) { return p28Y; } if (i == 29) { return p29Y; }
+    if (i == 30) { return p30Y; } if (i == 31) { return p31Y; } if (i == 32) { return p32Y; }
+    if (i == 33) { return p33Y; } if (i == 34) { return p34Y; } if (i == 35) { return p35Y; }
+    if (i == 36) { return p36Y; } if (i == 37) { return p37Y; } if (i == 38) { return p38Y; }
+    if (i == 39) { return p39Y; } if (i == 40) { return p40Y; } if (i == 41) { return p41Y; }
+    if (i == 42) { return p42Y; } if (i == 43) { return p43Y; } if (i == 44) { return p44Y; }
+    if (i == 45) { return p45Y; } if (i == 46) { return p46Y; } if (i == 47) { return p47Y; }
+    if (i == 48) { return p48Y; } if (i == 49) { return p49Y; }
+    return 0.0;
+}
+
+fn getPVX(i: i32): f32 {
+    if (i == 0) { return p0VX; } if (i == 1) { return p1VX; } if (i == 2) { return p2VX; }
+    if (i == 3) { return p3VX; } if (i == 4) { return p4VX; } if (i == 5) { return p5VX; }
+    if (i == 6) { return p6VX; } if (i == 7) { return p7VX; } if (i == 8) { return p8VX; }
+    if (i == 9) { return p9VX; } if (i == 10) { return p10VX; } if (i == 11) { return p11VX; }
+    if (i == 12) { return p12VX; } if (i == 13) { return p13VX; } if (i == 14) { return p14VX; }
+    if (i == 15) { return p15VX; } if (i == 16) { return p16VX; } if (i == 17) { return p17VX; }
+    if (i == 18) { return p18VX; } if (i == 19) { return p19VX; } if (i == 20) { return p20VX; }
+    if (i == 21) { return p21VX; } if (i == 22) { return p22VX; } if (i == 23) { return p23VX; }
+    if (i == 24) { return p24VX; } if (i == 25) { return p25VX; } if (i == 26) { return p26VX; }
+    if (i == 27) { return p27VX; } if (i == 28) { return p28VX; } if (i == 29) { return p29VX; }
+    if (i == 30) { return p30VX; } if (i == 31) { return p31VX; } if (i == 32) { return p32VX; }
+    if (i == 33) { return p33VX; } if (i == 34) { return p34VX; } if (i == 35) { return p35VX; }
+    if (i == 36) { return p36VX; } if (i == 37) { return p37VX; } if (i == 38) { return p38VX; }
+    if (i == 39) { return p39VX; } if (i == 40) { return p40VX; } if (i == 41) { return p41VX; }
+    if (i == 42) { return p42VX; } if (i == 43) { return p43VX; } if (i == 44) { return p44VX; }
+    if (i == 45) { return p45VX; } if (i == 46) { return p46VX; } if (i == 47) { return p47VX; }
+    if (i == 48) { return p48VX; } if (i == 49) { return p49VX; }
+    return 0.0;
+}
+
+fn getPVY(i: i32): f32 {
+    if (i == 0) { return p0VY; } if (i == 1) { return p1VY; } if (i == 2) { return p2VY; }
+    if (i == 3) { return p3VY; } if (i == 4) { return p4VY; } if (i == 5) { return p5VY; }
+    if (i == 6) { return p6VY; } if (i == 7) { return p7VY; } if (i == 8) { return p8VY; }
+    if (i == 9) { return p9VY; } if (i == 10) { return p10VY; } if (i == 11) { return p11VY; }
+    if (i == 12) { return p12VY; } if (i == 13) { return p13VY; } if (i == 14) { return p14VY; }
+    if (i == 15) { return p15VY; } if (i == 16) { return p16VY; } if (i == 17) { return p17VY; }
+    if (i == 18) { return p18VY; } if (i == 19) { return p19VY; } if (i == 20) { return p20VY; }
+    if (i == 21) { return p21VY; } if (i == 22) { return p22VY; } if (i == 23) { return p23VY; }
+    if (i == 24) { return p24VY; } if (i == 25) { return p25VY; } if (i == 26) { return p26VY; }
+    if (i == 27) { return p27VY; } if (i == 28) { return p28VY; } if (i == 29) { return p29VY; }
+    if (i == 30) { return p30VY; } if (i == 31) { return p31VY; } if (i == 32) { return p32VY; }
+    if (i == 33) { return p33VY; } if (i == 34) { return p34VY; } if (i == 35) { return p35VY; }
+    if (i == 36) { return p36VY; } if (i == 37) { return p37VY; } if (i == 38) { return p38VY; }
+    if (i == 39) { return p39VY; } if (i == 40) { return p40VY; } if (i == 41) { return p41VY; }
+    if (i == 42) { return p42VY; } if (i == 43) { return p43VY; } if (i == 44) { return p44VY; }
+    if (i == 45) { return p45VY; } if (i == 46) { return p46VY; } if (i == 47) { return p47VY; }
+    if (i == 48) { return p48VY; } if (i == 49) { return p49VY; }
+    return 0.0;
+}
+
+fn getPLife(i: i32): f32 {
+    if (i == 0) { return p0Life; } if (i == 1) { return p1Life; } if (i == 2) { return p2Life; }
+    if (i == 3) { return p3Life; } if (i == 4) { return p4Life; } if (i == 5) { return p5Life; }
+    if (i == 6) { return p6Life; } if (i == 7) { return p7Life; } if (i == 8) { return p8Life; }
+    if (i == 9) { return p9Life; } if (i == 10) { return p10Life; } if (i == 11) { return p11Life; }
+    if (i == 12) { return p12Life; } if (i == 13) { return p13Life; } if (i == 14) { return p14Life; }
+    if (i == 15) { return p15Life; } if (i == 16) { return p16Life; } if (i == 17) { return p17Life; }
+    if (i == 18) { return p18Life; } if (i == 19) { return p19Life; } if (i == 20) { return p20Life; }
+    if (i == 21) { return p21Life; } if (i == 22) { return p22Life; } if (i == 23) { return p23Life; }
+    if (i == 24) { return p24Life; } if (i == 25) { return p25Life; } if (i == 26) { return p26Life; }
+    if (i == 27) { return p27Life; } if (i == 28) { return p28Life; } if (i == 29) { return p29Life; }
+    if (i == 30) { return p30Life; } if (i == 31) { return p31Life; } if (i == 32) { return p32Life; }
+    if (i == 33) { return p33Life; } if (i == 34) { return p34Life; } if (i == 35) { return p35Life; }
+    if (i == 36) { return p36Life; } if (i == 37) { return p37Life; } if (i == 38) { return p38Life; }
+    if (i == 39) { return p39Life; } if (i == 40) { return p40Life; } if (i == 41) { return p41Life; }
+    if (i == 42) { return p42Life; } if (i == 43) { return p43Life; } if (i == 44) { return p44Life; }
+    if (i == 45) { return p45Life; } if (i == 46) { return p46Life; } if (i == 47) { return p47Life; }
+    if (i == 48) { return p48Life; } if (i == 49) { return p49Life; }
+    return 0.0;
+}
+
+fn getPSize(i: i32): f32 {
+    if (i == 0) { return p0Size; } if (i == 1) { return p1Size; } if (i == 2) { return p2Size; }
+    if (i == 3) { return p3Size; } if (i == 4) { return p4Size; } if (i == 5) { return p5Size; }
+    if (i == 6) { return p6Size; } if (i == 7) { return p7Size; } if (i == 8) { return p8Size; }
+    if (i == 9) { return p9Size; } if (i == 10) { return p10Size; } if (i == 11) { return p11Size; }
+    if (i == 12) { return p12Size; } if (i == 13) { return p13Size; } if (i == 14) { return p14Size; }
+    if (i == 15) { return p15Size; } if (i == 16) { return p16Size; } if (i == 17) { return p17Size; }
+    if (i == 18) { return p18Size; } if (i == 19) { return p19Size; } if (i == 20) { return p20Size; }
+    if (i == 21) { return p21Size; } if (i == 22) { return p22Size; } if (i == 23) { return p23Size; }
+    if (i == 24) { return p24Size; } if (i == 25) { return p25Size; } if (i == 26) { return p26Size; }
+    if (i == 27) { return p27Size; } if (i == 28) { return p28Size; } if (i == 29) { return p29Size; }
+    if (i == 30) { return p30Size; } if (i == 31) { return p31Size; } if (i == 32) { return p32Size; }
+    if (i == 33) { return p33Size; } if (i == 34) { return p34Size; } if (i == 35) { return p35Size; }
+    if (i == 36) { return p36Size; } if (i == 37) { return p37Size; } if (i == 38) { return p38Size; }
+    if (i == 39) { return p39Size; } if (i == 40) { return p40Size; } if (i == 41) { return p41Size; }
+    if (i == 42) { return p42Size; } if (i == 43) { return p43Size; } if (i == 44) { return p44Size; }
+    if (i == 45) { return p45Size; } if (i == 46) { return p46Size; } if (i == 47) { return p47Size; }
+    if (i == 48) { return p48Size; } if (i == 49) { return p49Size; }
+    return 0.0;
+}
+
+fn getPR(i: i32): i32 {
+    if (i == 0) { return p0R; } if (i == 1) { return p1R; } if (i == 2) { return p2R; }
+    if (i == 3) { return p3R; } if (i == 4) { return p4R; } if (i == 5) { return p5R; }
+    if (i == 6) { return p6R; } if (i == 7) { return p7R; } if (i == 8) { return p8R; }
+    if (i == 9) { return p9R; } if (i == 10) { return p10R; } if (i == 11) { return p11R; }
+    if (i == 12) { return p12R; } if (i == 13) { return p13R; } if (i == 14) { return p14R; }
+    if (i == 15) { return p15R; } if (i == 16) { return p16R; } if (i == 17) { return p17R; }
+    if (i == 18) { return p18R; } if (i == 19) { return p19R; } if (i == 20) { return p20R; }
+    if (i == 21) { return p21R; } if (i == 22) { return p22R; } if (i == 23) { return p23R; }
+    if (i == 24) { return p24R; } if (i == 25) { return p25R; } if (i == 26) { return p26R; }
+    if (i == 27) { return p27R; } if (i == 28) { return p28R; } if (i == 29) { return p29R; }
+    if (i == 30) { return p30R; } if (i == 31) { return p31R; } if (i == 32) { return p32R; }
+    if (i == 33) { return p33R; } if (i == 34) { return p34R; } if (i == 35) { return p35R; }
+    if (i == 36) { return p36R; } if (i == 37) { return p37R; } if (i == 38) { return p38R; }
+    if (i == 39) { return p39R; } if (i == 40) { return p40R; } if (i == 41) { return p41R; }
+    if (i == 42) { return p42R; } if (i == 43) { return p43R; } if (i == 44) { return p44R; }
+    if (i == 45) { return p45R; } if (i == 46) { return p46R; } if (i == 47) { return p47R; }
+    if (i == 48) { return p48R; } if (i == 49) { return p49R; }
+    return 255;
+}
+
+fn getPG(i: i32): i32 {
+    if (i == 0) { return p0G; } if (i == 1) { return p1G; } if (i == 2) { return p2G; }
+    if (i == 3) { return p3G; } if (i == 4) { return p4G; } if (i == 5) { return p5G; }
+    if (i == 6) { return p6G; } if (i == 7) { return p7G; } if (i == 8) { return p8G; }
+    if (i == 9) { return p9G; } if (i == 10) { return p10G; } if (i == 11) { return p11G; }
+    if (i == 12) { return p12G; } if (i == 13) { return p13G; } if (i == 14) { return p14G; }
+    if (i == 15) { return p15G; } if (i == 16) { return p16G; } if (i == 17) { return p17G; }
+    if (i == 18) { return p18G; } if (i == 19) { return p19G; } if (i == 20) { return p20G; }
+    if (i == 21) { return p21G; } if (i == 22) { return p22G; } if (i == 23) { return p23G; }
+    if (i == 24) { return p24G; } if (i == 25) { return p25G; } if (i == 26) { return p26G; }
+    if (i == 27) { return p27G; } if (i == 28) { return p28G; } if (i == 29) { return p29G; }
+    if (i == 30) { return p30G; } if (i == 31) { return p31G; } if (i == 32) { return p32G; }
+    if (i == 33) { return p33G; } if (i == 34) { return p34G; } if (i == 35) { return p35G; }
+    if (i == 36) { return p36G; } if (i == 37) { return p37G; } if (i == 38) { return p38G; }
+    if (i == 39) { return p39G; } if (i == 40) { return p40G; } if (i == 41) { return p41G; }
+    if (i == 42) { return p42G; } if (i == 43) { return p43G; } if (i == 44) { return p44G; }
+    if (i == 45) { return p45G; } if (i == 46) { return p46G; } if (i == 47) { return p47G; }
+    if (i == 48) { return p48G; } if (i == 49) { return p49G; }
+    return 255;
+}
+
+fn getPB(i: i32): i32 {
+    if (i == 0) { return p0B; } if (i == 1) { return p1B; } if (i == 2) { return p2B; }
+    if (i == 3) { return p3B; } if (i == 4) { return p4B; } if (i == 5) { return p5B; }
+    if (i == 6) { return p6B; } if (i == 7) { return p7B; } if (i == 8) { return p8B; }
+    if (i == 9) { return p9B; } if (i == 10) { return p10B; } if (i == 11) { return p11B; }
+    if (i == 12) { return p12B; } if (i == 13) { return p13B; } if (i == 14) { return p14B; }
+    if (i == 15) { return p15B; } if (i == 16) { return p16B; } if (i == 17) { return p17B; }
+    if (i == 18) { return p18B; } if (i == 19) { return p19B; } if (i == 20) { return p20B; }
+    if (i == 21) { return p21B; } if (i == 22) { return p22B; } if (i == 23) { return p23B; }
+    if (i == 24) { return p24B; } if (i == 25) { return p25B; } if (i == 26) { return p26B; }
+    if (i == 27) { return p27B; } if (i == 28) { return p28B; } if (i == 29) { return p29B; }
+    if (i == 30) { return p30B; } if (i == 31) { return p31B; } if (i == 32) { return p32B; }
+    if (i == 33) { return p33B; } if (i == 34) { return p34B; } if (i == 35) { return p35B; }
+    if (i == 36) { return p36B; } if (i == 37) { return p37B; } if (i == 38) { return p38B; }
+    if (i == 39) { return p39B; } if (i == 40) { return p40B; } if (i == 41) { return p41B; }
+    if (i == 42) { return p42B; } if (i == 43) { return p43B; } if (i == 44) { return p44B; }
+    if (i == 45) { return p45B; } if (i == 46) { return p46B; } if (i == 47) { return p47B; }
+    if (i == 48) { return p48B; } if (i == 49) { return p49B; }
+    return 255;
+}
+
+// Setters
+fn setPX(i: i32, v: f32) {
+    if (i == 0) { p0X = v; } if (i == 1) { p1X = v; } if (i == 2) { p2X = v; }
+    if (i == 3) { p3X = v; } if (i == 4) { p4X = v; } if (i == 5) { p5X = v; }
+    if (i == 6) { p6X = v; } if (i == 7) { p7X = v; } if (i == 8) { p8X = v; }
+    if (i == 9) { p9X = v; } if (i == 10) { p10X = v; } if (i == 11) { p11X = v; }
+    if (i == 12) { p12X = v; } if (i == 13) { p13X = v; } if (i == 14) { p14X = v; }
+    if (i == 15) { p15X = v; } if (i == 16) { p16X = v; } if (i == 17) { p17X = v; }
+    if (i == 18) { p18X = v; } if (i == 19) { p19X = v; } if (i == 20) { p20X = v; }
+    if (i == 21) { p21X = v; } if (i == 22) { p22X = v; } if (i == 23) { p23X = v; }
+    if (i == 24) { p24X = v; } if (i == 25) { p25X = v; } if (i == 26) { p26X = v; }
+    if (i == 27) { p27X = v; } if (i == 28) { p28X = v; } if (i == 29) { p29X = v; }
+    if (i == 30) { p30X = v; } if (i == 31) { p31X = v; } if (i == 32) { p32X = v; }
+    if (i == 33) { p33X = v; } if (i == 34) { p34X = v; } if (i == 35) { p35X = v; }
+    if (i == 36) { p36X = v; } if (i == 37) { p37X = v; } if (i == 38) { p38X = v; }
+    if (i == 39) { p39X = v; } if (i == 40) { p40X = v; } if (i == 41) { p41X = v; }
+    if (i == 42) { p42X = v; } if (i == 43) { p43X = v; } if (i == 44) { p44X = v; }
+    if (i == 45) { p45X = v; } if (i == 46) { p46X = v; } if (i == 47) { p47X = v; }
+    if (i == 48) { p48X = v; } if (i == 49) { p49X = v; }
+}
+
+fn setPY(i: i32, v: f32) {
+    if (i == 0) { p0Y = v; } if (i == 1) { p1Y = v; } if (i == 2) { p2Y = v; }
+    if (i == 3) { p3Y = v; } if (i == 4) { p4Y = v; } if (i == 5) { p5Y = v; }
+    if (i == 6) { p6Y = v; } if (i == 7) { p7Y = v; } if (i == 8) { p8Y = v; }
+    if (i == 9) { p9Y = v; } if (i == 10) { p10Y = v; } if (i == 11) { p11Y = v; }
+    if (i == 12) { p12Y = v; } if (i == 13) { p13Y = v; } if (i == 14) { p14Y = v; }
+    if (i == 15) { p15Y = v; } if (i == 16) { p16Y = v; } if (i == 17) { p17Y = v; }
+    if (i == 18) { p18Y = v; } if (i == 19) { p19Y = v; } if (i == 20) { p20Y = v; }
+    if (i == 21) { p21Y = v; } if (i == 22) { p22Y = v; } if (i == 23) { p23Y = v; }
+    if (i == 24) { p24Y = v; } if (i == 25) { p25Y = v; } if (i == 26) { p26Y = v; }
+    if (i == 27) { p27Y = v; } if (i == 28) { p28Y = v; } if (i == 29) { p29Y = v; }
+    if (i == 30) { p30Y = v; } if (i == 31) { p31Y = v; } if (i == 32) { p32Y = v; }
+    if (i == 33) { p33Y = v; } if (i == 34) { p34Y = v; } if (i == 35) { p35Y = v; }
+    if (i == 36) { p36Y = v; } if (i == 37) { p37Y = v; } if (i == 38) { p38Y = v; }
+    if (i == 39) { p39Y = v; } if (i == 40) { p40Y = v; } if (i == 41) { p41Y = v; }
+    if (i == 42) { p42Y = v; } if (i == 43) { p43Y = v; } if (i == 44) { p44Y = v; }
+    if (i == 45) { p45Y = v; } if (i == 46) { p46Y = v; } if (i == 47) { p47Y = v; }
+    if (i == 48) { p48Y = v; } if (i == 49) { p49Y = v; }
+}
+
+fn setPVX(i: i32, v: f32) {
+    if (i == 0) { p0VX = v; } if (i == 1) { p1VX = v; } if (i == 2) { p2VX = v; }
+    if (i == 3) { p3VX = v; } if (i == 4) { p4VX = v; } if (i == 5) { p5VX = v; }
+    if (i == 6) { p6VX = v; } if (i == 7) { p7VX = v; } if (i == 8) { p8VX = v; }
+    if (i == 9) { p9VX = v; } if (i == 10) { p10VX = v; } if (i == 11) { p11VX = v; }
+    if (i == 12) { p12VX = v; } if (i == 13) { p13VX = v; } if (i == 14) { p14VX = v; }
+    if (i == 15) { p15VX = v; } if (i == 16) { p16VX = v; } if (i == 17) { p17VX = v; }
+    if (i == 18) { p18VX = v; } if (i == 19) { p19VX = v; } if (i == 20) { p20VX = v; }
+    if (i == 21) { p21VX = v; } if (i == 22) { p22VX = v; } if (i == 23) { p23VX = v; }
+    if (i == 24) { p24VX = v; } if (i == 25) { p25VX = v; } if (i == 26) { p26VX = v; }
+    if (i == 27) { p27VX = v; } if (i == 28) { p28VX = v; } if (i == 29) { p29VX = v; }
+    if (i == 30) { p30VX = v; } if (i == 31) { p31VX = v; } if (i == 32) { p32VX = v; }
+    if (i == 33) { p33VX = v; } if (i == 34) { p34VX = v; } if (i == 35) { p35VX = v; }
+    if (i == 36) { p36VX = v; } if (i == 37) { p37VX = v; } if (i == 38) { p38VX = v; }
+    if (i == 39) { p39VX = v; } if (i == 40) { p40VX = v; } if (i == 41) { p41VX = v; }
+    if (i == 42) { p42VX = v; } if (i == 43) { p43VX = v; } if (i == 44) { p44VX = v; }
+    if (i == 45) { p45VX = v; } if (i == 46) { p46VX = v; } if (i == 47) { p47VX = v; }
+    if (i == 48) { p48VX = v; } if (i == 49) { p49VX = v; }
+}
+
+fn setPVY(i: i32, v: f32) {
+    if (i == 0) { p0VY = v; } if (i == 1) { p1VY = v; } if (i == 2) { p2VY = v; }
+    if (i == 3) { p3VY = v; } if (i == 4) { p4VY = v; } if (i == 5) { p5VY = v; }
+    if (i == 6) { p6VY = v; } if (i == 7) { p7VY = v; } if (i == 8) { p8VY = v; }
+    if (i == 9) { p9VY = v; } if (i == 10) { p10VY = v; } if (i == 11) { p11VY = v; }
+    if (i == 12) { p12VY = v; } if (i == 13) { p13VY = v; } if (i == 14) { p14VY = v; }
+    if (i == 15) { p15VY = v; } if (i == 16) { p16VY = v; } if (i == 17) { p17VY = v; }
+    if (i == 18) { p18VY = v; } if (i == 19) { p19VY = v; } if (i == 20) { p20VY = v; }
+    if (i == 21) { p21VY = v; } if (i == 22) { p22VY = v; } if (i == 23) { p23VY = v; }
+    if (i == 24) { p24VY = v; } if (i == 25) { p25VY = v; } if (i == 26) { p26VY = v; }
+    if (i == 27) { p27VY = v; } if (i == 28) { p28VY = v; } if (i == 29) { p29VY = v; }
+    if (i == 30) { p30VY = v; } if (i == 31) { p31VY = v; } if (i == 32) { p32VY = v; }
+    if (i == 33) { p33VY = v; } if (i == 34) { p34VY = v; } if (i == 35) { p35VY = v; }
+    if (i == 36) { p36VY = v; } if (i == 37) { p37VY = v; } if (i == 38) { p38VY = v; }
+    if (i == 39) { p39VY = v; } if (i == 40) { p40VY = v; } if (i == 41) { p41VY = v; }
+    if (i == 42) { p42VY = v; } if (i == 43) { p43VY = v; } if (i == 44) { p44VY = v; }
+    if (i == 45) { p45VY = v; } if (i == 46) { p46VY = v; } if (i == 47) { p47VY = v; }
+    if (i == 48) { p48VY = v; } if (i == 49) { p49VY = v; }
+}
+
+fn setPLife(i: i32, v: f32) {
+    if (i == 0) { p0Life = v; } if (i == 1) { p1Life = v; } if (i == 2) { p2Life = v; }
+    if (i == 3) { p3Life = v; } if (i == 4) { p4Life = v; } if (i == 5) { p5Life = v; }
+    if (i == 6) { p6Life = v; } if (i == 7) { p7Life = v; } if (i == 8) { p8Life = v; }
+    if (i == 9) { p9Life = v; } if (i == 10) { p10Life = v; } if (i == 11) { p11Life = v; }
+    if (i == 12) { p12Life = v; } if (i == 13) { p13Life = v; } if (i == 14) { p14Life = v; }
+    if (i == 15) { p15Life = v; } if (i == 16) { p16Life = v; } if (i == 17) { p17Life = v; }
+    if (i == 18) { p18Life = v; } if (i == 19) { p19Life = v; } if (i == 20) { p20Life = v; }
+    if (i == 21) { p21Life = v; } if (i == 22) { p22Life = v; } if (i == 23) { p23Life = v; }
+    if (i == 24) { p24Life = v; } if (i == 25) { p25Life = v; } if (i == 26) { p26Life = v; }
+    if (i == 27) { p27Life = v; } if (i == 28) { p28Life = v; } if (i == 29) { p29Life = v; }
+    if (i == 30) { p30Life = v; } if (i == 31) { p31Life = v; } if (i == 32) { p32Life = v; }
+    if (i == 33) { p33Life = v; } if (i == 34) { p34Life = v; } if (i == 35) { p35Life = v; }
+    if (i == 36) { p36Life = v; } if (i == 37) { p37Life = v; } if (i == 38) { p38Life = v; }
+    if (i == 39) { p39Life = v; } if (i == 40) { p40Life = v; } if (i == 41) { p41Life = v; }
+    if (i == 42) { p42Life = v; } if (i == 43) { p43Life = v; } if (i == 44) { p44Life = v; }
+    if (i == 45) { p45Life = v; } if (i == 46) { p46Life = v; } if (i == 47) { p47Life = v; }
+    if (i == 48) { p48Life = v; } if (i == 49) { p49Life = v; }
+}
+
+fn setPSize(i: i32, v: f32) {
+    if (i == 0) { p0Size = v; } if (i == 1) { p1Size = v; } if (i == 2) { p2Size = v; }
+    if (i == 3) { p3Size = v; } if (i == 4) { p4Size = v; } if (i == 5) { p5Size = v; }
+    if (i == 6) { p6Size = v; } if (i == 7) { p7Size = v; } if (i == 8) { p8Size = v; }
+    if (i == 9) { p9Size = v; } if (i == 10) { p10Size = v; } if (i == 11) { p11Size = v; }
+    if (i == 12) { p12Size = v; } if (i == 13) { p13Size = v; } if (i == 14) { p14Size = v; }
+    if (i == 15) { p15Size = v; } if (i == 16) { p16Size = v; } if (i == 17) { p17Size = v; }
+    if (i == 18) { p18Size = v; } if (i == 19) { p19Size = v; } if (i == 20) { p20Size = v; }
+    if (i == 21) { p21Size = v; } if (i == 22) { p22Size = v; } if (i == 23) { p23Size = v; }
+    if (i == 24) { p24Size = v; } if (i == 25) { p25Size = v; } if (i == 26) { p26Size = v; }
+    if (i == 27) { p27Size = v; } if (i == 28) { p28Size = v; } if (i == 29) { p29Size = v; }
+    if (i == 30) { p30Size = v; } if (i == 31) { p31Size = v; } if (i == 32) { p32Size = v; }
+    if (i == 33) { p33Size = v; } if (i == 34) { p34Size = v; } if (i == 35) { p35Size = v; }
+    if (i == 36) { p36Size = v; } if (i == 37) { p37Size = v; } if (i == 38) { p38Size = v; }
+    if (i == 39) { p39Size = v; } if (i == 40) { p40Size = v; } if (i == 41) { p41Size = v; }
+    if (i == 42) { p42Size = v; } if (i == 43) { p43Size = v; } if (i == 44) { p44Size = v; }
+    if (i == 45) { p45Size = v; } if (i == 46) { p46Size = v; } if (i == 47) { p47Size = v; }
+    if (i == 48) { p48Size = v; } if (i == 49) { p49Size = v; }
+}
+
+fn setPRGB(i: i32, r: i32, g: i32, b: i32) {
+    if (i == 0) { p0R = r; p0G = g; p0B = b; }
+    if (i == 1) { p1R = r; p1G = g; p1B = b; }
+    if (i == 2) { p2R = r; p2G = g; p2B = b; }
+    if (i == 3) { p3R = r; p3G = g; p3B = b; }
+    if (i == 4) { p4R = r; p4G = g; p4B = b; }
+    if (i == 5) { p5R = r; p5G = g; p5B = b; }
+    if (i == 6) { p6R = r; p6G = g; p6B = b; }
+    if (i == 7) { p7R = r; p7G = g; p7B = b; }
+    if (i == 8) { p8R = r; p8G = g; p8B = b; }
+    if (i == 9) { p9R = r; p9G = g; p9B = b; }
+    if (i == 10) { p10R = r; p10G = g; p10B = b; }
+    if (i == 11) { p11R = r; p11G = g; p11B = b; }
+    if (i == 12) { p12R = r; p12G = g; p12B = b; }
+    if (i == 13) { p13R = r; p13G = g; p13B = b; }
+    if (i == 14) { p14R = r; p14G = g; p14B = b; }
+    if (i == 15) { p15R = r; p15G = g; p15B = b; }
+    if (i == 16) { p16R = r; p16G = g; p16B = b; }
+    if (i == 17) { p17R = r; p17G = g; p17B = b; }
+    if (i == 18) { p18R = r; p18G = g; p18B = b; }
+    if (i == 19) { p19R = r; p19G = g; p19B = b; }
+    if (i == 20) { p20R = r; p20G = g; p20B = b; }
+    if (i == 21) { p21R = r; p21G = g; p21B = b; }
+    if (i == 22) { p22R = r; p22G = g; p22B = b; }
+    if (i == 23) { p23R = r; p23G = g; p23B = b; }
+    if (i == 24) { p24R = r; p24G = g; p24B = b; }
+    if (i == 25) { p25R = r; p25G = g; p25B = b; }
+    if (i == 26) { p26R = r; p26G = g; p26B = b; }
+    if (i == 27) { p27R = r; p27G = g; p27B = b; }
+    if (i == 28) { p28R = r; p28G = g; p28B = b; }
+    if (i == 29) { p29R = r; p29G = g; p29B = b; }
+    if (i == 30) { p30R = r; p30G = g; p30B = b; }
+    if (i == 31) { p31R = r; p31G = g; p31B = b; }
+    if (i == 32) { p32R = r; p32G = g; p32B = b; }
+    if (i == 33) { p33R = r; p33G = g; p33B = b; }
+    if (i == 34) { p34R = r; p34G = g; p34B = b; }
+    if (i == 35) { p35R = r; p35G = g; p35B = b; }
+    if (i == 36) { p36R = r; p36G = g; p36B = b; }
+    if (i == 37) { p37R = r; p37G = g; p37B = b; }
+    if (i == 38) { p38R = r; p38G = g; p38B = b; }
+    if (i == 39) { p39R = r; p39G = g; p39B = b; }
+    if (i == 40) { p40R = r; p40G = g; p40B = b; }
+    if (i == 41) { p41R = r; p41G = g; p41B = b; }
+    if (i == 42) { p42R = r; p42G = g; p42B = b; }
+    if (i == 43) { p43R = r; p43G = g; p43B = b; }
+    if (i == 44) { p44R = r; p44G = g; p44B = b; }
+    if (i == 45) { p45R = r; p45G = g; p45B = b; }
+    if (i == 46) { p46R = r; p46G = g; p46B = b; }
+    if (i == 47) { p47R = r; p47G = g; p47B = b; }
+    if (i == 48) { p48R = r; p48G = g; p48B = b; }
+    if (i == 49) { p49R = r; p49G = g; p49B = b; }
+}
+
+// Spawn a single particle at position
+fn spawnParticle(x: f32, y: f32, vx: f32, vy: f32, life: f32, size: f32, r: i32, g: i32, b: i32) {
+    setPX(nextParticle, x);
+    setPY(nextParticle, y);
+    setPVX(nextParticle, vx);
+    setPVY(nextParticle, vy);
+    setPLife(nextParticle, life);
+    setPSize(nextParticle, size);
+    setPRGB(nextParticle, r, g, b);
+
+    nextParticle = nextParticle + 1;
+    if (nextParticle >= 50) {
+        nextParticle = 0;
+    }
+}
+
+// Spawn explosion effect
+fn spawnExplosion(x: f32, y: f32) {
+    let count = 0;
+    while (count < 20) {
+        let angle: f32 = GetRandomValue(0, 360);
+        let speed: f32 = GetRandomValue(100, 400);
+        let vx = speed * 0.01745 * angle; // Approximate cos
+        let vy = speed * 0.01745 * (angle + 90.0); // Approximate sin
+        // Simpler velocity calculation
+        vx = (GetRandomValue(-400, 400));
+        vy = (GetRandomValue(-400, 400));
+
+        let r = GetRandomValue(200, 255);
+        let g = GetRandomValue(50, 200);
+        let b = GetRandomValue(0, 50);
+        let life: f32 = GetRandomValue(50, 150) / 100.0;
+        let size: f32 = GetRandomValue(3, 12);
+
+        spawnParticle(x, y, vx, vy, life, size, r, g, b);
+        count = count + 1;
+    }
+}
+
+// Spawn fire effect (continuous)
+fn spawnFire(x: f32, y: f32) {
+    let vx: f32 = GetRandomValue(-50, 50);
+    let vy: f32 = GetRandomValue(-300, -150);
+    let r = 255;
+    let g = GetRandomValue(100, 200);
+    let b = 0;
+    let life: f32 = GetRandomValue(50, 120) / 100.0;
+    let size: f32 = GetRandomValue(4, 10);
+
+    spawnParticle(x + GetRandomValue(-30, 30), y, vx, vy, life, size, r, g, b);
+}
+
+// Spawn sparkle effect
+fn spawnSparkle(x: f32, y: f32) {
+    let vx: f32 = GetRandomValue(-100, 100);
+    let vy: f32 = GetRandomValue(-100, 100);
+    let brightness = GetRandomValue(200, 255);
+    let life: f32 = GetRandomValue(30, 80) / 100.0;
+    let size: f32 = GetRandomValue(2, 6);
+
+    spawnParticle(x, y, vx, vy, life, size, brightness, brightness, brightness);
+}
+
+// Spawn snow effect
+fn spawnSnow() {
+    let x: f32 = GetRandomValue(0, screenWidth);
+    let y: f32 = -10.0;
+    let vx: f32 = GetRandomValue(-30, 30);
+    let vy: f32 = GetRandomValue(50, 150);
+    let brightness = GetRandomValue(220, 255);
+    let life: f32 = GetRandomValue(300, 500) / 100.0;
+    let size: f32 = GetRandomValue(2, 5);
+
+    spawnParticle(x, y, vx, vy, life, size, brightness, brightness, brightness);
+}
+
+// Spawn rainbow burst
+fn spawnRainbow(x: f32, y: f32) {
+    let count = 0;
+    while (count < 15) {
+        let vx: f32 = GetRandomValue(-300, 300);
+        let vy: f32 = GetRandomValue(-300, 300);
+        // Rainbow colors
+        let colorChoice = GetRandomValue(0, 6);
+        let r = 255;
+        let g = 255;
+        let b = 255;
+        if (colorChoice == 0) { r = 255; g = 0; b = 0; }      // Red
+        if (colorChoice == 1) { r = 255; g = 127; b = 0; }    // Orange
+        if (colorChoice == 2) { r = 255; g = 255; b = 0; }    // Yellow
+        if (colorChoice == 3) { r = 0; g = 255; b = 0; }      // Green
+        if (colorChoice == 4) { r = 0; g = 127; b = 255; }    // Blue
+        if (colorChoice == 5) { r = 75; g = 0; b = 130; }     // Indigo
+        if (colorChoice == 6) { r = 148; g = 0; b = 211; }    // Violet
+
+        let life: f32 = GetRandomValue(80, 150) / 100.0;
+        let size: f32 = GetRandomValue(5, 12);
+
+        spawnParticle(x, y, vx, vy, life, size, r, g, b);
+        count = count + 1;
+    }
+}
+
+// Update all particles
+fn updateParticles(dt: f32) {
+    let i = 0;
+    while (i < 50) {
+        let life = getPLife(i);
+        if (life > 0.0) {
+            // Update position
+            setPX(i, getPX(i) + getPVX(i) * dt);
+            setPY(i, getPY(i) + getPVY(i) * dt);
+
+            // Apply gravity for some effects
+            if (effectType == 1) {  // Explosion
+                setPVY(i, getPVY(i) + 400.0 * dt);
+            }
+            if (effectType == 2) {  // Fire (float up)
+                setPVY(i, getPVY(i) - 100.0 * dt);
+            }
+            if (effectType == 5) {  // Rainbow (gravity)
+                setPVY(i, getPVY(i) + 300.0 * dt);
+            }
+
+            // Decay life
+            setPLife(i, life - dt);
+
+            // Shrink particle over time
+            let size = getPSize(i);
+            if (size > 0.5) {
+                setPSize(i, size - dt * 3.0);
+            }
+        }
+        i = i + 1;
+    }
+}
+
+// Draw all particles
+fn drawParticles() {
+    let i = 0;
+    while (i < 50) {
+        let life = getPLife(i);
+        if (life > 0.0) {
+            let x = getPX(i);
+            let y = getPY(i);
+            let size = getPSize(i);
+            let r = getPR(i);
+            let g = getPG(i);
+            let b = getPB(i);
+
+            // Fade alpha based on remaining life
+            let alpha = life;
+            if (alpha > 1.0) { alpha = 1.0; }
+            let alphaInt = (alpha * 255.0);
+            if (alphaInt > 255) { alphaInt = 255; }
+            if (alphaInt < 0) { alphaInt = 0; }
+
+            let color = Color(r, g, b, alphaInt);
+
+            DrawCircle(x, y, size, color);
+
+            // Add glow effect for fire/sparkle
+            if (effectType == 2) {
+                let glowColor = Color(r, g, b, alphaInt / 3);
+                DrawCircle(x, y, size * 2.0, glowColor);
+            }
+            if (effectType == 3) {
+                let glowColor = Color(255, 255, 200, alphaInt / 2);
+                DrawCircle(x, y, size * 1.5, glowColor);
+            }
+        }
+        i = i + 1;
+    }
+}
+
+// Get effect name
+fn getEffectName(): string {
+    if (effectType == 1) { return effectNames0; }
+    if (effectType == 2) { return effectNames1; }
+    if (effectType == 3) { return effectNames2; }
+    if (effectType == 4) { return effectNames3; }
+    if (effectType == 5) { return effectNames4; }
+    return "Unknown";
+}
+
+// Continuous effect spawning timer
+let spawnTimer: f32 = 0.0;
+
+InitWindow(screenWidth, screenHeight, "Particle Effects Demo - Hemlock + Raylib");
+SetTargetFPS(60);
+
+while (WindowShouldClose() == 0) {
+    let dt = GetFrameTime();
+
+    // Effect type selection
+    if (IsKeyPressed(KEY_ONE) != 0) { effectType = 1; }
+    if (IsKeyPressed(KEY_TWO) != 0) { effectType = 2; }
+    if (IsKeyPressed(KEY_THREE) != 0) { effectType = 3; }
+    if (IsKeyPressed(KEY_FOUR) != 0) { effectType = 4; }
+    if (IsKeyPressed(KEY_FIVE) != 0) { effectType = 5; }
+
+    // Clear particles
+    if (IsKeyPressed(KEY_C) != 0) {
+        let i = 0;
+        while (i < 50) {
+            setPLife(i, 0.0);
+            i = i + 1;
+        }
+    }
+
+    // Spawn fireworks with space
+    if (IsKeyPressed(KEY_SPACE) != 0) {
+        let fx: f32 = GetRandomValue(100, screenWidth - 100);
+        let fy: f32 = GetRandomValue(100, 400);
+        spawnRainbow(fx, fy);
+    }
+
+    // Mouse click to spawn effect
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) != 0) {
+        let mx: f32 = GetMouseX();
+        let my: f32 = GetMouseY();
+
+        if (effectType == 1) { spawnExplosion(mx, my); }
+        if (effectType == 3) {
+            let count = 0;
+            while (count < 10) {
+                spawnSparkle(mx + GetRandomValue(-20, 20), my + GetRandomValue(-20, 20));
+                count = count + 1;
+            }
+        }
+        if (effectType == 5) { spawnRainbow(mx, my); }
+    }
+
+    // Continuous effects
+    spawnTimer = spawnTimer + dt;
+    if (effectType == 2) {  // Fire fountain
+        if (spawnTimer > 0.02) {
+            spawnTimer = 0.0;
+            spawnFire(screenWidth / 2, screenHeight - 50);
+        }
+    }
+    if (effectType == 4) {  // Snow
+        if (spawnTimer > 0.1) {
+            spawnTimer = 0.0;
+            spawnSnow();
+        }
+    }
+
+    // Update particles
+    updateParticles(dt);
+
+    // Draw
+    BeginDrawing();
+
+    // Background based on effect
+    if (effectType == 4) {
+        ClearBackground(Color(30, 40, 60, 255));  // Dark blue for snow
+    } else {
+        ClearBackground(Color(20, 20, 30, 255));  // Dark for other effects
+    }
+
+    // Draw particles
+    drawParticles();
+
+    // Draw fire source indicator
+    if (effectType == 2) {
+        DrawRectangle(screenWidth / 2 - 40, screenHeight - 30, 80, 30, MAROON);
+        DrawRectangle(screenWidth / 2 - 35, screenHeight - 25, 70, 20, ORANGE);
+    }
+
+    // UI Panel
+    DrawRectangle(0, 0, screenWidth, 70, Color(0, 0, 0, 180));
+
+    DrawText("PARTICLE EFFECTS DEMO", 10, 8, 24, WHITE);
+    DrawText("Current Effect: " + getEffectName(), 10, 38, 18, GOLD);
+
+    // Controls
+    DrawText("1-5: Effects | Click: Spawn | SPACE: Firework | C: Clear", 350, 10, 14, LIGHTGRAY);
+    DrawText("FPS: " + GetFPS(), screenWidth - 80, 10, 16, GREEN);
+
+    // Effect buttons
+    let bx = 350;
+    let by = 35;
+    let bw = 90;
+    let bh = 25;
+
+    // Draw effect buttons
+    if (effectType == 1) { DrawRectangle(bx, by, bw, bh, ORANGE); }
+    else { DrawRectangle(bx, by, bw, bh, DARKGRAY); }
+    DrawText("1:Explosion", bx + 5, by + 5, 14, WHITE);
+
+    if (effectType == 2) { DrawRectangle(bx + 95, by, bw, bh, ORANGE); }
+    else { DrawRectangle(bx + 95, by, bw, bh, DARKGRAY); }
+    DrawText("2:Fire", bx + 115, by + 5, 14, WHITE);
+
+    if (effectType == 3) { DrawRectangle(bx + 190, by, bw, bh, ORANGE); }
+    else { DrawRectangle(bx + 190, by, bw, bh, DARKGRAY); }
+    DrawText("3:Sparkle", bx + 200, by + 5, 14, WHITE);
+
+    if (effectType == 4) { DrawRectangle(bx + 285, by, bw, bh, ORANGE); }
+    else { DrawRectangle(bx + 285, by, bw, bh, DARKGRAY); }
+    DrawText("4:Snow", bx + 305, by + 5, 14, WHITE);
+
+    if (effectType == 5) { DrawRectangle(bx + 380, by, bw, bh, ORANGE); }
+    else { DrawRectangle(bx + 380, by, bw, bh, DARKGRAY); }
+    DrawText("5:Rainbow", bx + 385, by + 5, 14, WHITE);
+
+    EndDrawing();
+}
+
+CloseWindow();
+print("Particle effects demo closed!");

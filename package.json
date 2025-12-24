@@ -5,7 +5,7 @@
   "author": "hemlang",
   "license": "MIT",
   "repository": "https://github.com/hemlang/raylock",
-  "main": "src/index.hml",
+  "main": "src/raylib.hml",
   "keywords": [
     "raylib",
     "graphics",

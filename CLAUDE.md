@@ -56,8 +56,7 @@ hemlock examples/animation.hml
 ## Key Files
 
 - `package.json` - hpm module manifest
-- `src/index.hml` - Module entry point (re-exports raylib.hml)
-- `src/raylib.hml` - Core raylib FFI bindings and utility functions
+- `src/raylib.hml` - Core raylib FFI bindings and utility functions (module entry point)
 - `src/raylib_loader.hml` - Cross-platform raylib library loader (macOS + Linux)
 - `examples/` - Example Hemlock programs using raylib
 - `tests/` - Test suite for utility functions

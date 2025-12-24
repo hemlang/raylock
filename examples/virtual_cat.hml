@@ -6,7 +6,7 @@ import {
     InitWindow, CloseWindow, WindowShouldClose, SetTargetFPS, GetFPS, GetFrameTime,
     BeginDrawing, EndDrawing, ClearBackground,
     DrawCircle, DrawCircleLines, DrawRectangle, DrawRectangleLines,
-    DrawEllipse, DrawTriangle, DrawLine, DrawText,
+    DrawEllipse, DrawTriangleFill, DrawLine, DrawText,
     IsMouseButtonPressed, IsMouseButtonDown, GetMouseX, GetMouseY,
     IsKeyPressed, GetRandomValue, GetTime,
     CheckCollisionPointCircleXY, CheckCollisionPointRectXY,
@@ -88,10 +88,13 @@ fn distance(x1: f32, y1: f32, x2: f32, y2: f32): f32 {
     return dx + dy * 0.7;
 }
 
-// Draw the cat - using DrawRectangle since DrawCircle/Ellipse seem broken
+// Draw the cat
 fn drawCat() {
     let ix: i32 = catX;
     let iy: i32 = catY;
+    // f32 versions for triangle drawing (DrawTriangle uses Vector2/floats)
+    let fx: f32 = catX;
+    let fy: f32 = catY;
 
     // Shadow
     DrawRectangle(ix - 40, iy + 50, 80, 20, DARKGRAY);
@@ -119,17 +122,19 @@ fn drawCat() {
 
     // Head
     let headY = iy - 25;
+    let headYf: f32 = fy - 25.0;
     if (catState == 2) {
         headY = iy + 5;
+        headYf = fy + 5.0;
     }
     DrawRectangle(ix - 35, headY - 30, 70, 60, ORANGE);
 
-    // Ears
-    DrawTriangle(ix - 30, headY - 25, ix - 35, headY - 55, ix - 10, headY - 30, ORANGE);
-    DrawTriangle(ix + 30, headY - 25, ix + 35, headY - 55, ix + 10, headY - 30, ORANGE);
+    // Ears (CCW winding: swap v2 and v3 from original)
+    DrawTriangleFill(fx - 30.0, headYf - 25.0, fx - 10.0, headYf - 30.0, fx - 35.0, headYf - 55.0, ORANGE);
+    DrawTriangleFill(fx + 30.0, headYf - 25.0, fx + 35.0, headYf - 55.0, fx + 10.0, headYf - 30.0, ORANGE);
     // Inner ear
-    DrawTriangle(ix - 25, headY - 30, ix - 32, headY - 48, ix - 15, headY - 32, PINK);
-    DrawTriangle(ix + 25, headY - 30, ix + 32, headY - 48, ix + 15, headY - 32, PINK);
+    DrawTriangleFill(fx - 25.0, headYf - 30.0, fx - 15.0, headYf - 32.0, fx - 32.0, headYf - 48.0, PINK);
+    DrawTriangleFill(fx + 25.0, headYf - 30.0, fx + 32.0, headYf - 48.0, fx + 15.0, headYf - 32.0, PINK);
 
     // Face - Eyes (using rectangles)
     let eyeY = headY - 8;
@@ -139,8 +144,8 @@ fn drawCat() {
     DrawRectangle(ix - 14, eyeY - 3, 6, 6, BLACK);
     DrawRectangle(ix + 10, eyeY - 3, 6, 6, BLACK);
 
-    // Nose
-    DrawTriangle(ix, headY + 8, ix - 6, headY + 2, ix + 6, headY + 2, PINK);
+    // Nose (CCW winding)
+    DrawTriangleFill(fx, headYf + 8.0, fx + 6.0, headYf + 2.0, fx - 6.0, headYf + 2.0, PINK);
 
     // Mouth
     DrawLine(ix, headY + 10, ix - 8, headY + 16, BROWN);
@@ -203,17 +208,20 @@ fn drawToyBall() {
     DrawRectangle(bx + 2, by + 2, 6, 6, YELLOW);
 }
 
-// Draw toy mouse (using rectangles)
+// Draw toy mouse
 fn drawToyMouse() {
     let mx: i32 = toyMouseX;
     let my: i32 = toyMouseY;
+    // f32 versions for triangles
+    let mxf: f32 = toyMouseX;
+    let myf: f32 = toyMouseY;
     // Body
     DrawRectangle(mx - 18, my - 10, 36, 20, LIGHTGRAY);
     // Head
     DrawRectangle(mx + 12, my - 8, 18, 16, LIGHTGRAY);
-    // Ears
-    DrawTriangle(mx + 18, my - 8, mx + 14, my - 18, mx + 24, my - 10, PINK);
-    DrawTriangle(mx + 26, my - 6, mx + 22, my - 16, mx + 32, my - 8, PINK);
+    // Ears (CCW winding)
+    DrawTriangleFill(mxf + 18.0, myf - 8.0, mxf + 24.0, myf - 10.0, mxf + 14.0, myf - 18.0, PINK);
+    DrawTriangleFill(mxf + 26.0, myf - 6.0, mxf + 32.0, myf - 8.0, mxf + 22.0, myf - 16.0, PINK);
     // Eyes
     DrawRectangle(mx + 22, my - 4, 4, 4, BLACK);
     // Nose
@@ -225,17 +233,20 @@ fn drawToyMouse() {
     DrawLine(mx + 30, my + 2, mx + 42, my + 5, DARKGRAY);
 }
 
-// Draw speech bubble (using rectangles)
+// Draw speech bubble
 fn drawBubble() {
     if (showBubble != 0) {
         let bx: i32 = catX + 50.0;
         let by: i32 = catY - 80.0;
+        // f32 versions for triangle
+        let bxf: f32 = catX + 50.0;
+        let byf: f32 = catY - 80.0;
 
         // Bubble
         DrawRectangle(bx - 45, by - 25, 90, 50, WHITE);
         DrawRectangleLines(bx - 45, by - 25, 90, 50, DARKGRAY);
-        // Pointer
-        DrawTriangle(bx - 30, by + 20, bx - 15, by + 20, bx - 25, by + 35, WHITE);
+        // Pointer (CCW winding)
+        DrawTriangleFill(bxf - 30.0, byf + 20.0, bxf - 25.0, byf + 35.0, bxf - 15.0, byf + 20.0, WHITE);
 
         // Text
         if (bubbleText == 1) { DrawText("Meow!", bx - 25, by - 8, 18, BLACK); }

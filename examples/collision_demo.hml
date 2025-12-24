@@ -131,16 +131,10 @@ while (WindowShouldClose() == 0) {
     DrawRectangle(r2x, r2y, r2w, r2h, r2Color);
     DrawText("Rect 2", r2x + 20, r2y + r2h + 10, 14, DARKGRAY);
 
-    // Draw Triangle
+    // Draw Triangle (using f32 directly since DrawTriangle uses Vector2)
     let triColor = LIME;
     if (hitTriangle != 0) { triColor = RED; }
-    let tax: i32 = triAX;
-    let tay: i32 = triAY;
-    let tbx: i32 = triBX;
-    let tby: i32 = triBY;
-    let tcx: i32 = triCX;
-    let tcy: i32 = triCY;
-    DrawTriangle(tax, tay, tbx, tby, tcx, tcy, triColor);
+    DrawTriangle(triAX, triAY, triBX, triBY, triCX, triCY, triColor);
     DrawText("Triangle", 420, 510, 14, DARKGRAY);
 
     // Draw draggable circle at mouse position

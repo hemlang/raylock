@@ -1,0 +1,38 @@
+// Simple triangle test using DrawTriangleFill (rlgl-based)
+import {
+    InitWindow, CloseWindow, WindowShouldClose, SetTargetFPS,
+    BeginDrawing, EndDrawing, ClearBackground,
+    DrawTriangleFill, DrawTriangleOutline, DrawRectangle, DrawText,
+    RAYWHITE, RED, BLUE, GREEN, ORANGE, BLACK, YELLOW
+} from "../src/raylib.hml";
+
+InitWindow(800, 600, "Triangle Test - DrawTriangleFill");
+SetTargetFPS(60);
+
+while (WindowShouldClose() == 0) {
+    BeginDrawing();
+    ClearBackground(RAYWHITE);
+
+    DrawText("Triangle Test - using rlgl-based DrawTriangleFill", 50, 30, 20, BLACK);
+
+    // Reference rectangles
+    DrawRectangle(100, 100, 10, 10, BLACK);
+    DrawRectangle(200, 100, 10, 10, BLACK);
+    DrawRectangle(150, 200, 10, 10, BLACK);
+
+    // Test filled triangles (counter-clockwise winding order)
+    DrawText("Filled triangles:", 50, 250, 16, BLACK);
+    // CCW: bottom -> right -> left (in screen coords where Y goes down)
+    DrawTriangleFill(150.0, 350.0, 200.0, 280.0, 100.0, 280.0, RED);
+    DrawTriangleFill(350.0, 350.0, 400.0, 280.0, 300.0, 280.0, BLUE);
+    DrawTriangleFill(550.0, 350.0, 600.0, 280.0, 500.0, 280.0, GREEN);
+
+    // Test outline triangles
+    DrawText("Outline triangles:", 50, 400, 16, BLACK);
+    DrawTriangleOutline(150.0, 550.0, 100.0, 480.0, 200.0, 480.0, ORANGE);
+    DrawTriangleOutline(350.0, 550.0, 300.0, 480.0, 400.0, 480.0, YELLOW);
+
+    EndDrawing();
+}
+
+CloseWindow();

@@ -49,8 +49,8 @@ while (WindowShouldClose() == 0) {
 
     // Row 2: Triangles and polygons
     DrawText("Triangles", 80, 200, 16, DARKGRAY);
-    DrawTriangle(100, 280, 60, 220, 140, 220, ORANGE);
-    DrawTriangleLines(200, 280, 160, 220, 240, 220, PURPLE);
+    DrawTriangle(100.0, 280.0, 60.0, 220.0, 140.0, 220.0, ORANGE);
+    DrawTriangleLines(200.0, 280.0, 160.0, 220.0, 240.0, 220.0, PURPLE);
 
     DrawText("Polygons", 320, 200, 16, DARKGRAY);
     // Pentagon

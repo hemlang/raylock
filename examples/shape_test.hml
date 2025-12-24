@@ -1,0 +1,105 @@
+// Minimal test to investigate shape rendering with computed vs literal values
+import {
+    InitWindow, CloseWindow, WindowShouldClose, SetTargetFPS,
+    BeginDrawing, EndDrawing, ClearBackground,
+    DrawCircle, DrawTriangle, DrawText,
+    RAYWHITE, RED, BLUE, GREEN, ORANGE, PURPLE, LIME, SKYBLUE, MAGENTA, GOLD, DARKGREEN, BLACK
+} from "../src/raylib.hml";
+
+InitWindow(800, 600, "Shape Test - Computed vs Literal");
+SetTargetFPS(60);
+
+// Pre-declare all variables outside the loop
+// Test 2: Variables only (i32 for DrawCircle)
+let x2: i32 = 100;
+let y2: i32 = 250;
+let r2: f32 = 30.0;
+// f32 for DrawTriangle (uses Vector2)
+let t2x1: f32 = 200.0;
+let t2y1: f32 = 300.0;
+let t2x2: f32 = 170.0;
+let t2y2: f32 = 250.0;
+let t2x3: f32 = 230.0;
+let t2y3: f32 = 250.0;
+
+// Test 3: Arithmetic in call
+let bx: i32 = 450;
+let by: i32 = 100;
+
+// Test 4: Computed values stored first
+let cx: i32 = 450;
+let cy: i32 = 250;
+let cx1: i32 = cx;
+let cy1: i32 = cy;
+
+// Test 5: f32 to i32 conversion
+let fx: f32 = 100.0;
+let fy: f32 = 420.0;
+let ix5: i32 = fx;
+let iy5: i32 = fy;
+
+// Test 6: f32 converted then arithmetic
+let fx6: f32 = 450.0;
+let fy6: f32 = 420.0;
+let ix6: i32 = fx6;
+let iy6: i32 = fy6;
+let px6: i32 = ix6;
+let py6: i32 = iy6;
+
+// Test 7: Triangle with f32 arithmetic
+let tx: f32 = 700.0;
+let ty: f32 = 150.0;
+
+// Test 8: Triangle pre-computed (f32)
+let t8x: f32 = 700.0;
+let t8y: f32 = 300.0;
+let t8x1: f32 = t8x;
+let t8y1: f32 = t8y;
+let t8x2: f32 = 670.0;
+let t8y2: f32 = 250.0;
+let t8x3: f32 = 730.0;
+let t8y3: f32 = 250.0;
+
+while (WindowShouldClose() == 0) {
+    BeginDrawing();
+    ClearBackground(RAYWHITE);
+
+    // Test 1: Literal values
+    DrawText("Test 1: Literal values", 50, 30, 20, BLACK);
+    DrawCircle(100, 100, 30.0, RED);
+    DrawTriangle(200.0, 150.0, 170.0, 100.0, 230.0, 100.0, BLUE);
+
+    // Test 2: Variables only, no arithmetic in call
+    DrawText("Test 2: Variables (no arithmetic)", 50, 180, 20, BLACK);
+    DrawCircle(x2, y2, r2, GREEN);
+    DrawTriangle(t2x1, t2y1, t2x2, t2y2, t2x3, t2y3, ORANGE);
+
+    // Test 3: Arithmetic in function call
+    DrawText("Test 3: Arithmetic in call", 350, 30, 20, BLACK);
+    DrawCircle(bx + 0, by + 0, 30.0, RED);
+    DrawCircle(bx - 50 + 50, by, 30.0, PURPLE);
+
+    // Test 4: Computed values stored first, then passed
+    DrawText("Test 4: Pre-computed variables", 350, 180, 20, BLACK);
+    DrawCircle(cx1, cy1, 30.0, LIME);
+
+    // Test 5: f32 to i32 conversion then use
+    DrawText("Test 5: f32 to i32 converted", 50, 350, 20, BLACK);
+    DrawCircle(ix5, iy5, 30.0, SKYBLUE);
+
+    // Test 6: f32 converted, then arithmetic stored in new var
+    DrawText("Test 6: Converted + pre-computed", 350, 350, 20, BLACK);
+    DrawCircle(px6, py6, 30.0, MAGENTA);
+
+    // Test 7: Triangle with arithmetic in call (f32)
+    DrawText("Test 7: Triangle arithmetic", 600, 30, 20, BLACK);
+    DrawTriangle(tx, ty, tx - 30.0, ty - 50.0, tx + 30.0, ty - 50.0, GOLD);
+
+    // Test 8: Triangle with pre-computed coords (f32)
+    DrawText("Test 8: Triangle pre-computed", 600, 180, 20, BLACK);
+    DrawTriangle(t8x1, t8y1, t8x2, t8y2, t8x3, t8y3, DARKGREEN);
+
+    EndDrawing();
+}
+
+CloseWindow();

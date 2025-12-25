@@ -17,9 +17,8 @@ import {
     DrawText, DrawFPS,
     // Colors
     RAYWHITE, RED, GREEN, BLUE, YELLOW, ORANGE, PURPLE, PINK,
-    DARKGRAY, BLACK, WHITE, SKYBLUE, LIME, GOLD,
-    // Structs
-    Vector2
+    DARKGRAY, BLACK, WHITE, SKYBLUE, LIME, GOLD
+    // Note: Vector2 and other struct types are auto-available after importing
 } from "../src/raylib.hml";
 
 let screenWidth = 1000;

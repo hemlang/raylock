@@ -113,12 +113,15 @@ fn myFunc(x: i32) -> i32 {
 Use `string` not `str` for string types.
 
 ### FFI Struct Support
-Hemlock now has FFI struct support. The bindings define these structs that match raylib's C structures:
+Hemlock now has FFI struct support. The bindings define these structs that match raylib's C structures: `Vector2`, `Vector3`, `Vector4`, `Rectangle`, `Texture2D`, `Image`, `Font`, `Sound`, `Music`, `Camera2D`, `RenderTexture2D`.
+
+**Important: Struct types are auto-imported.** When you import anything from the raylib module, all struct types become globally available. Do NOT include them in the import list:
 
 ```hemlock
-import { Vector2, Rectangle, Texture2D, Image, Font, Sound, Music } from "hemlang/raylock";
+// GOOD - struct types are auto-available after any import
+import { InitWindow, DrawCircleV, RED } from "hemlang/raylock";
 
-// Create a Vector2
+// Create a Vector2 - the type is already available
 let pos: Vector2 = { x: 100.0, y: 200.0 };
 
 // Create a Rectangle
@@ -128,6 +131,11 @@ let bounds: Rectangle = { x: 0.0, y: 0.0, width: 800.0, height: 450.0 };
 DrawCircleV(pos, 50.0, RED);
 DrawRectangleRec(bounds, BLUE);
 DrawTriangle({ x: 100.0, y: 200.0 }, { x: 150.0, y: 100.0 }, { x: 50.0, y: 100.0 }, GREEN);
+```
+
+```hemlock
+// BAD - do NOT try to explicitly import struct types
+import { Vector2, Rectangle } from "hemlang/raylock";  // Error: Undefined variable 'Vector2'
 ```
 
 **Important: Counter-Clockwise Winding Order for Triangles**

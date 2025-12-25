@@ -113,7 +113,14 @@ fn myFunc(x: i32) -> i32 {
 Use `string` not `str` for string types.
 
 ### FFI Struct Support
-Hemlock now has FFI struct support. The bindings define these structs that match raylib's C structures: `Vector2`, `Vector3`, `Vector4`, `Rectangle`, `Texture2D`, `Image`, `Font`, `Sound`, `Music`, `Camera2D`, `RenderTexture2D`.
+Hemlock now has FFI struct support. The bindings define these structs that match raylib's C structures:
+
+**2D Types:** `Vector2`, `Vector3`, `Vector4`, `Rectangle`, `Camera2D`
+**3D Types:** `Camera3D`, `Matrix`, `Ray`, `RayCollision`, `BoundingBox`
+**Textures:** `Texture2D`, `Image`, `RenderTexture2D`
+**Text:** `Font`, `GlyphInfo`
+**Audio:** `Sound`, `Music`
+**Colors:** `ColorStruct`
 
 **Important: Struct types are auto-imported.** When you import anything from the raylib module, all struct types become globally available. Do NOT include them in the import list:
 
@@ -192,3 +199,142 @@ This is critical for:
 These colors are defined: `LIGHTGRAY`, `GRAY`, `DARKGRAY`, `YELLOW`, `GOLD`, `ORANGE`, `PINK`, `RED`, `MAROON`, `GREEN`, `LIME`, `DARKGREEN`, `SKYBLUE`, `BLUE`, `DARKBLUE`, `PURPLE`, `VIOLET`, `DARKPURPLE`, `BEIGE`, `BROWN`, `DARKBROWN`, `WHITE`, `BLACK`, `BLANK`, `MAGENTA`, `RAYWHITE`
 
 Note: `CYAN` is NOT defined - use `SKYBLUE` instead.
+
+## 3D Graphics Support
+
+The bindings include full 3D graphics support:
+
+### Camera3D
+
+```hemlock
+import { BeginMode3D, EndMode3D, DrawCube, DrawGrid, CAMERA_PERSPECTIVE } from "hemlang/raylock";
+
+// Create a 3D camera
+let camera: Camera3D = {
+    position: { x: 10.0, y: 10.0, z: 10.0 },
+    target: { x: 0.0, y: 0.0, z: 0.0 },
+    up: { x: 0.0, y: 1.0, z: 0.0 },
+    fovy: 45.0,
+    projection: CAMERA_PERSPECTIVE
+};
+
+// In your render loop:
+BeginMode3D(camera);
+DrawCube({ x: 0.0, y: 0.0, z: 0.0 }, 2.0, 2.0, 2.0, RED);
+DrawGrid(10, 1.0);
+EndMode3D();
+```
+
+### 3D Shapes
+- `DrawCube`, `DrawCubeV`, `DrawCubeWires`
+- `DrawSphere`, `DrawSphereEx`, `DrawSphereWires`
+- `DrawCylinder`, `DrawCylinderEx`, `DrawCylinderWires`
+- `DrawCapsule`, `DrawCapsuleWires`
+- `DrawPlane`, `DrawGrid`, `DrawRay`
+- `DrawLine3D`, `DrawPoint3D`, `DrawCircle3D`, `DrawTriangle3D`
+
+### 3D Collision Detection
+- `CheckCollisionSpheres`, `CheckCollisionBoxes`, `CheckCollisionBoxSphere`
+- `GetRayCollisionSphere`, `GetRayCollisionBox`, `GetRayCollisionTriangle`, `GetRayCollisionQuad`
+
+## Shader Support
+
+```hemlock
+import { LoadShader, BeginShaderMode, EndShaderMode, SetShaderValue, SHADER_UNIFORM_FLOAT } from "hemlang/raylock";
+
+let shader = LoadShader("vertex.glsl", "fragment.glsl");
+let timeLoc = GetShaderLocation(shader, "time");
+
+// In render loop:
+BeginShaderMode(shader);
+// Draw with shader...
+EndShaderMode();
+
+// Don't forget to unload:
+UnloadShader(shader);
+```
+
+## Spline Drawing
+
+Draw smooth curves using splines:
+
+```hemlock
+import { DrawSplineLinear, DrawSplineCatmullRom, DrawSplineBezierCubic } from "hemlang/raylock";
+
+// Points array (needs to be allocated and filled)
+// DrawSplineLinear(points, pointCount, 2.0, RED);
+// DrawSplineCatmullRom(points, pointCount, 2.0, GREEN);
+// DrawSplineBezierCubic(points, pointCount, 2.0, BLUE);
+
+// Or get points along a spline for custom use:
+let point = GetSplinePointLinear(startPos, endPos, 0.5);  // t=0.5 means halfway
+```
+
+## Camera2D for Scrolling/Zooming
+
+```hemlock
+import { BeginMode2D, EndMode2D, GetScreenToWorld2D, GetWorldToScreen2D } from "hemlang/raylock";
+
+let camera: Camera2D = {
+    offset: { x: 400.0, y: 300.0 },  // Center of screen
+    target: { x: 0.0, y: 0.0 },       // What we're looking at
+    rotation: 0.0,
+    zoom: 1.0
+};
+
+// In render loop:
+BeginMode2D(camera);
+// Draw world objects here - they will be affected by camera
+DrawCircleV({ x: 0.0, y: 0.0 }, 50.0, RED);
+EndMode2D();
+
+// Convert mouse position to world coordinates:
+let worldPos = GetScreenToWorld2D(GetMousePosition(), camera);
+```
+
+## Text Utilities
+
+```hemlock
+import { TextLength, TextToUpper, TextToLower, TextFindIndex, TextToInteger } from "hemlang/raylock";
+
+let len = TextLength("Hello");  // 5
+let upper = TextToUpper("hello");  // "HELLO"
+let lower = TextToLower("HELLO");  // "hello"
+let idx = TextFindIndex("Hello World", "World");  // 6
+let num = TextToInteger("42");  // 42
+```
+
+## Native Color Functions
+
+```hemlock
+import { Fade, ColorToHSV, ColorFromHSV, ColorLerp } from "hemlang/raylock";
+
+let transparent = Fade(RED, 0.5);  // RED with 50% alpha
+let hsv = ColorToHSV(RED);  // Get hue, saturation, value
+let color = ColorFromHSV(0.0, 1.0, 1.0);  // Pure red from HSV
+let blend = ColorLerp(RED, BLUE, 0.5);  // Blend between colors
+```
+
+## Extended rlgl Functions
+
+For custom low-level rendering:
+
+```hemlock
+import {
+    rlPushMatrix, rlPopMatrix, rlTranslatef, rlRotatef, rlScalef,
+    rlEnableDepthTest, rlDisableDepthTest,
+    rlEnableWireMode, rlDisableWireMode
+} from "hemlang/raylock";
+
+// Transform stack
+rlPushMatrix();
+rlTranslatef(100.0, 100.0, 0.0);
+rlRotatef(45.0, 0.0, 0.0, 1.0);
+// Draw something...
+rlPopMatrix();
+
+// Toggle wireframe mode
+rlEnableWireMode();
+// Draw shapes as wireframes...
+rlDisableWireMode();
+```

@@ -104,6 +104,43 @@ export define Camera2D {
     zoom: f32,          // Camera zoom (scaling)
 }
 
+// Camera3D - 3D camera
+export define Camera3D {
+    position: Vector3,  // Camera position
+    target: Vector3,    // Camera target it looks at
+    up: Vector3,        // Camera up vector (rotation over its axis)
+    fovy: f32,          // Camera field-of-view Y (in degrees) in perspective, or size in orthographic
+    projection: i32,    // Camera projection: CAMERA_PERSPECTIVE or CAMERA_ORTHOGRAPHIC
+}
+
+// Matrix - 4x4 matrix for 3D transformations (column-major, OpenGL style)
+export define Matrix {
+    m0: f32, m4: f32, m8: f32, m12: f32,
+    m1: f32, m5: f32, m9: f32, m13: f32,
+    m2: f32, m6: f32, m10: f32, m14: f32,
+    m3: f32, m7: f32, m11: f32, m15: f32,
+}
+
+// Ray - for 3D picking
+export define Ray {
+    position: Vector3,   // Ray position (origin)
+    direction: Vector3,  // Ray direction (normalized)
+}
+
+// RayCollision - raycast hit information
+export define RayCollision {
+    hit: i32,            // Did the ray hit something? (bool)
+    distance: f32,       // Distance to the nearest hit
+    point: Vector3,      // Point of the nearest hit
+    normal: Vector3,     // Surface normal of hit
+}
+
+// BoundingBox - 3D bounding box
+export define BoundingBox {
+    min: Vector3,        // Minimum vertex box-corner
+    max: Vector3,        // Maximum vertex box-corner
+}
+
 // Sound - Audio stream
 export define Sound {
     stream_buffer: ptr,     // Pointer to internal data
@@ -207,6 +244,90 @@ export extern fn EndDrawing(): void;
 export extern fn BeginBlendMode(mode: i32): void;
 export extern fn EndBlendMode(): void;
 
+// ============================================================================
+// Core - Camera2D
+// ============================================================================
+
+export extern fn BeginMode2D(camera: Camera2D): void;
+export extern fn EndMode2D(): void;
+export extern fn GetScreenToWorld2D(position: Vector2, camera: Camera2D): Vector2;
+export extern fn GetWorldToScreen2D(position: Vector2, camera: Camera2D): Vector2;
+export extern fn GetCameraMatrix2D(camera: Camera2D): ptr;  // Returns Matrix (16 floats)
+
+// ============================================================================
+// Core - Camera3D
+// ============================================================================
+
+export extern fn BeginMode3D(camera: Camera3D): void;
+export extern fn EndMode3D(): void;
+export extern fn GetCameraMatrix(camera: Camera3D): Matrix;
+export extern fn UpdateCamera(camera: ptr, mode: i32): void;  // camera: Camera3D*
+export extern fn UpdateCameraPro(camera: ptr, movement: Vector3, rotation: Vector3, zoom: f32): void;
+
+// Camera projection types
+export let CAMERA_PERSPECTIVE: i32  = 0;
+export let CAMERA_ORTHOGRAPHIC: i32 = 1;
+
+// Camera modes (for UpdateCamera)
+export let CAMERA_CUSTOM: i32       = 0;
+export let CAMERA_FREE: i32         = 1;
+export let CAMERA_ORBITAL: i32      = 2;
+export let CAMERA_FIRST_PERSON: i32 = 3;
+export let CAMERA_THIRD_PERSON: i32 = 4;
+
+// Screen/world coordinate conversions for 3D
+export extern fn GetWorldToScreen(position: Vector3, camera: Camera3D): Vector2;
+export extern fn GetWorldToScreenEx(position: Vector3, camera: Camera3D, width: i32, height: i32): Vector2;
+export extern fn GetScreenToWorldRay(position: Vector2, camera: Camera3D): Ray;
+export extern fn GetScreenToWorldRayEx(position: Vector2, camera: Camera3D, width: i32, height: i32): Ray;
+
+// ============================================================================
+// 3D Shapes - Basic Drawing
+// ============================================================================
+
+// Draw lines
+export extern fn DrawLine3D(startPos: Vector3, endPos: Vector3, color: u32): void;
+export extern fn DrawPoint3D(position: Vector3, color: u32): void;
+export extern fn DrawCircle3D(center: Vector3, radius: f32, rotationAxis: Vector3, rotationAngle: f32, color: u32): void;
+export extern fn DrawTriangle3D(v1: Vector3, v2: Vector3, v3: Vector3, color: u32): void;
+export extern fn DrawTriangleStrip3D(points: ptr, pointCount: i32, color: u32): void;
+
+// Draw cubes
+export extern fn DrawCube(position: Vector3, width: f32, height: f32, length: f32, color: u32): void;
+export extern fn DrawCubeV(position: Vector3, size: Vector3, color: u32): void;
+export extern fn DrawCubeWires(position: Vector3, width: f32, height: f32, length: f32, color: u32): void;
+export extern fn DrawCubeWiresV(position: Vector3, size: Vector3, color: u32): void;
+
+// Draw spheres
+export extern fn DrawSphere(centerPos: Vector3, radius: f32, color: u32): void;
+export extern fn DrawSphereEx(centerPos: Vector3, radius: f32, rings: i32, slices: i32, color: u32): void;
+export extern fn DrawSphereWires(centerPos: Vector3, radius: f32, rings: i32, slices: i32, color: u32): void;
+
+// Draw cylinders and capsules
+export extern fn DrawCylinder(position: Vector3, radiusTop: f32, radiusBottom: f32, height: f32, slices: i32, color: u32): void;
+export extern fn DrawCylinderEx(startPos: Vector3, endPos: Vector3, startRadius: f32, endRadius: f32, sides: i32, color: u32): void;
+export extern fn DrawCylinderWires(position: Vector3, radiusTop: f32, radiusBottom: f32, height: f32, slices: i32, color: u32): void;
+export extern fn DrawCylinderWiresEx(startPos: Vector3, endPos: Vector3, startRadius: f32, endRadius: f32, sides: i32, color: u32): void;
+export extern fn DrawCapsule(startPos: Vector3, endPos: Vector3, radius: f32, slices: i32, rings: i32, color: u32): void;
+export extern fn DrawCapsuleWires(startPos: Vector3, endPos: Vector3, radius: f32, slices: i32, rings: i32, color: u32): void;
+
+// Draw plane and grid
+export extern fn DrawPlane(centerPos: Vector3, size: Vector2, color: u32): void;
+export extern fn DrawRay(ray: Ray, color: u32): void;
+export extern fn DrawGrid(slices: i32, spacing: f32): void;
+
+// ============================================================================
+// 3D Collision Detection
+// ============================================================================
+
+export extern fn CheckCollisionSpheres(center1: Vector3, radius1: f32, center2: Vector3, radius2: f32): i32;
+export extern fn CheckCollisionBoxes(box1: BoundingBox, box2: BoundingBox): i32;
+export extern fn CheckCollisionBoxSphere(box: BoundingBox, center: Vector3, radius: f32): i32;
+export extern fn GetRayCollisionSphere(ray: Ray, center: Vector3, radius: f32): RayCollision;
+export extern fn GetRayCollisionBox(ray: Ray, box: BoundingBox): RayCollision;
+export extern fn GetRayCollisionTriangle(ray: Ray, p1: Vector3, p2: Vector3, p3: Vector3): RayCollision;
+export extern fn GetRayCollisionQuad(ray: Ray, p1: Vector3, p2: Vector3, p3: Vector3, p4: Vector3): RayCollision;
+
 // Scissor mode (clipping)
 export extern fn BeginScissorMode(x: i32, y: i32, width: i32, height: i32): void;
 export extern fn EndScissorMode(): void;
@@ -220,7 +341,44 @@ export extern fn rlBegin(mode: i32): void;       // Begin vertex definition
 export extern fn rlEnd(): void;                   // End vertex definition
 export extern fn rlVertex2f(x: f32, y: f32): void;  // Define vertex position (float)
 export extern fn rlVertex2i(x: i32, y: i32): void;  // Define vertex position (int)
+export extern fn rlVertex3f(x: f32, y: f32, z: f32): void;  // Define vertex position (float) for 3D
 export extern fn rlColor4ub(r: u8, g: u8, b: u8, a: u8): void;  // Define vertex color
+export extern fn rlColor3f(x: f32, y: f32, z: f32): void;  // Define vertex color (float)
+export extern fn rlColor4f(x: f32, y: f32, z: f32, w: f32): void;  // Define vertex color (float)
+export extern fn rlTexCoord2f(x: f32, y: f32): void;  // Define vertex texture coordinate
+export extern fn rlNormal3f(x: f32, y: f32, z: f32): void;  // Define vertex normal
+
+// rlgl matrix operations
+export extern fn rlPushMatrix(): void;
+export extern fn rlPopMatrix(): void;
+export extern fn rlLoadIdentity(): void;
+export extern fn rlTranslatef(x: f32, y: f32, z: f32): void;
+export extern fn rlRotatef(angle: f32, x: f32, y: f32, z: f32): void;
+export extern fn rlScalef(x: f32, y: f32, z: f32): void;
+export extern fn rlMultMatrixf(matf: ptr): void;  // matf: const float*
+export extern fn rlFrustum(left: f64, right: f64, bottom: f64, top: f64, znear: f64, zfar: f64): void;
+export extern fn rlOrtho(left: f64, right: f64, bottom: f64, top: f64, znear: f64, zfar: f64): void;
+export extern fn rlViewport(x: i32, y: i32, width: i32, height: i32): void;
+export extern fn rlSetClipPlanes(nearPlane: f64, farPlane: f64): void;
+export extern fn rlGetCullDistanceNear(): f64;
+export extern fn rlGetCullDistanceFar(): f64;
+
+// rlgl texture operations
+export extern fn rlSetTexture(id: u32): void;
+export extern fn rlEnableTexture(id: u32): void;
+export extern fn rlDisableTexture(): void;
+export extern fn rlEnableDepthTest(): void;
+export extern fn rlDisableDepthTest(): void;
+export extern fn rlEnableDepthMask(): void;
+export extern fn rlDisableDepthMask(): void;
+export extern fn rlEnableBackfaceCulling(): void;
+export extern fn rlDisableBackfaceCulling(): void;
+export extern fn rlEnableSmoothLines(): void;
+export extern fn rlDisableSmoothLines(): void;
+export extern fn rlEnableWireMode(): void;
+export extern fn rlDisableWireMode(): void;
+export extern fn rlSetLineWidth(width: f32): void;
+export extern fn rlGetLineWidth(): f32;
 
 // rlgl drawing modes
 export let RL_LINES = 1;
@@ -359,6 +517,28 @@ export extern fn DrawPolyLines(center: Vector2, sides: i32, radius: f32, rotatio
 export extern fn DrawPolyLinesEx(center: Vector2, sides: i32, radius: f32, rotation: f32, lineThick: f32, color: u32): void;
 
 // ============================================================================
+// Shapes - Splines
+// ============================================================================
+
+export extern fn DrawSplineLinear(points: ptr, pointCount: i32, thick: f32, color: u32): void;
+export extern fn DrawSplineBasis(points: ptr, pointCount: i32, thick: f32, color: u32): void;
+export extern fn DrawSplineCatmullRom(points: ptr, pointCount: i32, thick: f32, color: u32): void;
+export extern fn DrawSplineBezierQuadratic(points: ptr, pointCount: i32, thick: f32, color: u32): void;
+export extern fn DrawSplineBezierCubic(points: ptr, pointCount: i32, thick: f32, color: u32): void;
+export extern fn DrawSplineSegmentLinear(p1: Vector2, p2: Vector2, thick: f32, color: u32): void;
+export extern fn DrawSplineSegmentBasis(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2, thick: f32, color: u32): void;
+export extern fn DrawSplineSegmentCatmullRom(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2, thick: f32, color: u32): void;
+export extern fn DrawSplineSegmentBezierQuadratic(p1: Vector2, c2: Vector2, p3: Vector2, thick: f32, color: u32): void;
+export extern fn DrawSplineSegmentBezierCubic(p1: Vector2, c2: Vector2, c3: Vector2, p4: Vector2, thick: f32, color: u32): void;
+
+// Get spline point functions
+export extern fn GetSplinePointLinear(startPos: Vector2, endPos: Vector2, t: f32): Vector2;
+export extern fn GetSplinePointBasis(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2, t: f32): Vector2;
+export extern fn GetSplinePointCatmullRom(p1: Vector2, p2: Vector2, p3: Vector2, p4: Vector2, t: f32): Vector2;
+export extern fn GetSplinePointBezierQuad(p1: Vector2, c2: Vector2, p3: Vector2, t: f32): Vector2;
+export extern fn GetSplinePointBezierCubic(p1: Vector2, c2: Vector2, c3: Vector2, p4: Vector2, t: f32): Vector2;
+
+// ============================================================================
 // Text - Drawing
 // ============================================================================
 
@@ -413,6 +593,24 @@ export extern fn GetCollisionRec(rec1: Rectangle, rec2: Rectangle): Rectangle;
 
 export extern fn DrawFPS(posX: i32, posY: i32): void;
 
+// Text utility functions
+// NOTE: Most TextXxx functions return static internal buffers - do not store results long-term
+export extern fn TextLength(text: string): u32;
+export extern fn TextSubstring(text: string, position: i32, length: i32): string;
+export extern fn TextReplace(text: string, replace: string, by: string): string;
+export extern fn TextInsert(text: string, insert: string, position: i32): string;
+export extern fn TextJoin(textList: ptr, count: i32, delimiter: string): string;
+export extern fn TextSplit(text: string, delimiter: i8, count: ptr): ptr;  // Returns char**, count is int*
+export extern fn TextAppend(text: string, append: string, position: ptr): void;  // position: int*
+export extern fn TextFindIndex(text: string, find: string): i32;
+export extern fn TextToUpper(text: string): string;
+export extern fn TextToLower(text: string): string;
+export extern fn TextToPascal(text: string): string;
+export extern fn TextToSnake(text: string): string;
+export extern fn TextToCamel(text: string): string;
+export extern fn TextToInteger(text: string): i32;
+export extern fn TextToFloat(text: string): f32;
+
 // ============================================================================
 // Audio - Device Management
 // ============================================================================
@@ -450,6 +648,63 @@ export extern fn BeginTextureMode(target: RenderTexture2D): void;
 export extern fn EndTextureMode(): void;
 
 // ============================================================================
+// Shaders
+// ============================================================================
+// NOTE: Shader struct is complex, using ptr for now
+
+export extern fn LoadShader(vsFileName: string, fsFileName: string): ptr;
+export extern fn LoadShaderFromMemory(vsCode: string, fsCode: string): ptr;
+export extern fn IsShaderValid(shader: ptr): i32;  // C: bool
+export extern fn GetShaderLocation(shader: ptr, uniformName: string): i32;
+export extern fn GetShaderLocationAttrib(shader: ptr, attribName: string): i32;
+export extern fn SetShaderValue(shader: ptr, locIndex: i32, value: ptr, uniformType: i32): void;
+export extern fn SetShaderValueV(shader: ptr, locIndex: i32, value: ptr, uniformType: i32, count: i32): void;
+export extern fn SetShaderValueMatrix(shader: ptr, locIndex: i32, mat: ptr): void;
+export extern fn SetShaderValueTexture(shader: ptr, locIndex: i32, texture: Texture2D): void;
+export extern fn UnloadShader(shader: ptr): void;
+export extern fn BeginShaderMode(shader: ptr): void;
+export extern fn EndShaderMode(): void;
+
+// Shader uniform types
+export let SHADER_UNIFORM_FLOAT: i32     = 0;
+export let SHADER_UNIFORM_VEC2: i32      = 1;
+export let SHADER_UNIFORM_VEC3: i32      = 2;
+export let SHADER_UNIFORM_VEC4: i32      = 3;
+export let SHADER_UNIFORM_INT: i32       = 4;
+export let SHADER_UNIFORM_IVEC2: i32     = 5;
+export let SHADER_UNIFORM_IVEC3: i32     = 6;
+export let SHADER_UNIFORM_IVEC4: i32     = 7;
+export let SHADER_UNIFORM_SAMPLER2D: i32 = 8;
+
+// Shader location indices
+export let SHADER_LOC_VERTEX_POSITION: i32   = 0;
+export let SHADER_LOC_VERTEX_TEXCOORD01: i32 = 1;
+export let SHADER_LOC_VERTEX_TEXCOORD02: i32 = 2;
+export let SHADER_LOC_VERTEX_NORMAL: i32     = 3;
+export let SHADER_LOC_VERTEX_TANGENT: i32    = 4;
+export let SHADER_LOC_VERTEX_COLOR: i32      = 5;
+export let SHADER_LOC_MATRIX_MVP: i32        = 6;
+export let SHADER_LOC_MATRIX_VIEW: i32       = 7;
+export let SHADER_LOC_MATRIX_PROJECTION: i32 = 8;
+export let SHADER_LOC_MATRIX_MODEL: i32      = 9;
+export let SHADER_LOC_MATRIX_NORMAL: i32     = 10;
+export let SHADER_LOC_VECTOR_VIEW: i32       = 11;
+export let SHADER_LOC_COLOR_DIFFUSE: i32     = 12;
+export let SHADER_LOC_COLOR_SPECULAR: i32    = 13;
+export let SHADER_LOC_COLOR_AMBIENT: i32     = 14;
+export let SHADER_LOC_MAP_ALBEDO: i32        = 15;
+export let SHADER_LOC_MAP_METALNESS: i32     = 16;
+export let SHADER_LOC_MAP_NORMAL: i32        = 17;
+export let SHADER_LOC_MAP_ROUGHNESS: i32     = 18;
+export let SHADER_LOC_MAP_OCCLUSION: i32     = 19;
+export let SHADER_LOC_MAP_EMISSION: i32      = 20;
+export let SHADER_LOC_MAP_HEIGHT: i32        = 21;
+export let SHADER_LOC_MAP_CUBEMAP: i32       = 22;
+export let SHADER_LOC_MAP_IRRADIANCE: i32    = 23;
+export let SHADER_LOC_MAP_PREFILTER: i32     = 24;
+export let SHADER_LOC_MAP_BRDF: i32          = 25;
+
+// ============================================================================
 // Audio - Sound Loading and Playing
 // ============================================================================
 
@@ -485,6 +740,20 @@ export extern fn GetMusicTimeLength(music: Music): f32;
 export extern fn GetMusicTimePlayed(music: Music): f32;
 export extern fn SeekMusicStream(music: Music, position: f32): void;
 export extern fn SetMusicLooping(music: Music, looping: i32): void;
+
+// ============================================================================
+// Colors - Native raylib functions
+// ============================================================================
+// NOTE: These are the native raylib color functions (operate on Color struct as u32)
+
+export extern fn Fade(color: u32, alpha: f32): u32;  // Get color with alpha applied
+export extern fn ColorToInt(color: u32): i32;        // Get hexadecimal value for a Color
+export extern fn ColorNormalize(color: u32): Vector4;  // Get Color normalized as float [0..1]
+export extern fn ColorFromNormalized(normalized: Vector4): u32;  // Get Color from normalized values [0..1]
+export extern fn ColorToHSV(color: u32): Vector3;    // Get HSV values for a Color (hue, saturation, value)
+export extern fn ColorFromHSV(hue: f32, saturation: f32, value: f32): u32;  // Get a Color from HSV values
+export extern fn ColorLerp(color1: u32, color2: u32, factor: f32): u32;  // Get color lerped by factor
+export extern fn GetColor(hexValue: u32): u32;       // Get Color structure from hexadecimal value
 
 // ============================================================================
 // Text - Font Loading and Drawing

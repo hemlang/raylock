@@ -19,8 +19,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libraylib-dev
 
-      - name: Setup Hemlock
-        uses: hemlang/setup-hemlock@v1
+      - name: Clone and build Hemlock
+        run: |
+          git clone https://github.com/hemlang/hemlock.git ../hemlock
+          cd ../hemlock
+          make
+          sudo cp hemlock /usr/local/bin/
 
       - name: Run tests
         run: ./tests/run_tests.sh hemlock
